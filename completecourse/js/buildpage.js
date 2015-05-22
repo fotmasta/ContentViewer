@@ -1,6 +1,6 @@
 requirejs.config({
-	/*baseUrl: "https://s3.amazonaws.com/storefronts/streaming-video/completecourse/js/",*/
-	baseUrl: "../completecourse/js",
+	baseUrl: "https://s3.amazonaws.com/storefronts/streaming-video/completecourse/js/",
+	/*baseUrl: "../completecourse/js",*/
 	paths: {
 		"jquery": "jquery-2.1.3.min",
 		"jquery.ui": "jquery-ui.min",
@@ -66,6 +66,14 @@ requirejs.config({
 		},
 		"handlebars": {
 			exports: "Handlebars"
+		}
+	},
+	// this fixed the "appending .js" problem I was getting on informit.com
+	config: {
+		text: {
+			useXhr: function (url, protocol, hostname, port) {
+				return true;
+			}
 		}
 	}
 });
