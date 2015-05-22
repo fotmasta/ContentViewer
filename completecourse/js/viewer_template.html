@@ -1,0 +1,72 @@
+<header id="main-bar" class="navbar navbar-inverse navbar-fixed-top" role="banner">
+    <button id="toc-toggler" data-coach="Show and hide the Table of Contents." data-coach-pos="bottom" title="Show and hide the video list." class="btn btn-primary pull-left open"><i class="fa fa-bars"></i></button>
+    <button id="resource-toggler" data-coach="Show and hide the Resources." title="Show and hide the Resources." data-coach-pos="bottom" class="btn btn-primary pull-right">Resources</button>
+    <div class="container">
+        <nav role="navigation">
+            <div class="navbar-collapse collapse">
+                <ul class="nav navbar-nav navbar-left">
+                    <li>
+                        <a id="home-button">{{title}}</a>
+                    </li>
+                    <li>
+                        <a id="toc-button" class="hidden" data-toggle="offcanvas" data-target=".navmenu" data-autohide="false" data-canvas="#main-contents"><i class="fa fa-list"></i> Contents</a>
+                    </li>
+                </ul>
+                <div class="navbar-form navbar-left" id="search-form" name="search-form">
+                    <div class="input-group">
+                        <div class="input-group-btn">
+                            <button id="clear-search-button" class="btn btn-primary" title="Clear search text."><span class="fa fa-times-circle-o fa-lg"></span></button>
+                        </div>
+                        <input type="text" class="form-control" placeholder="Search" id="query" name="query" value="">
+                        <div class="input-group-btn">
+                            <button class="btn btn-primary search-button" title="Search video titles."><span class="glyphicon glyphicon-search"></span></button>
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <button id="account-button" data-coach="Show and hide the Resources." title="Show and hide the Resources." data-coach-pos="bottom" class="btn btn-primary pull-right">Account</button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </div>
+</header>
+
+<div id="main" class="container-fluid invisible">
+    <div class="row">
+        <div id="contents" class="col-xs-3">
+            <div id="contents-pane">
+                <div class="course-progress">
+                    <button id="collapse-button" title="Expand or collapse entire video list." class="btn btn-primary btn-xs pull-left"><i class="fa fa-lg fa-caret-up"></i></button>
+                    <div class="progress" data-progress="41% Complete">
+                        <div id="completed-progress" class="progress-bar progress-bar-warning" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 40%">
+                        </div>
+                    </div>
+                    <div class="clearfix"></div>
+                </div>
+                <div class="scroller">
+                    <ul class="nav nav-list toc">
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div id="video" class="col-xs-9">
+            <div class="video-holder">
+                <div class="overlay"></div>
+                <video class="video-js vjs-default-skin vjs-big-play-centered" id="main_video" controls>
+                </video>
+            </div>
+            <div class="iframe-holder">
+            </div>
+        </div>
+        <div id="sidebar" class="col-xs-0">
+            <div class="scroller">
+                <ul class="nav nav-list resource-list">
+                </ul>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div id="coach-marks">
+</div>
