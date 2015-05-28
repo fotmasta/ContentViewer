@@ -1,5 +1,6 @@
 define([], function () {
 	var video_example = {
+		title: "Node.js, MongoDB, and Angular.js Fundamentals",
 		folder: "title_nodejs",
 		type: "metadata",
 		scrolling: false

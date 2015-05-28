@@ -1,6 +1,13 @@
+var baseURL;
+
+if (window.location.hostname == "localhost") {
+	baseURL = "../completecourse/";
+} else {
+	baseURL = "https://s3.amazonaws.com/storefronts/streaming-video/completecourse/";
+}
+
 requirejs.config({
-	baseUrl: "https://s3.amazonaws.com/storefronts/streaming-video/completecourse/js/",
-	/*baseUrl: "../completecourse/js",*/
+	baseUrl: baseURL + "js/",
 	paths: {
 		"jquery": "jquery-2.1.3.min",
 		"jquery.ui": "jquery-ui.min",
@@ -78,11 +85,13 @@ requirejs.config({
 	}
 });
 
-define(["jquery", "handlebars", "text!viewer_template.html", "video-manager", "toc-tree", "videojs", "popcorn", "popcorn.timebase"], function ($, Handlebars, viewerTemplate, VideoManager) {
+define(["jquery", "handlebars", "text!viewer_template.html", "video-manager", "video-overlay", "toc-tree", "videojs", "popcorn", "popcorn.timebase", "bootstrap-toolkit"], function ($, Handlebars, viewerTemplate, VideoManager) {
 	var manifest;
 
 	function initialize () {
 		onResize();
+
+		var v = $("#video .overlay").VideoOverlay();
 
 		// NOTE: started using opacity too since the tab panels were overriding "invisible"
 		$("#main").removeClass("invisible").css("opacity", 1);
@@ -121,9 +130,11 @@ define(["jquery", "handlebars", "text!viewer_template.html", "video-manager", "t
 			var a = $(item);
 			var href = a.attr("href");
 			var hash = VideoManager.HashInURL(href);
+			// TODO: remove this in Production version
+			href = href.replace(".xhtml", ".html");
 			return {
 				desc: a.text(),
-				src: manifest.folder + "/OPS/" + a.attr("href"),
+				src: manifest.folder + "/ops/" + href,
 				hash: hash
 			};
 		});
@@ -132,16 +143,15 @@ define(["jquery", "handlebars", "text!viewer_template.html", "video-manager", "t
 	}
 
 	function onLoadedTOC (metadata) {
-		/*
-		 $(".toc").TOCTree({ data: metadata.toc });
+		$(".toc").TOCTree({ data: metadata.toc, expander: "#collapse-button" });
 
-		 $(".resource-list").TOCTree();
+		$(".resource-list").TOCTree();
 
-		 VideoManager.initialize(metadata.toc, "#video video", videojs("main_video"), metadata.markers);
+		VideoManager.initialize(metadata.toc, "#video video", videojs("main_video"), metadata.markers);
 
-		 //VideoManager.loadFirstVideo();
-		 VideoManager.loadMostRecentVideo();
-		 */
+		initialize();
+
+		VideoManager.loadMostRecentVideo();
 	}
 
 	function onHabitatTOCLoaded (data) {
@@ -162,9 +172,61 @@ define(["jquery", "handlebars", "text!viewer_template.html", "video-manager", "t
 				require([manifest.folder + "/nodejs-toc.js"], onLoadedTOC);
 				break;
 			case "habitat":
-				$.get(manifest.folder + "/OPS/toc.xhtml", onHabitatTOCLoaded);
+				$.get(manifest.folder + "/ops/toc.html", onHabitatTOCLoaded);
+				// loading toc.html via "get" gets a 500 error on manageit
+				// loading toc.xhtml via "get" gets a 403 error on manageit (cross-origin?)
+				// loading toc.html via require gets a 500 error on manageit
+				// loading toc.xhtml via require gets a 403 error on manageit (cross-origin?)
+				/*
+				var path = getAbsolutePath() + "/" + manifest.folder + "/OPS/toc.xhtml";
+				console.log("path = " + path);
+				require(["text!" + path], function () { console.log("was able to open toc"); });
+				*/
 				break;
 		}
+	}
+
+	function getAbsolutePath () {
+		var loc = window.location;
+		var pathName = loc.pathname.substring(0, loc.pathname.lastIndexOf('/'));
+		return loc.origin + pathName;
+	}
+
+	function resizePanes (contentsVisible, resourcesVisible) {
+		var md = ResponsiveBootstrapToolkit.is(">=md");
+
+		// xs = 3, 6, 3
+		// md = 3, 7, 2
+
+		var contentsSize = 3, resourcesSize = md ? 2 : 3;
+
+		var videoSize = 12 - (contentsVisible ? contentsSize : 0) - (resourcesVisible ? resourcesSize : 0);
+
+		if (contentsVisible) {
+			$("#contents").removeClass("col-xs-0").addClass("col-xs-" + contentsSize);
+		} else {
+			$("#contents").removeClass("col-xs-3").addClass("col-xs-0");
+		}
+
+		if (resourcesVisible) {
+			$("#sidebar").removeClass("col-xs-0").addClass("col-xs-" + resourcesSize);
+		} else {
+			$("#sidebar").removeClass("col-xs-3 col-xs-2").addClass("col-xs-0");
+		}
+
+		$("#video").removeClass("col-xs-6 col-xs-7 col-xs-8 col-xs-9 col-xs-11 col-xs-12").addClass("col-xs-" + videoSize);
+	}
+
+	function onToggleTOC () {
+		var contentsVisible =$("#contents .scroller").is(":visible");
+		var resourcesVisible = $("#sidebar").is(":visible");
+
+		resizePanes(!contentsVisible, resourcesVisible);
+
+		$("#contents .scroller").toggle("slide");
+		$("#toc-toggler").toggleClass("open");
+
+		onResize();
 	}
 
 	var BuildPage = {
@@ -175,20 +237,30 @@ define(["jquery", "handlebars", "text!viewer_template.html", "video-manager", "t
 
 			$("body").append($(html));
 
-			addLinkToCSS("../completecourse/css/bootstrap.min.css");
-			addLinkToCSS("../completecourse/css/bootstrap-theme.min.css");
-			addLinkToCSS("../completecourse/css/animate.css");
-			addLinkToCSS("../completecourse/css/font-awesome.min.css");
-			addLinkToCSS("../completecourse/css/video-js.min.css");
-			addLinkToCSS("../completecourse/css/bootstrap-dialog.min.css");
-			addLinkToCSS("../completecourse/css/videojs.markers.min.css");
-			addLinkToCSS("../completecourse/css/main.css");
+			addLinkToCSS(baseURL + "css/bootstrap.min.css");
+			addLinkToCSS(baseURL + "css/bootstrap-theme.min.css");
+			addLinkToCSS(baseURL + "css/animate.css");
+			addLinkToCSS(baseURL + "css/font-awesome.min.css");
+			addLinkToCSS(baseURL + "css/video-js.min.css");
+			addLinkToCSS(baseURL + "css/bootstrap-dialog.min.css");
+			addLinkToCSS(baseURL + "css/videojs.markers.min.css");
+			addLinkToCSS(baseURL + "css/main.css");
 
 			manifest = options;
 
 			loadContent();
 
 			$(window).resize(onResize);
+
+			//$(".show-all-markers").click(onShowAllMarkers);
+			$("#toc-toggler").click(onToggleTOC);
+			//$("#resource-toggler").click(onToggleResources);
+			//$("a[data-toggle='tab']").on("shown.bs.tab", onResize);
+			//$(".resource-list").on("playvideo", onClickMarker);
+			//$(".search-button").click(onSearch);
+			//$("#query").on("input", onSearch);
+			//$("#clear-search-button").click(onClearSearch);
+			$("#account-button").click(function () { window.open("//memberservices.informit.com/my_account/index.aspx"); });
 		}
 	};
 

@@ -7,12 +7,54 @@ define(["jquery.ui"], function () {
 		}
 	});
 
+	function setNodeAtDepth  (nodes, depth, node) {
+		var depths = depth.split(",");
+		var curLevel = nodes;
+		for (var i = 0; i < depths.length; i++) {
+			var curDepth = depths[i];
+			if (curLevel[curDepth] == undefined) {
+				curLevel[curDepth] = { node: null, children: [] };
+			}
+
+			if (i == depths.length - 1) {
+				curLevel[curDepth].node = node;
+			}
+
+			curLevel = curLevel[curDepth].children;
+		}
+	}
+
+	function convertHabitatDataToNodes (data) {
+		var nodes = [];
+
+		addChildNodes(nodes, data.find("> li"));
+
+		return nodes;
+	}
+
+	function addChildNodes (nodes, children) {
+		for (var i = 0; i < children.length; i++) {
+			var d = children.eq(i);
+
+			var node = { desc: d.find("> a").text() };
+
+			var obj = { node: node, children: [] };
+
+			nodes[i] = obj;
+
+			addChildNodes(obj.children, d.find("> ol > li"));
+		}
+	}
+
 	$.widget("que.TOCTree", {
 
 		options: {},
 
 		_create: function () {
 			this.refresh();
+
+			if (this.options.expander)
+				$(this.options.expander).click($.proxy(this.expandOrCollapse, this));
 		},
 
 		refresh: function () {
@@ -29,9 +71,9 @@ define(["jquery.ui"], function () {
 			this.element.append(p);
 		},
 
-		addNodes: function (params, ol, dest, depth) {
-			for (var i = 0; i < ol.children().length; i++) {
-				var d = ol.children().eq(i);
+		addNodes: function (params, nodes, dest, depth) {
+			for (var i = 0; i < nodes.length; i++) {
+				var d = nodes[i];
 
 				var new_depth = depth.slice();
 				new_depth.push(i + 1);
@@ -46,7 +88,7 @@ define(["jquery.ui"], function () {
 			li = $("<li>");
 			dest.append(li);
 
-			if (d.find("ol").length) {
+			if (d.children.length > 0) {
 				var lbl = $("<label>", {class: "tree-toggler nav-header"});
 				li.append(lbl);
 				linkholder = lbl;
@@ -57,14 +99,11 @@ define(["jquery.ui"], function () {
 				linkholder = li;
 			}
 
-			// TODO: is this defined in the metadata version?
-			var id = undefined;
-
-			li.attr("id", id).attr("data-index", params.counter);
+			li.attr("data-index", params.counter);
 
 			var a = $("<a href='#'>");
 
-			var entry_text = d.find("a").eq(0).text();
+			var entry_text = d.node.desc;
 			var sp = $("<span>", { class: "desc", html: " " + entry_text });
 
 			var short = $("<span>", { class: "level tree-toggler" });
@@ -93,21 +132,37 @@ define(["jquery.ui"], function () {
 				$(this).parents("li").eq(0).children('ul.tree').toggle(300);
 			});
 
-
 			params.counter++;
 
-			var ol = d.children("ol");
-
-			this.addNodes(params, ol, ul, depth);
+			this.addNodes(params, d.children, ul, depth);
 		},
 
 		refreshFromHabitatData: function () {
 			var ol = $(this.options.data).find("nav > ol");
 
-			this.addNodes( { counter: 0 }, ol, this.element, []);
+			// for some reason, this fallback was necessary when running locally (or when some of the js code was loaded via AWS?)
+			if (ol.length == 0) {
+				ol = $(this.options.data).children().eq(1);
+			}
+
+			var nodes = convertHabitatDataToNodes(ol);
+
+			this.addNodes( { counter: 0 }, nodes, this.element, []);
 		},
 
 		refreshFromMetadata: function () {
+			var d = this.options.data;
+			var nodes = [];
+
+			for (var i = 0; i < d.length; i++) {
+				var n = d[i];
+				setNodeAtDepth(nodes, n.depth, n);
+			}
+
+			this.addNodes( { counter: 0 }, nodes, this.element, []);
+		},
+
+		refreshFromMetadataX: function () {
 			var depths = [];
 			var last_depth = undefined;
 			var current_ul;
@@ -246,6 +301,20 @@ define(["jquery.ui"], function () {
 					this.markCompleted(i);
 				else if (item.started)
 					this.markStarted(i);
+			}
+		},
+
+		expandOrCollapse: function (event) {
+			var vis = $(".toc > li > ul").is(":visible");
+
+			if (vis) {
+				$(this.options.expander + " i").removeClass("fa-caret-up").addClass("fa-caret-down");
+				this.element.find("> li > ul").hide(300);
+				//$(".toc > li > ul").hide(300);
+			} else {
+				$(this.options.expander + " i").removeClass("fa-caret-down").addClass("fa-caret-up");
+				this.element.find("li ul").show(300);
+				//$(".toc li ul").show(300);
 			}
 		}
 	});

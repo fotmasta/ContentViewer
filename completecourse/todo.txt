@@ -1,0 +1,9 @@
+// TODO: multiple test courses in subfolders under "completecourse"?
+// TODO: tag new content
+// TODO: Habitat external resource upload (or just link) capability
+// TODO: test server options?
+
+////////////////////////////////////////////////////////////////////////////
+
+// DONE: get sample course to load and work correctly on InformIT the same way the test page does
+// DONE: make the same code work locally and on InformIT

@@ -54,6 +54,10 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 		return $(visible);
 	}
 
+	function onPlayContent (element, depth) {
+		VideoManager.playFromTOC(depth, {});
+	}
+
 	videojs.BackButton = videojs.Button.extend({});
 
 	videojs.BackButton.prototype.buttonText = 'Back 10';
@@ -85,9 +89,14 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 			var backButton = new videojs.BackButton(this.player);
 			this.player.controlBar.addChild(backButton);
 
-			this.player.on("play", $.proxy(this.onVideoStarted, this));
+			//  NOTE: Not sure why this stopped working and I had to switch to the straight HTML5 event
+//			this.player.on("play", $.proxy(this.onVideoStarted, this));
+			$("video")[0].addEventListener("play", $.proxy(this.onVideoStarted, this));
+
 			this.player.on("ended", $.proxy(this.onVideoEnded, this));
 			this.player.on("timeupdate", $.proxy(this.saveCurrentVideoTime, this));
+
+			$(".toc").on("playvideo", onPlayContent);
 
 			$("#video").scroll($.proxy(this.onScrollContent, this));
 
@@ -173,7 +182,7 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 		},
 		
 		playFromTOC: function (index, options) {
-			if (options.skipToNextSource) {
+			if (options && options.skipToNextSource) {
 				while (index < this.toc.length && URLWithoutHash(this.toc[index].src) == options.previousSource) {
 					index++;
 				}
@@ -184,6 +193,10 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 			// if this is iframe content, open it now; otherwise, it's video
 			if (this.toc[index].src) {
 				this.playExtraFromTOC(index, options);
+
+				$(".iframe-holder").show();
+				$(".video-holder").hide();
+
 				return;
 			}
 
@@ -205,8 +218,8 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 				this.player.currentTime(options.time);
 			}
 
-			$("#main_iframe").hide();
-			$("#main_video").show();
+			$(".iframe-holder").hide();
+			$(".video-holder").show();
 
 			if (options && options.pause) {
 			} else {
@@ -505,7 +518,7 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 
 		removeAllTriggers: function () {
 			for (var i = 0; i < this.trackID; i++) {
-				console.log("removing " + i);
+				//console.log("removing " + i);
 				this.pop.removeTrackEvent(i);
 			}
 
