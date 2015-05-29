@@ -169,7 +169,7 @@ define(["jquery", "handlebars", "text!viewer_template.html", "video-manager", "v
 	function loadContent () {
 		switch (manifest.type) {
 			case "metadata":
-				require([manifest.folder + "/nodejs-toc.js"], onLoadedTOC);
+				require(["toc.js"], onLoadedTOC);
 				break;
 			case "habitat":
 				$.get(manifest.folder + "/ops/toc.html", onHabitatTOCLoaded);

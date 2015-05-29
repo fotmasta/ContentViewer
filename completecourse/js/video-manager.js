@@ -208,8 +208,10 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 
 			var src = "video/" + this.toc[index].video;
 
+			// I couldn't seem to get videojs to load the video via localhost (which seems odd)
 			if (window.location.hostname == "localhost") {
-				src = "https://video15.firebaseapp.com/" + src;
+				//src = "https://video15.firebaseapp.com/" + src;
+				console.log(src);
 			}
 
 			this.player.src({ type: "video/mp4", src: src });

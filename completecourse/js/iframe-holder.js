@@ -49,8 +49,14 @@ define(["bootstrap-dialog", "jquery.ui"], function (BootstrapDialog) {
 
 		addStylesheet: function () {
 			//var path = getAbsolutePath();
-			//var path = getAbsolutePath() + "/../completecourse";
-			var path = "https://s3.amazonaws.com/storefronts/streaming-video/completecourse";
+
+			var path;
+
+			if (window.location.hostname == "localhost") {
+				path = getAbsolutePath() + "/../completecourse";
+			} else {
+				path = "https://s3.amazonaws.com/storefronts/streaming-video/completecourse";
+			}
 
 			// add our own stylesheet for additional styles
 			var $head = this.iframe.contents().find("head");

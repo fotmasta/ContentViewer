@@ -36,7 +36,14 @@ define(["jquery.ui"], function () {
 		for (var i = 0; i < children.length; i++) {
 			var d = children.eq(i);
 
-			var node = { desc: d.find("> a").text() };
+			var anchor = d.find("> a");
+			var label = anchor.text();
+
+			if (anchor.hasClass("build-2015")) {
+				label += " <span class='badge'>new</span>";
+			}
+
+			var node = { desc: label };
 
 			var obj = { node: node, children: [] };
 
