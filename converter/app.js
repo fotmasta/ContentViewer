@@ -1,29 +1,43 @@
-// TODO: rename .xhtml to .html
-// TODO: change internal references from .xhtml to .html
-
+var fs = require('fs');
 var AdmZip = require('adm-zip');
 
 var zip = new AdmZip("unleashed_template.zip");
 
-/*
-var zipEntries = zip.getEntries();
+var express = require('express');
+var app = express();
 
-zipEntries.forEach(function(zipEntry) {
-	console.log(zipEntry.toString()); // outputs zip entries information
-	if (zipEntry.entryName == "my_file.txt") {
-		console.log(zipEntry.data.toString('utf8'));
-	}
-});
-*/
+app.set('port', (process.env.PORT || 5000));
 
-var targetDir = "unleashed_template/";
-
-zip.getEntries().forEach(function(entry) {
-	var entryName = entry.entryName;
-
-	var targetPath = entryName.toLowerCase();
-
-	zip.extractEntryTo(entry, targetDir + targetPath, true, true);
+app.get('/', function(request, response) {
+	response.send("Hello world!");
 });
 
-//zip.extractAllTo("unleashed_template", true);
+app.listen(app.get('port'), function() {
+	console.log("Node app is running on port:" + app.get('port'))
+});
+
+function doConversion () {
+	var targetDir = "unleashed_template/";
+
+	zip.getEntries().forEach(function (entry) {
+		var entryName = entry.entryName;
+
+		zip.extractEntryTo(entry, targetDir, true, true);
+
+		var oldPath = targetDir + entryName;
+
+		var newPath = targetDir + entryName.toLowerCase();
+
+		newPath = newPath.replace(".xhtml", ".html");
+
+		fs.rename(oldPath, newPath);
+	});
+
+	fs.rename(targetDir + "OPS", targetDir + "ops");
+
+	var toc = fs.readFileSync(targetDir + "ops/toc.html", {encoding: "UTF-8"});
+
+	toc = toc.replace(/.xhtml/g, ".html");
+
+	console.log(toc);
+}

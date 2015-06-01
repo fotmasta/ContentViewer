@@ -1,5 +1,5 @@
-// TODO: multiple test courses in subfolders under "completecourse"?
-// TODO: tag new content
+// TODO: check to see Habitat output headers can be tracked in the TOC for scrolling purposes
+// TODO: tag new content and process via converter
 // TODO: Habitat external resource upload (or just link) capability
 // TODO: test server options?
 
@@ -7,3 +7,4 @@
 
 // DONE: get sample course to load and work correctly on InformIT the same way the test page does
 // DONE: make the same code work locally and on InformIT
+// DONE: multiple test courses in subfolders under "completecourse"?
