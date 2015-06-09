@@ -147,7 +147,7 @@ define(["jquery", "handlebars", "text!viewer_template.html", "video-manager", "v
 
 		$(".resource-list").TOCTree();
 
-		VideoManager.initialize(metadata.toc, "#video video", videojs("main_video"), metadata.markers);
+		VideoManager.initialize(metadata.toc, "#video video", videojs("main_video"), metadata.markers, manifest);
 
 		initialize();
 
@@ -155,11 +155,11 @@ define(["jquery", "handlebars", "text!viewer_template.html", "video-manager", "v
 	}
 
 	function onHabitatTOCLoaded (data) {
-		$(".toc").TOCTree({ type: "habitat", data: data });
+		$(".toc").TOCTree({ type: "habitat", data: data, expander: "#collapse-button" });
 
 		var metadata = convertHabitatTOCtoMetadata(data);
 
-		VideoManager.initialize(metadata, "#video video", videojs("main_video"), []);
+		VideoManager.initialize(metadata, "#video video", videojs("main_video"), [], manifest);
 
 		initialize();
 

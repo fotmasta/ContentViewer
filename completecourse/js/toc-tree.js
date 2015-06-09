@@ -39,7 +39,7 @@ define(["jquery.ui"], function () {
 			var anchor = d.find("> a");
 			var label = anchor.text();
 
-			if (anchor.hasClass("build-2015")) {
+			if (anchor.hasClass("rr-updated")) {
 				label += " <span class='badge'>new</span>";
 			}
 

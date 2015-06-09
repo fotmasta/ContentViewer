@@ -72,12 +72,13 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 	};
 
 	var VideoManager = {
-		initialize: function (toc, el, player, markers, db) {
+		initialize: function (toc, el, player, markers, options) {
 			this.toc = toc;
 			this.el = el;
 			this.markers = markers;
 			this.player = player;
 			this.name = "Larry";
+			this.options = options;
 
 			Database.initialize(toc);
 			$(".toc").TOCTree("setStatus", Database.getItems());
@@ -131,7 +132,14 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 		},
 
 		setCurrentIndex: function (index) {
+			/*
 			if (index == this.currentIndex + 1) {
+				this.markItemCompleted(this.currentIndex);
+			}
+			*/
+
+			// THEORY: when switching, mark the current section completed (should probably be: have we scrolled past everything)
+			if (this.currentIndex) {
 				this.markItemCompleted(this.currentIndex);
 			}
 
@@ -258,7 +266,7 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 			}
 
 			if (immediate) {
-				$("#video").scrollTop(dest);
+				//$("#video").scrollTop(dest);
 			} else {
 				this.busyScrolling = true;
 				$("#video").stop().animate({scrollTop: dest}, { duration: 1000, complete: $.proxy(this.onDoneScrolling, this) });
@@ -270,7 +278,14 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 		},
 
 		addIFrame: function (params) {
-			var iframe = $("<div>").iFrameHolder({ manager: this, src: this.toc[params.index].src, index: params.index, scrollTo: params.scrollTo });
+			var iframe = $("<div>").iFrameHolder({
+				manager: this,
+				src: this.toc[params.index].src,
+				index: params.index,
+				scrollTo: params.scrollTo,
+				infinite_scrolling: this.options.infinite_scrolling,
+			});
+
 			iframe.appendTo(".iframe-holder");
 		},
 
@@ -362,8 +377,12 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 			this.markItemStarted(this.currentIndex);
 		},
 
+		markCurrentItemCompleted: function () {
+			this.markItemCompleted(this.currentIndex);
+		},
+
 		markItemCompleted: function (index) {
-			Database.setItemProperty(this.currentIndex, "completed", true);
+			Database.setItemProperty(index, "completed", true);
 			$(".toc").TOCTree("markCompleted", index);
 
 			this.updateProgress();
@@ -742,7 +761,9 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 			if (!this.busyScrolling) {
 				this.syncTOCToContent();
 
-				this.checkForAutoAdvance();
+				if (this.options.infinite_scrolling != false) {
+					this.checkForAutoAdvance();
+				}
 			}
 		},
 
@@ -792,11 +813,13 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 			if (distToScroll >= 0) {
 				var obj = this.getNextSection();
 
-				waitingForAutoAdvance = true;
+				if (obj) {
+					waitingForAutoAdvance = true;
 
-				this.addIFrame( { index: obj.index, scrollTo: false } );
+					this.addIFrame({index: obj.index, scrollTo: false });
 
-				this.setCurrentIndex(obj.index);
+					this.setCurrentIndex(obj.index);
+				}
 			}
 		}
 

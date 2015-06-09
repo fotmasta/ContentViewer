@@ -28,23 +28,29 @@ define(["bootstrap-dialog", "jquery.ui"], function (BootstrapDialog) {
 		onLoaded: function ()  {
 			this.addStylesheet();
 
-			//this.addNextButton();
-
-			var h = this.iframe.contents()[0].body.scrollHeight;
-
-			// turn off scrolling on the iframe's content
-			this.iframe.contents().find("html").css("overflow", "hidden");
-
-			this.iframe.height(h);
-
-			this.makeImagesModal();
-
-			// if we're auto-advancing, don't scroll to any hashtags
-			if (this.options.scrollTo) {
-				this.options.manager.scrollToHash(this.iframe, this.options.index, true);
+			if (!this.options.infinite_scrolling) {
+				this.addNextButton();
 			}
 
-			this.options.manager.onIFrameLoaded(this);
+			var me = this;
+
+			setTimeout(function () {
+				var h = me.iframe.contents()[0].body.scrollHeight;
+
+				// turn off scrolling on the iframe's content
+				me.iframe.contents().find("html").css("overflow", "hidden");
+
+				me.iframe.height(h);
+
+				me.makeImagesModal();
+
+				// if we're auto-advancing, don't scroll to any hashtags
+				if (me.options.scrollTo) {
+					me.options.manager.scrollToHash(me.iframe, me.options.index, true);
+				}
+
+				me.options.manager.onIFrameLoaded(me);
+			}, 1000);
 		},
 
 		addStylesheet: function () {
@@ -62,20 +68,27 @@ define(["bootstrap-dialog", "jquery.ui"], function (BootstrapDialog) {
 			var $head = this.iframe.contents().find("head");
 			$head.append($("<link/>",
 				{ rel: "stylesheet", href: path + "/css/main.css", type: "text/css" }));
+
+			var $body = this.iframe.contents().find("body").addClass("habitat-body");
 		},
 
 		addNextButton: function () {
 			var obj = this.options.manager.getNextSection(this.options.index);
 
-			// add a next button
-			var a = $('<a href="" class="button button-a"><h4>Next Up </h4>' + obj.title + '</a>');
-			a.click(function (event) {
-				event.preventDefault();
-				//onPlayVideo(a, obj.index);
-				console.log("play video " + obj.index);
-			});
+			var me = this;
 
-			this.iframe.contents().find("body").append(a);
+			if (obj) {
+				// add a next button
+				var a = $('<button class="button button-a"><h4>Next Up </h4>' + obj.title + '</button>');
+				a.click(function (event) {
+					event.preventDefault();
+					// NOTE: not sure at all why me.options.manager.getCurrentIndex() is undefined here; reference problem?
+					me.options.manager.markItemCompleted(me.options.index);
+					me.options.manager.playFromTOC(obj.index, {replaceAll: true});
+				});
+
+				this.iframe.contents().find("body").append(a);
+			}
 		},
 
 		makeImagesModal: function () {

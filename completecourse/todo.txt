@@ -1,10 +1,13 @@
+// TODO: replace the timeout in iframe-holder's height checking with imagesLoaded, etc
+// TODO: the Unleashed CSS causes an ugly scrolling jump when a new iframe section is loaded via infinite scrolling
 // TODO: check to see Habitat output headers can be tracked in the TOC for scrolling purposes
-// TODO: tag new content and process via converter
 // TODO: Habitat external resource upload (or just link) capability
-// TODO: test server options?
+// TODO: test server options? (completecourse folder?)
 
 ////////////////////////////////////////////////////////////////////////////
 
 // DONE: get sample course to load and work correctly on InformIT the same way the test page does
 // DONE: make the same code work locally and on InformIT
 // DONE: multiple test courses in subfolders under "completecourse"?
+// DONE: expand/collapse button is no longer working
+// DONE: tag new content and process via converter (.rr-updated and .rr-update)
