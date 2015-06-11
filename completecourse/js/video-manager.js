@@ -80,6 +80,9 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 			this.name = "Larry";
 			this.options = options;
 
+			if (options.title)
+				document.title = options.title;
+
 			Database.initialize(toc);
 			$(".toc").TOCTree("setStatus", Database.getItems());
 
