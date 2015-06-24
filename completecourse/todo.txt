@@ -1,8 +1,8 @@
+// TODO: implement content searching (using pre-created index, ala HCW, using lunr)
+// TODO: (BUG) new Habitat projects open to video page at first (?)
+// TODO: tighten up TOC look and feel (maybe: a's without tree-toggler don't have to be padded so far to the right)
 // TODO: replace the timeout in iframe-holder's height checking with imagesLoaded, etc
 // TODO: the Unleashed CSS causes an ugly scrolling jump when a new iframe section is loaded via infinite scrolling
-// TODO: check to see Habitat output headers can be tracked in the TOC for scrolling purposes
-// TODO: Habitat external resource upload (or just link) capability
-// TODO: test server options? (completecourse folder?)
 
 ////////////////////////////////////////////////////////////////////////////
 
@@ -11,3 +11,11 @@
 // DONE: multiple test courses in subfolders under "completecourse"?
 // DONE: expand/collapse button is no longer working
 // DONE: tag new content and process via converter (.rr-updated and .rr-update)
+// DONE: shouldn't images be zoomable?
+// DONE: better tracking of the TOC via headers
+// DONE: check to see Habitat output headers can be tracked in the TOC for scrolling purposes
+// DONE: add a "previous section" button/header
+// DONE: make the previous button return the first section with the new src (as opposed to the last section with that new src)
+// DONE: re-implement TOC searching
+// TODONT: Habitat external resource upload (or just link) capability [link to S3]
+// TODONT: test server options? (completecourse folder?) [completecourse]

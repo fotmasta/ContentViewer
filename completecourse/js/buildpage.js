@@ -21,7 +21,8 @@ requirejs.config({
 		"bootstrap-toolkit": "bootstrap-toolkit.min",
 		"videojs": "video.dev",
 		"videojs-markers": "videojs-markers",
-		"handlebars": "handlebars-v3.0.3"
+		"handlebars": "handlebars-v3.0.3",
+		"lunr": "lunr.min"
 	},
 	shim: {
 		"jquery": {
@@ -85,7 +86,7 @@ requirejs.config({
 	}
 });
 
-define(["jquery", "handlebars", "text!viewer_template.html", "video-manager", "video-overlay", "toc-tree", "videojs", "popcorn", "popcorn.timebase", "bootstrap-toolkit"], function ($, Handlebars, viewerTemplate, VideoManager) {
+define(["jquery", "handlebars", "text!viewer_template.html", "video-manager", "lunr", "video-overlay", "toc-tree", "videojs", "popcorn", "popcorn.timebase", "bootstrap-toolkit"], function ($, Handlebars, viewerTemplate, VideoManager, lunr) {
 	var manifest;
 
 	function initialize () {
@@ -229,6 +230,16 @@ define(["jquery", "handlebars", "text!viewer_template.html", "video-manager", "v
 		onResize();
 	}
 
+	function onSearch () {
+		var term = $("#query").val();
+		$(".toc").TOCTree("search", term);
+	}
+
+	function onClearSearch () {
+		$("#query").val("");
+		$(".toc").TOCTree("search", "");
+	}
+
 	var BuildPage = {
 		build: function (options) {
 			var template = Handlebars.compile(viewerTemplate);
@@ -257,10 +268,19 @@ define(["jquery", "handlebars", "text!viewer_template.html", "video-manager", "v
 			//$("#resource-toggler").click(onToggleResources);
 			//$("a[data-toggle='tab']").on("shown.bs.tab", onResize);
 			//$(".resource-list").on("playvideo", onClickMarker);
-			//$(".search-button").click(onSearch);
-			//$("#query").on("input", onSearch);
-			//$("#clear-search-button").click(onClearSearch);
+			$(".search-button").click(onSearch);
+			$("#query").on("input", onSearch);
+			$("#clear-search-button").click(onClearSearch);
 			$("#account-button").click(function () { window.open("//memberservices.informit.com/my_account/index.aspx"); });
+
+			//require(["text!../search_index.json"], onLoadedSearchIndex);
+		},
+
+		setSearchIndex: function (data) {
+			var newIndex = lunr.Index.load(data);
+
+			var result = newIndex.search("hardware");
+			console.log(result);
 		}
 	};
 

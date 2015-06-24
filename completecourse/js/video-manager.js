@@ -697,6 +697,31 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 			return this.pop.SHOWING_ALL;
 		},
 
+		getPreviousSection: function (index) {
+			if (index == undefined) index = this.currentIndex;
+
+			// return the title of the next entry with a different src (ie, a different section)
+			var curSrc = URLWithoutHash(this.toc[index].src);
+
+			for (var i = index - 1; i >= 0; i--) {
+				var nextSrc = URLWithoutHash(this.toc[i].src);
+				if (nextSrc != curSrc) {
+					var indexToReturn = i;
+					// return the first one with this new source
+					for (j = i - 1; j >= 0; j--) {
+						var nextNextSrc = URLWithoutHash(this.toc[j].src);
+						if (nextNextSrc != nextSrc) {
+							indexToReturn = j + 1;
+							break;
+						}
+					}
+					return { index: indexToReturn, title: this.toc[indexToReturn].desc, src: nextSrc };
+				}
+			}
+
+			return null;
+		},
+
 		getNextSection: function (index) {
 			if (index == undefined) index = this.currentIndex;
 
@@ -713,7 +738,36 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 			return null;
 		},
 
+		// using header text (as opposed to Habitat IDs)
 		findCurrentItem: function () {
+			var foundindex = undefined;
+
+			var me = this;
+
+			var iframes = $("iframe:onScreen");
+
+			$(iframes.get().reverse()).each(function (index, item) {
+				var iframe = $(item);
+				var headers = iframe.contents().find("h1, h2, h3");
+				var headersOnScreen = iFrameElementsOnScreen(headers, iframe);
+				for (var i = headersOnScreen.length - 1; i >= 0; i--) {
+					var item = headersOnScreen[i];
+					var h = $(item);
+					//var t = h.text().replace(/(\r\n|\n|\r)/gm,"").replace(/\s+/g, " ");
+					var t = h.text();
+					for (var j = 0; j < me.toc.length; j++) {
+						if (me.toc[j].desc == t) {
+							foundindex = j;
+						}
+					}
+				}
+			});
+
+			return foundindex;
+		},
+
+		// using Habitat IDs (as opposed to header text)
+		findCurrentItem_byID: function () {
 			var me = this;
 
 			var iframes = $("iframe:onScreen");

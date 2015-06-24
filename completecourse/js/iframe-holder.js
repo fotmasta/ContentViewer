@@ -29,6 +29,7 @@ define(["bootstrap-dialog", "jquery.ui"], function (BootstrapDialog) {
 			this.addStylesheet();
 
 			if (!this.options.infinite_scrolling) {
+				this.addPreviousButton();
 				this.addNextButton();
 			}
 
@@ -72,6 +73,25 @@ define(["bootstrap-dialog", "jquery.ui"], function (BootstrapDialog) {
 			var $body = this.iframe.contents().find("body").addClass("habitat-body");
 		},
 
+		addPreviousButton: function () {
+			var obj = this.options.manager.getPreviousSection(this.options.index);
+
+			var me = this;
+
+			if (obj) {
+				// add a next button
+				var a = $('<button class="button button-a"><h4>Previous </h4>' + obj.title + '</button>');
+				a.click(function (event) {
+					event.preventDefault();
+					// NOTE: not sure at all why me.options.manager.getCurrentIndex() is undefined here; reference problem?
+					me.options.manager.markItemCompleted(me.options.index);
+					me.options.manager.playFromTOC(obj.index, {replaceAll: true});
+				});
+
+				this.iframe.contents().find("body").prepend(a);
+			}
+		},
+
 		addNextButton: function () {
 			var obj = this.options.manager.getNextSection(this.options.index);
 
@@ -111,6 +131,37 @@ define(["bootstrap-dialog", "jquery.ui"], function (BootstrapDialog) {
 					event.preventDefault();
 
 					var contents = '<iframe src="' + path + "/" + a.attr("href") + '" width="100%" height="__window height__" frameborder="0"></frame>';
+
+					var wh = $(window).outerHeight();
+					contents = contents.replace("__window height__", (wh * .75));
+
+					BootstrapDialog.show({
+						title: title,
+						message: contents,
+						size: BootstrapDialog.SIZE_WIDE
+					});
+				});
+			});
+
+			// find just images within figures
+			var figs = this.iframe.contents().find("figure img");
+			var me = this;
+
+			figs.each(function (index, item) {
+				var captionTitle = $(item).parents("figure").find(".caption-title");
+				var title = "Image";
+				if (captionTitle.length) {
+					title = captionTitle.text();
+				}
+
+				var fig = $(item);
+				var fullpath = me.iframe[0].contentWindow.location.href;
+				var path = URLWithoutPage(fullpath);
+
+				fig.click(function (event) {
+					event.preventDefault();
+
+					var contents = '<iframe src="' + path + "/" + fig.attr("src") + '" width="100%" height="__window height__" frameborder="0"></frame>';
 
 					var wh = $(window).outerHeight();
 					contents = contents.replace("__window height__", (wh * .75));
