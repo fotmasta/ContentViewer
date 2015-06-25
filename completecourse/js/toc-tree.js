@@ -1,4 +1,4 @@
-define(["jquery.ui"], function () {
+define(["lunr", "jquery.ui"], function (lunr) {
 
 	// case-insensitive search (found on web)
 	$.extend($.expr[":"], {
@@ -43,7 +43,7 @@ define(["jquery.ui"], function () {
 				label += " <span class='badge'>new</span>";
 			}
 
-			var node = { desc: label };
+			var node = { desc: label, href: anchor.attr("href") };
 
 			var obj = { node: node, children: [] };
 
@@ -108,7 +108,7 @@ define(["jquery.ui"], function () {
 
 			li.attr("data-index", params.counter);
 
-			var a = $("<a href='#'>");
+			var a = $("<a>").attr("href", d.node.href);
 
 			var entry_text = d.node.desc;
 			var sp = $("<span>", { class: "desc", html: " " + entry_text });
@@ -168,83 +168,9 @@ define(["jquery.ui"], function () {
 
 			this.addNodes( { counter: 0 }, nodes, this.element, []);
 		},
-
-		refreshFromMetadataX: function () {
-			var depths = [];
-			var last_depth = undefined;
-			var current_ul;
-
-			for (var i = 0; i < this.options.data.length; i++) {
-				var d = this.options.data[i];
-
-				var depth = d.depth.split(",");
-
-				depth = $.map(depth, function (el, index) { return parseInt(el); });
-
-				var li, linkholder;
-
-				if (depth[0] != last_depth) {
-					li = $("<li>");
-					this.element.append(li);
-
-					var lbl = $("<label>", { class: "tree-toggler nav-header" });
-					li.append(lbl);
-					linkholder = lbl;
-
-					var ul = $("<ul>", { class: "nav nav-list tree" });
-					li.append(ul);
-
-					current_ul = ul;
-				} else {
-					li = $("<li>");
-					li.appendTo(current_ul);
-
-					linkholder = li;
-				}
-
-				li.attr("id", d.id).attr("data-index", i);
-
-				var a = $("<a href='#'>");
-				var sp = $("<span>", { class: "desc", html: " " + d.desc });
-
-				switch (d.type) {
-					case "quiz":
-						a.addClass("quiz");
-						break;
-				}
-
-				if (d.short) {
-					var short = $("<span>", { class: "level tree-toggler" });
-
-					// kludge for quiz coloring
-					if (d.short.indexOf("question") != -1) {
-						short.addClass("quiz-background");
-					}
-
-					short.html(d.short);
-
-					a.append(short);
-
-					if (d.timestamp) {
-						var time = $("<span>", { class: "timestamp", text: d.timestamp });
-						a.append(time);
-					}
-				}
-
-				a.append(sp);
-
-				a.appendTo(linkholder);
-
-				if (d.callback)
-					a.click(d.callback);
-				else
-					a.click($.proxy(this.launchVideo, this, i));
-
-				last_depth = depth[0];
-			}
-		},
 		
-		launchVideo: function (index) {
+		launchVideo: function (index, event) {
+			event.preventDefault();
 			this.element.trigger("playvideo", index);
 		},
 		
@@ -277,6 +203,42 @@ define(["jquery.ui"], function () {
 					$("#query-summary").text("Count: " + toShow.length);
 				} else {
 					$("#query-summary").text("No matching titles. Try a different search?");
+				}
+			} else {
+				$("#query-summary").text("");
+			}
+		},
+
+		setSearchIndex: function (data) {
+			this.searchIndex = lunr.Index.load(data);
+		},
+
+		searchByIndex: function (term) {
+			var result = this.searchIndex.search(term);
+
+			var toShow = $();
+			var toHide = this.element.find("li");
+
+			for (var i = 0; i < result.length; i++) {
+				// get rid of initial OPS/ folder
+				var r = result[i].ref.replace(/^ops\//, "");
+
+				var matching = this.element.find('a[href*="' + r + '"]');
+				matching.each(function (index, element) {
+					var li = $(element).parents("li");
+					toShow.push(li[0]);
+					toHide = toHide.not(li);
+				});
+			}
+
+			toHide.hide(300);
+			toShow.show(300);
+
+			if (term != "") {
+				if (toShow.length) {
+					$("#query-summary").text("Count: " + toShow.length);
+				} else {
+					$("#query-summary").text("No matching text. Try a different search?");
 				}
 			} else {
 				$("#query-summary").text("");

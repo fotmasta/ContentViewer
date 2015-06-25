@@ -86,7 +86,7 @@ requirejs.config({
 	}
 });
 
-define(["jquery", "handlebars", "text!viewer_template.html", "video-manager", "lunr", "video-overlay", "toc-tree", "videojs", "popcorn", "popcorn.timebase", "bootstrap-toolkit"], function ($, Handlebars, viewerTemplate, VideoManager, lunr) {
+define(["jquery", "handlebars", "text!viewer_template.html", "video-manager", "video-overlay", "toc-tree", "videojs", "popcorn", "popcorn.timebase", "bootstrap-toolkit"], function ($, Handlebars, viewerTemplate, VideoManager) {
 	var manifest;
 
 	function initialize () {
@@ -232,7 +232,8 @@ define(["jquery", "handlebars", "text!viewer_template.html", "video-manager", "l
 
 	function onSearch () {
 		var term = $("#query").val();
-		$(".toc").TOCTree("search", term);
+		//$(".toc").TOCTree("search", term);
+		$(".toc").TOCTree("searchByIndex", term);
 	}
 
 	function onClearSearch () {
@@ -277,10 +278,7 @@ define(["jquery", "handlebars", "text!viewer_template.html", "video-manager", "l
 		},
 
 		setSearchIndex: function (data) {
-			var newIndex = lunr.Index.load(data);
-
-			var result = newIndex.search("hardware");
-			console.log(result);
+			$(".toc").TOCTree("setSearchIndex", data);
 		}
 	};
 

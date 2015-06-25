@@ -1,4 +1,4 @@
-// TODO: implement content searching (using pre-created index, ala HCW, using lunr)
+// TODO: full-text searching UI?
 // TODO: (BUG) new Habitat projects open to video page at first (?)
 // TODO: tighten up TOC look and feel (maybe: a's without tree-toggler don't have to be padded so far to the right)
 // TODO: replace the timeout in iframe-holder's height checking with imagesLoaded, etc
@@ -19,3 +19,5 @@
 // DONE: re-implement TOC searching
 // TODONT: Habitat external resource upload (or just link) capability [link to S3]
 // TODONT: test server options? (completecourse folder?) [completecourse]
+// DONE: implement content searching (using pre-created index, ala HCW, using lunr)
+// DONE: finish searching and refactor the loading of the index file (as .json, preferably?) [left it as .js for simplicity]
