@@ -191,33 +191,43 @@ define(["lunr", "jquery.ui"], function (lunr) {
 			this._super( "_setOption", key, value );
 		},
 
-		search: function (term) {
-			var toShow = this.element.find("li:containsNC('" + term + "')");
-
-			toShow.show(300);
-
-			this.element.find("li:not(:containsNC('" + term + "'))").hide(300);
-
-			if (term != "") {
-				if (toShow.length) {
-					$("#query-summary").text("Count: " + toShow.length);
-				} else {
-					$("#query-summary").text("No matching titles. Try a different search?");
-				}
-			} else {
-				$("#query-summary").text("");
-			}
-		},
-
 		setSearchIndex: function (data) {
 			this.searchIndex = lunr.Index.load(data);
 		},
 
-		searchByIndex: function (term) {
+		search: function (term) {
+			var results = { toShow: $(), toHide: $() };
+
+			//this.searchByTitle(term, results);
+			this.searchByIndex(term, results);
+
+			if (term != "") {
+				if (results.toShow.length) {
+					$("#query-summary").text("Count: " + results.toShow.length);
+				} else {
+					$("#query-summary").text("No matching titles. Try a different search?");
+				}
+			} else {
+				results.toShow = this.element.find("li");
+				results.toHide = $();
+				$("#query-summary").text("");
+			}
+
+			results.toShow.show(300);
+			results.toHide.hide(300);
+		},
+
+		searchByTitle: function (term, results) {
+			results.toShow = this.element.find("li:containsNC('" + term + "')");
+
+			results.toHide = this.element.find("li:not(:containsNC('" + term + "'))");
+		},
+
+		searchByIndex: function (term, results) {
 			var result = this.searchIndex.search(term);
 
-			var toShow = $();
-			var toHide = this.element.find("li");
+			results.toShow = $();
+			results.toHide = this.element.find("li");
 
 			for (var i = 0; i < result.length; i++) {
 				// get rid of initial OPS/ folder
@@ -226,22 +236,10 @@ define(["lunr", "jquery.ui"], function (lunr) {
 				var matching = this.element.find('a[href*="' + r + '"]');
 				matching.each(function (index, element) {
 					var li = $(element).parents("li");
-					toShow.push(li[0]);
-					toHide = toHide.not(li);
+					$.merge(results.toShow, li);
+					results.toShow = $.unique(results.toShow);
+					results.toHide = results.toHide.not(li);
 				});
-			}
-
-			toHide.hide(300);
-			toShow.show(300);
-
-			if (term != "") {
-				if (toShow.length) {
-					$("#query-summary").text("Count: " + toShow.length);
-				} else {
-					$("#query-summary").text("No matching text. Try a different search?");
-				}
-			} else {
-				$("#query-summary").text("");
 			}
 		},
 

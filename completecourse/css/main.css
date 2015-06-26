@@ -19,6 +19,7 @@
       color: #719db7;
       display: block; }
       #contents #contents-pane a span.desc {
+        display: inline-block;
         padding-left: 5px; }
         #contents #contents-pane a span.desc .badge {
           display: none; }
@@ -178,7 +179,7 @@
 
 .nav-list .nav-header {
   margin-right: -15px;
-  margin-left: -15px; }
+  margin-left: -8px; }
 
 .nav-header {
   display: block;

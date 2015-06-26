@@ -232,8 +232,7 @@ define(["jquery", "handlebars", "text!viewer_template.html", "video-manager", "v
 
 	function onSearch () {
 		var term = $("#query").val();
-		//$(".toc").TOCTree("search", term);
-		$(".toc").TOCTree("searchByIndex", term);
+		$(".toc").TOCTree("search", term);
 	}
 
 	function onClearSearch () {

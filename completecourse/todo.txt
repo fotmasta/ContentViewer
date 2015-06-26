@@ -1,5 +1,7 @@
-// TODO: full-text searching UI?
+// TODO: full-text searching UI? (or just combine title search and full-text search results)
+// TODO: highlight search term on page, with next/prev button in search box
 // TODO: (BUG) new Habitat projects open to video page at first (?)
+// TODO: when scrolling through content, check off sections that might not have triggered the usual "completed" scrolling trigger (ie, check for sequential completions)
 // TODO: tighten up TOC look and feel (maybe: a's without tree-toggler don't have to be padded so far to the right)
 // TODO: replace the timeout in iframe-holder's height checking with imagesLoaded, etc
 // TODO: the Unleashed CSS causes an ugly scrolling jump when a new iframe section is loaded via infinite scrolling
@@ -21,3 +23,5 @@
 // TODONT: test server options? (completecourse folder?) [completecourse]
 // DONE: implement content searching (using pre-created index, ala HCW, using lunr)
 // DONE: finish searching and refactor the loading of the index file (as .json, preferably?) [left it as .js for simplicity]
+// DONE: when switching to new sections via an anchor, it doesn't actually take you to the anchor [line was commented out?!]
+// DONE: handle not finding a search_index.js

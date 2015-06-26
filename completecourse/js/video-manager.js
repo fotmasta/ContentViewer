@@ -269,7 +269,7 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 			}
 
 			if (immediate) {
-				//$("#video").scrollTop(dest);
+				$("#video").scrollTop(dest);
 			} else {
 				this.busyScrolling = true;
 				$("#video").stop().animate({scrollTop: dest}, { duration: 1000, complete: $.proxy(this.onDoneScrolling, this) });
@@ -398,7 +398,7 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 
 		updateProgress: function () {
 			var pct = Math.round(Database.getPercentageComplete() * 100);
-			$("#completed-progress").css("width", pct);
+			$("#completed-progress").css("width", pct + "%");
 			// this is used by .progress::after (works on all browsers?)
 			$(".progress").attr("data-progress", pct + "% Complete");
 		},
