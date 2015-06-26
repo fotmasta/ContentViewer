@@ -130,7 +130,7 @@ define(["bootstrap-dialog", "jquery.ui"], function (BootstrapDialog) {
 				a.click(function (event) {
 					event.preventDefault();
 
-					var contents = '<iframe src="' + path + "/" + a.attr("href") + '" width="100%" height="__window height__" frameborder="0"></frame>';
+					var contents = '<iframe src="' + path + "/" + a.attr("href") + '" width="100%" height="__window height__" frameborder="0"></iframe>';
 
 					var wh = $(window).outerHeight();
 					contents = contents.replace("__window height__", (wh * .75));
@@ -161,7 +161,8 @@ define(["bootstrap-dialog", "jquery.ui"], function (BootstrapDialog) {
 				fig.click(function (event) {
 					event.preventDefault();
 
-					var contents = '<iframe src="' + path + "/" + fig.attr("src") + '" width="100%" height="__window height__" frameborder="0"></frame>';
+//					var contents = '<iframe src="' + path + "/" + fig.attr("src") + '" width="100%" height="__window height__" frameborder="0"><p>This is a test.</p></iframe>';
+					var contents = '<div class="image_popup" style="height: __window height__px"><img src="' + path + "/" + fig.attr("src") + '"/></div>';
 
 					var wh = $(window).outerHeight();
 					contents = contents.replace("__window height__", (wh * .75));

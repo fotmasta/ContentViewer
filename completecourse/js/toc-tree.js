@@ -154,6 +154,8 @@ define(["lunr", "jquery.ui"], function (lunr) {
 
 			var nodes = convertHabitatDataToNodes(ol);
 
+			this.nodes = nodes;
+
 			this.addNodes( { counter: 0 }, nodes, this.element, []);
 		},
 
@@ -196,6 +198,28 @@ define(["lunr", "jquery.ui"], function (lunr) {
 		},
 
 		search: function (term) {
+			var results = this.searchIndex.search(term);
+
+			$(".search-results").empty();
+
+			for (var i = 0; i < results.length; i++) {
+				var index = results[i].ref;
+				var hit = this.options.metadata[index];
+				var hitResult = $("<div>", { class: "hit", text: hit.desc });
+				hitResult.click($.proxy(this.launchVideo, this, index));
+				$(".search-results").append(hitResult);
+			}
+
+			if (term != "") {
+				this.element.parent().find(".toc").hide();
+				this.element.parent().find(".search-results").show();
+			} else {
+				this.element.parent().find(".toc").show();
+				this.element.parent().find(".search-results").hide();
+			}
+		},
+
+		searchX: function (term) {
 			var results = { toShow: $(), toHide: $() };
 
 			//this.searchByTitle(term, results);

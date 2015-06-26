@@ -156,9 +156,9 @@ define(["jquery", "handlebars", "text!viewer_template.html", "video-manager", "v
 	}
 
 	function onHabitatTOCLoaded (data) {
-		$(".toc").TOCTree({ type: "habitat", data: data, expander: "#collapse-button" });
-
 		var metadata = convertHabitatTOCtoMetadata(data);
+
+		$(".toc").TOCTree({ type: "habitat", data: data, metadata: metadata, expander: "#collapse-button" });
 
 		VideoManager.initialize(metadata, "#video video", videojs("main_video"), [], manifest);
 

@@ -1,4 +1,8 @@
-// TODO: full-text searching UI? (or just combine title search and full-text search results)
+// TODO: instead of using metadata, build a new flattened metadata with short "depth" labels, etc.
+// TODO: full-text searching UI?
+// TODO: put chapter identifier in search result
+// TODO: don't scroll search results (if they're visible)
+// TODO: refactor TOC to add container for both regular TOC and search results?
 // TODO: highlight search term on page, with next/prev button in search box
 // TODO: (BUG) new Habitat projects open to video page at first (?)
 // TODO: when scrolling through content, check off sections that might not have triggered the usual "completed" scrolling trigger (ie, check for sequential completions)

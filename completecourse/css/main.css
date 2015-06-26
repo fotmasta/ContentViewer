@@ -377,4 +377,23 @@ p.rr-update {
   .habitat-body .objectiveset {
     float: right; }
 
+.image_popup {
+  display: flex;
+  align-items: center;
+  justify-content: center; }
+  .image_popup img {
+    height: 100%; }
+
+.search-results {
+  display: none;
+  padding-left: 0; }
+  .search-results .hit {
+    padding: .5em 1em; }
+    .search-results .hit:nth-child(odd) {
+      background-color: #eee; }
+    .search-results .hit:hover {
+      background-color: blue;
+      color: white;
+      cursor: pointer; }
+
 /*# sourceMappingURL=main.css.map */
