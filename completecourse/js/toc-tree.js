@@ -8,7 +8,7 @@ define(["lunr", "jquery.ui"], function (lunr) {
 	});
 
 	function setNodeAtDepth  (nodes, depth, node) {
-		var depths = depth.split(",");
+		var depths = depth.toString().split(",");
 		var curLevel = nodes;
 		for (var i = 0; i < depths.length; i++) {
 			var curDepth = depths[i];
@@ -85,61 +85,80 @@ define(["lunr", "jquery.ui"], function (lunr) {
 				var new_depth = depth.slice();
 				new_depth.push(i + 1);
 
-				this.addParentNode(params, d, dest, new_depth);
+				if (d) {
+					this.addParentNode(params, d, dest, new_depth);
+				}
 			}
 		},
 
 		addParentNode: function (params, d, dest, depth) {
 			var li, linkholder;
 
-			li = $("<li>");
-			dest.append(li);
+			if (d && d.node) {
+				li = $("<li>");
+				dest.append(li);
 
-			if (d.children.length > 0) {
-				var lbl = $("<label>", {class: "tree-toggler nav-header"});
-				li.append(lbl);
-				linkholder = lbl;
+				if (d && d.children && d.children.length > 0) {
+					var lbl = $("<label>", {class: "tree-toggler nav-header"});
+					li.append(lbl);
+					linkholder = lbl;
 
-				var ul = $("<ul>", { class: "nav nav-list tree" });
-				li.append(ul);
-			} else {
-				linkholder = li;
+					var ul = $("<ul>", {class: "nav nav-list tree"});
+					li.append(ul);
+				} else {
+					linkholder = li;
+				}
+
+				li.attr("data-index", params.counter);
+
+				var a = $("<a>").attr("href", d.node.href);
+
+				var entry_text = d.node.desc;
+				var sp = $("<span>", {class: "desc", html: " " + entry_text});
+
+				var short = $("<span>", {class: "level tree-toggler"});
+
+				var short_label;
+				if (depth.length <= 3) {
+					short_label = depth.join(".");
+				} else {
+					short_label = depth[depth.length - 1];
+					short.addClass("invisible");
+				}
+
+				//short.html(short_label);
+				if (d.node.short) {
+					short.html(d.node.short);
+				} else {
+					var shortcut = d.node.desc.toLowerCase();
+
+					if (shortcut == "introduction") {
+						short.html("<i class='fa fa-home'></i>");
+					} else if (shortcut == "summary") {
+						short.html("<i class='fa fa-flag'></i>");
+					} else {
+						short.html(d.node.desc.substr(0, 1));
+					}
+				}
+
+				a.append(short);
+
+				a.append(sp);
+
+				a.appendTo(linkholder);
+
+				a.click($.proxy(this.launchVideo, this, params.counter));
+
+				short.click(function (event) {
+					event.preventDefault();
+					event.stopPropagation();
+					$(this).parents("li").eq(0).children('ul.tree').toggle(300);
+				});
+
+				params.counter++;
 			}
 
-			li.attr("data-index", params.counter);
-
-			var a = $("<a>").attr("href", d.node.href);
-
-			var entry_text = d.node.desc;
-			var sp = $("<span>", { class: "desc", html: " " + entry_text });
-
-			var short = $("<span>", { class: "level tree-toggler" });
-
-			var short_label;
-			if (depth.length <= 2) {
-				short_label = depth.join(".");
-			} else {
-				short_label = depth[depth.length - 1];
-				short.addClass("invisible");
-			}
-
-			short.html(short_label);
-
-			a.append(short);
-
-			a.append(sp);
-
-			a.appendTo(linkholder);
-
-			a.click($.proxy(this.launchVideo, this, params.counter));
-
-			short.click(function (event) {
-				event.preventDefault();
-				event.stopPropagation();
-				$(this).parents("li").eq(0).children('ul.tree').toggle(300);
-			});
-
-			params.counter++;
+			if (ul == undefined) ul = dest;
 
 			this.addNodes(params, d.children, ul, depth);
 		},
