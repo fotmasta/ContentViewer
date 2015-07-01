@@ -1,4 +1,4 @@
-// TODO: instead of using metadata, build a new flattened metadata with short "depth" labels, etc.
+// TODO: fall-back to other video formats (or does VideoJS do this automatically?)
 // TODO: full-text searching UI?
 // TODO: put chapter identifier in search result
 // TODO: don't scroll search results (if they're visible)
@@ -29,3 +29,5 @@
 // DONE: finish searching and refactor the loading of the index file (as .json, preferably?) [left it as .js for simplicity]
 // DONE: when switching to new sections via an anchor, it doesn't actually take you to the anchor [line was commented out?!]
 // DONE: handle not finding a search_index.js
+// DONE: instead of using metadata, build a new flattened metadata with short "depth" labels, etc.
+// DONE: put searching back in for videos [titles without search index]

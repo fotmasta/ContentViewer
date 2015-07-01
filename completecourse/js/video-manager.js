@@ -217,7 +217,7 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 
 			if (index >= this.toc.length) return;
 
-			var src = "video/" + this.toc[index].video;
+			var src = this.toc[index].video;
 
 			// I couldn't seem to get videojs to load the video via localhost (which seems odd)
 			if (window.location.hostname == "localhost") {

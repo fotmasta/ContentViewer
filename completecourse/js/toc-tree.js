@@ -217,6 +217,10 @@ define(["lunr", "jquery.ui"], function (lunr) {
 		},
 
 		search: function (term) {
+			if (!this.searchIndex) {
+				return this.searchByTitles(term);
+			}
+
 			var results = this.searchIndex.search(term);
 
 			$(".search-results").empty();
@@ -238,11 +242,11 @@ define(["lunr", "jquery.ui"], function (lunr) {
 			}
 		},
 
-		searchX: function (term) {
+		searchByTitles: function (term) {
 			var results = { toShow: $(), toHide: $() };
 
-			//this.searchByTitle(term, results);
-			this.searchByIndex(term, results);
+			results.toShow = this.element.find("li:containsNC('" + term + "')");
+			results.toHide = this.element.find("li:not(:containsNC('" + term + "'))");
 
 			if (term != "") {
 				if (results.toShow.length) {
@@ -258,32 +262,6 @@ define(["lunr", "jquery.ui"], function (lunr) {
 
 			results.toShow.show(300);
 			results.toHide.hide(300);
-		},
-
-		searchByTitle: function (term, results) {
-			results.toShow = this.element.find("li:containsNC('" + term + "')");
-
-			results.toHide = this.element.find("li:not(:containsNC('" + term + "'))");
-		},
-
-		searchByIndex: function (term, results) {
-			var result = this.searchIndex.search(term);
-
-			results.toShow = $();
-			results.toHide = this.element.find("li");
-
-			for (var i = 0; i < result.length; i++) {
-				// get rid of initial OPS/ folder
-				var r = result[i].ref.replace(/^ops\//, "");
-
-				var matching = this.element.find('a[href*="' + r + '"]');
-				matching.each(function (index, element) {
-					var li = $(element).parents("li");
-					$.merge(results.toShow, li);
-					results.toShow = $.unique(results.toShow);
-					results.toHide = results.toHide.not(li);
-				});
-			}
 		},
 
 		markStarted: function (index) {
