@@ -134,6 +134,14 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 			return this.currentIndex;
 		},
 
+		currentItemIsVideo: function () {
+			if (this.currentIndex != undefined) {
+				return this.toc[this.currentIndex].video != undefined;
+			} else {
+				return false;
+			}
+		},
+
 		setCurrentIndex: function (index) {
 			/*
 			if (index == this.currentIndex + 1) {
@@ -142,7 +150,7 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 			*/
 
 			// THEORY: when switching, mark the current section completed (should probably be: have we scrolled past everything)
-			if (this.currentIndex) {
+			if (this.currentIndex != undefined && !this.currentItemIsVideo()) {
 				this.markItemCompleted(this.currentIndex);
 			}
 
@@ -219,13 +227,15 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 
 			var src = this.toc[index].video;
 
-			// I couldn't seem to get videojs to load the video via localhost (which seems odd)
-			if (window.location.hostname == "localhost") {
-				//src = "https://video15.firebaseapp.com/" + src;
-				console.log(src);
+			if (src.indexOf(".mov") != -1 || src.indexOf(".mp4") != -1) {
+				this.player.src({type: "video/mp4", src: src });
+			} else {
+				this.player.src([
+					{type: "video/mp4", src: src + ".mp4"},
+					{type: "video/webm", src: src + ".webm"},
+					{type: "video/ogg", src: src + ".ogv"}
+				]);
 			}
-
-			this.player.src({ type: "video/mp4", src: src });
 
 			if (options && options.time) {
 				this.player.currentTime(options.time);

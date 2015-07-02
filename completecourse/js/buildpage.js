@@ -152,6 +152,14 @@ define(["jquery", "handlebars", "text!viewer_template.html", "video-manager", "v
 
 		initialize();
 
+		if (metadata.title) {
+			setProjectTitle(metadata.title);
+		}
+
+		if (metadata.posterImage) {
+			videojs("main_video").poster(metadata.posterImage);
+		}
+
 		VideoManager.loadMostRecentVideo();
 	}
 
@@ -240,6 +248,11 @@ define(["jquery", "handlebars", "text!viewer_template.html", "video-manager", "v
 		$(".toc").TOCTree("search", "");
 	}
 
+	function setProjectTitle (title) {
+		$("a#home-button").text(title);
+		$("title").text(title);
+	}
+
 	var BuildPage = {
 		build: function (options) {
 			var template = Handlebars.compile(viewerTemplate);
@@ -272,8 +285,6 @@ define(["jquery", "handlebars", "text!viewer_template.html", "video-manager", "v
 			$("#query").on("input", onSearch);
 			$("#clear-search-button").click(onClearSearch);
 			$("#account-button").click(function () { window.open("//memberservices.informit.com/my_account/index.aspx"); });
-
-			//require(["text!../search_index.json"], onLoadedSearchIndex);
 		},
 
 		setSearchIndex: function (data) {

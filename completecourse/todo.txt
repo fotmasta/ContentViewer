@@ -1,4 +1,3 @@
-// TODO: fall-back to other video formats (or does VideoJS do this automatically?)
 // TODO: full-text searching UI?
 // TODO: put chapter identifier in search result
 // TODO: don't scroll search results (if they're visible)
@@ -31,3 +30,6 @@
 // DONE: handle not finding a search_index.js
 // DONE: instead of using metadata, build a new flattened metadata with short "depth" labels, etc.
 // DONE: put searching back in for videos [titles without search index]
+// DONE: fall-back to other video formats (or does VideoJS do this automatically?)
+// DONE: for videos, don't mark complete when switching (it does that now for text content, for lack of "scroll checking")
+// DONE: (video) open with a title screen
