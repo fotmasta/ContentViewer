@@ -1,7 +1,5 @@
-// TODO: full-text searching UI?
-// TODO: put chapter identifier in search result
 // TODO: don't scroll search results (if they're visible)
-// TODO: refactor TOC to add container for both regular TOC and search results?
+// TODO: full-text searching UI? (close search, re-do search, # of hits, prev/next hit)
 // TODO: highlight search term on page, with next/prev button in search box
 // TODO: (BUG) new Habitat projects open to video page at first (?)
 // TODO: when scrolling through content, check off sections that might not have triggered the usual "completed" scrolling trigger (ie, check for sequential completions)
@@ -33,3 +31,6 @@
 // DONE: fall-back to other video formats (or does VideoJS do this automatically?)
 // DONE: for videos, don't mark complete when switching (it does that now for text content, for lack of "scroll checking")
 // DONE: (video) open with a title screen
+// DONE: "short" labels for Habitat content look wrong now (see: Unleashed; video conversion artifact?)
+// DONE: put chapter identifier in search result
+// DONE: refactor TOC to add container for both regular TOC and search results?

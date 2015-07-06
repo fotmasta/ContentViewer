@@ -53,11 +53,30 @@ define(["lunr", "jquery.ui"], function (lunr) {
 		}
 	}
 
+	function findNodeForIndex (nodes, index) {
+		for (var i = 0; i < nodes.length; i++) {
+			console.log("looking at " + nodes[i].node.index);
+			if (nodes[i].node.index == index) {
+				console.log("got it");
+				return nodes[i];
+			} else {
+				var r = findNodeForIndex(nodes[i].children, index);
+				if (r) {
+					return r;
+				}
+			}
+		}
+
+		return undefined;
+	}
+
 	$.widget("que.TOCTree", {
 
 		options: {},
 
 		_create: function () {
+			this.holder = this.element.find(".toc-holder");
+
 			this.refresh();
 
 			if (this.options.expander)
@@ -67,7 +86,7 @@ define(["lunr", "jquery.ui"], function (lunr) {
 		refresh: function () {
 			if (!this.options || !this.options.data) return;
 
-			this.element.empty();
+			this.holder.empty();
 
 			if (this.options.type == "habitat")
 				this.refreshFromHabitatData();
@@ -75,7 +94,7 @@ define(["lunr", "jquery.ui"], function (lunr) {
 				this.refreshFromMetadata();
 
 			var p = $("<p>", { id: "query-summary", class: "blocky", text: "" });
-			this.element.append(p);
+			this.holder.append(p);
 		},
 
 		addNodes: function (params, nodes, dest, depth) {
@@ -95,6 +114,9 @@ define(["lunr", "jquery.ui"], function (lunr) {
 			var li, linkholder;
 
 			if (d && d.node) {
+				d.node.depth = depth;
+				d.node.index = params.counter;
+
 				li = $("<li>");
 				dest.append(li);
 
@@ -126,18 +148,21 @@ define(["lunr", "jquery.ui"], function (lunr) {
 					short.addClass("invisible");
 				}
 
-				//short.html(short_label);
 				if (d.node.short) {
 					short.html(d.node.short);
 				} else {
-					var shortcut = d.node.desc.toLowerCase();
-
-					if (shortcut == "introduction") {
-						short.html("<i class='fa fa-home'></i>");
-					} else if (shortcut == "summary") {
-						short.html("<i class='fa fa-flag'></i>");
+					if (this.options.type == "habitat") {
+						short.html(short_label);
 					} else {
-						short.html(d.node.desc.substr(0, 1));
+						var shortcut = d.node.desc.toLowerCase();
+
+						if (shortcut == "introduction") {
+							short.html("<i class='fa fa-home'></i>");
+						} else if (shortcut == "summary") {
+							short.html("<i class='fa fa-flag'></i>");
+						} else {
+							short.html(d.node.desc.substr(0, 1));
+						}
 					}
 				}
 
@@ -175,7 +200,7 @@ define(["lunr", "jquery.ui"], function (lunr) {
 
 			this.nodes = nodes;
 
-			this.addNodes( { counter: 0 }, nodes, this.element, []);
+			this.addNodes( { counter: 0 }, nodes, this.holder, []);
 		},
 
 		refreshFromMetadata: function () {
@@ -187,7 +212,7 @@ define(["lunr", "jquery.ui"], function (lunr) {
 				setNodeAtDepth(nodes, n.depth, n);
 			}
 
-			this.addNodes( { counter: 0 }, nodes, this.element, []);
+			this.addNodes( { counter: 0 }, nodes, this.holder, []);
 		},
 		
 		launchVideo: function (index, event) {
@@ -223,14 +248,17 @@ define(["lunr", "jquery.ui"], function (lunr) {
 
 			var results = this.searchIndex.search(term);
 
-			$(".search-results").empty();
+			$(".search-result-list").empty();
 
 			for (var i = 0; i < results.length; i++) {
 				var index = results[i].ref;
 				var hit = this.options.metadata[index];
-				var hitResult = $("<div>", { class: "hit", text: hit.desc });
+				var node = findNodeForIndex(this.nodes, index);
+				var section_label = " <p class='section-label'>" + node.node.depth.join(".") + "</p>";
+				var hit_label = "<p class='hit-label'>" + hit.desc + "</p>";
+				var hitResult = $("<div>", { class: "hit", html: section_label + hit_label });
 				hitResult.click($.proxy(this.launchVideo, this, index));
-				$(".search-results").append(hitResult);
+				$(".search-result-list").append(hitResult);
 			}
 
 			if (term != "") {
@@ -245,8 +273,8 @@ define(["lunr", "jquery.ui"], function (lunr) {
 		searchByTitles: function (term) {
 			var results = { toShow: $(), toHide: $() };
 
-			results.toShow = this.element.find("li:containsNC('" + term + "')");
-			results.toHide = this.element.find("li:not(:containsNC('" + term + "'))");
+			results.toShow = this.holder.find("li:containsNC('" + term + "')");
+			results.toHide = this.holder.find("li:not(:containsNC('" + term + "'))");
 
 			if (term != "") {
 				if (results.toShow.length) {
@@ -255,7 +283,7 @@ define(["lunr", "jquery.ui"], function (lunr) {
 					$("#query-summary").text("No matching titles. Try a different search?");
 				}
 			} else {
-				results.toShow = this.element.find("li");
+				results.toShow = this.holder.find("li");
 				results.toHide = $();
 				$("#query-summary").text("");
 			}
@@ -265,7 +293,7 @@ define(["lunr", "jquery.ui"], function (lunr) {
 		},
 
 		markStarted: function (index) {
-			var el = this.element.find("[data-index=" + index + "]");
+			var el = this.holder.find("[data-index=" + index + "]");
 			var a = el.find("a");
 			var checked = a.find("i.checked");
 			checked.remove();
@@ -273,7 +301,7 @@ define(["lunr", "jquery.ui"], function (lunr) {
 		},
 
 		markCompleted: function (index) {
-			var el = this.element.find("[data-index=" + index + "]");
+			var el = this.holder.find("[data-index=" + index + "]");
 			var a = el.find("> label a, > a");
 			var checked = a.find("i.checked");
 			checked.remove();
@@ -297,11 +325,11 @@ define(["lunr", "jquery.ui"], function (lunr) {
 
 			if (vis) {
 				$(this.options.expander + " i").removeClass("fa-caret-up").addClass("fa-caret-down");
-				this.element.find("> li > ul").hide(300);
+				this.holder.find("> li > ul").hide(300);
 				//$(".toc > li > ul").hide(300);
 			} else {
 				$(this.options.expander + " i").removeClass("fa-caret-down").addClass("fa-caret-up");
-				this.element.find("li ul").show(300);
+				this.holder.find("li ul").show(300);
 				//$(".toc li ul").show(300);
 			}
 		}

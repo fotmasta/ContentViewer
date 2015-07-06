@@ -385,15 +385,35 @@ p.rr-update {
     height: 100%; }
 
 .search-results {
-  display: none;
-  padding-left: 0; }
-  .search-results .hit {
-    padding: .5em 1em; }
-    .search-results .hit:nth-child(odd) {
-      background-color: #eee; }
-    .search-results .hit:hover {
-      background-color: blue;
-      color: white;
-      cursor: pointer; }
+  display: none; }
+  .search-results h3 {
+    margin: 0;
+    padding: .5em 0;
+    text-align: center;
+    color: white;
+    background-color: black; }
+  .search-results .search-result-list {
+    padding-left: 0; }
+    .search-results .search-result-list .hit {
+      padding: .5em 1em;
+      position: relative; }
+      .search-results .search-result-list .hit:nth-child(odd) {
+        background-color: #eee; }
+      .search-results .search-result-list .hit:hover {
+        background-color: blue;
+        color: white;
+        cursor: pointer; }
+      .search-results .search-result-list .hit .section-label {
+        width: 5em;
+        display: inline-block;
+        vertical-align: top;
+        color: #7775CA;
+        position: absolute;
+        left: 1em; }
+      .search-results .search-result-list .hit .hit-label {
+        width: 100%;
+        padding-left: 5em;
+        left: 0;
+        display: inline-block; }
 
 /*# sourceMappingURL=main.css.map */

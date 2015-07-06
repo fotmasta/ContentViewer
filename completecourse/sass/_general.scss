@@ -569,19 +569,47 @@ p.rr-update {
 
 .search-results {
 	display: none;
-	padding-left: 0;
 
-	.hit {
-		padding: .5em 1em;
+	h3 {
+		margin: 0;
+		padding: .5em 0;
+		text-align: center;
+		color: white;
+		background-color: black;
+	}
 
-		&:nth-child(odd) {
-			background-color: #eee;
-		}
+	.search-result-list {
+		padding-left: 0;
 
-		&:hover {
-			background-color: blue;
-			color: white;
-			cursor: pointer;
+		.hit {
+			padding: .5em 1em;
+			position: relative;
+
+			&:nth-child(odd) {
+				background-color: #eee;
+			}
+
+			&:hover {
+				background-color: blue;
+				color: white;
+				cursor: pointer;
+			}
+
+			.section-label {
+				width: 5em;
+				display: inline-block;
+				vertical-align: top;
+				color: #7775CA;
+				position: absolute;
+				left: 1em;
+			}
+
+			.hit-label {
+				width: 100%;
+				padding-left: 5em;
+				left: 0;
+				display: inline-block;
+			}
 		}
 	}
 }

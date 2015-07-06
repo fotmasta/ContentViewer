@@ -36,7 +36,7 @@
 <div id="main" class="container-fluid invisible">
     <div class="row">
         <div id="contents" class="col-xs-3">
-            <div id="contents-pane">
+            <div class="toc" id="contents-pane">
                 <div class="course-progress">
                     <button id="collapse-button" title="Expand or collapse entire video list." class="btn btn-primary btn-xs pull-left"><i class="fa fa-lg fa-caret-up"></i></button>
                     <div class="progress" data-progress="0% Complete">
@@ -46,12 +46,17 @@
                     <div class="clearfix"></div>
                 </div>
                 <div class="scroller">
-                    <ul class="nav nav-list toc">
+                    <ul class="nav nav-list toc-holder">
                     </ul>
-	                <ul class="search-results">
-	                </ul>
                 </div>
             </div>
+	        <div class="search-results">
+		        <h3>Search Results</h3>
+		        <div class="scroller">
+			        <ul class="search-result-list">
+			        </ul>
+		        </div>
+	        </div>
         </div>
         <div id="video" class="col-xs-9">
             <div class="video-holder">

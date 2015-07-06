@@ -131,8 +131,6 @@ define(["jquery", "handlebars", "text!viewer_template.html", "video-manager", "v
 			var a = $(item);
 			var href = a.attr("href");
 			var hash = VideoManager.HashInURL(href);
-			// TODO: remove this in Production version
-			href = href.replace(".xhtml", ".html");
 			return {
 				desc: a.text(),
 				src: manifest.folder + "/ops/" + href,
