@@ -1,6 +1,6 @@
-// TODO: don't scroll search results (if they're visible)
 // TODO: full-text searching UI? (close search, re-do search, # of hits, prev/next hit)
 // TODO: highlight search term on page, with next/prev button in search box
+// TODO: short sub-sections don't get marked complete
 // TODO: (BUG) new Habitat projects open to video page at first (?)
 // TODO: when scrolling through content, check off sections that might not have triggered the usual "completed" scrolling trigger (ie, check for sequential completions)
 // TODO: tighten up TOC look and feel (maybe: a's without tree-toggler don't have to be padded so far to the right)
@@ -34,3 +34,8 @@
 // DONE: "short" labels for Habitat content look wrong now (see: Unleashed; video conversion artifact?)
 // DONE: put chapter identifier in search result
 // DONE: refactor TOC to add container for both regular TOC and search results?
+// DONE: only mark child objects "started" (so parents don't mark their children)
+// DONE: don't scroll search results (if they're visible)
+// DONE: responsive: show/hide full-screen
+// DONE: when xs and toc is clicked, hide toc
+// DONE: responsive: do something with search and account buttons and hide project text

@@ -55,9 +55,7 @@ define(["lunr", "jquery.ui"], function (lunr) {
 
 	function findNodeForIndex (nodes, index) {
 		for (var i = 0; i < nodes.length; i++) {
-			console.log("looking at " + nodes[i].node.index);
 			if (nodes[i].node.index == index) {
-				console.log("got it");
 				return nodes[i];
 			} else {
 				var r = findNodeForIndex(nodes[i].children, index);
@@ -294,7 +292,8 @@ define(["lunr", "jquery.ui"], function (lunr) {
 
 		markStarted: function (index) {
 			var el = this.holder.find("[data-index=" + index + "]");
-			var a = el.find("a");
+			// only mark the first link (not the children)
+			var a = el.find("a").first();
 			var checked = a.find("i.checked");
 			checked.remove();
 			a.append("<i class='checked fa fa-adjust fa-flip-horizontal fa-lg'></i>");

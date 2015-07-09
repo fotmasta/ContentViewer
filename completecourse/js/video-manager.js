@@ -143,15 +143,20 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 		},
 
 		setCurrentIndex: function (index) {
-			/*
-			if (index == this.currentIndex + 1) {
-				this.markItemCompleted(this.currentIndex);
-			}
-			*/
-
 			// THEORY: when switching, mark the current section completed (should probably be: have we scrolled past everything)
-			if (this.currentIndex != undefined && !this.currentItemIsVideo()) {
-				this.markItemCompleted(this.currentIndex);
+			if (!this.currentItemIsVideo()) {
+				if (this.currentIndex != undefined && this.currentIndex != index) {
+					this.markItemCompleted(this.currentIndex);
+				}
+
+				// THEORY: consecutive sections (of non-video content) are marked complete when going from section to section
+				if (index == this.currentIndex + 1) {
+					this.markItemCompleted(this.currentIndex);
+				}
+
+				if (index != undefined) {
+					this.markItemStarted(index);
+				}
 			}
 
 			this.currentIndex = index;
@@ -379,9 +384,9 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 		},
 
 		markItemStarted: function (index) {
-			var completed = Database.getItemProperty(this.currentIndex, "completed");
+			var completed = Database.getItemProperty(index, "completed");
 			if (!completed) {
-				Database.setItemProperty(this.currentIndex, "started", true);
+				Database.setItemProperty(index, "started", true);
 				$(".toc").TOCTree("markStarted", index);
 			}
 		},
@@ -768,8 +773,11 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 					for (var j = 0; j < me.toc.length; j++) {
 						if (me.toc[j].desc == t) {
 							foundindex = j;
+							break;
 						}
 					}
+					if (foundindex != undefined)
+						break;
 				}
 			});
 

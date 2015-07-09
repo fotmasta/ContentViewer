@@ -15,8 +15,11 @@ body {
 }
 
 #main {
-	margin-top: 50px;
 	opacity: 0;
+}
+
+#header-nav {
+	margin-bottom: 0;
 }
 
 #contents {
@@ -301,6 +304,18 @@ body {
 	text-transform: uppercase;
 }
 
+.toc {
+	overflow: hidden;
+}
+
+.navbar-brand {
+}
+
+#search-bar {
+	margin-right: 10px;
+	padding-right: 0;
+}
+
 #text-area {
 }
 
@@ -363,6 +378,12 @@ body {
 		background: white !important;
 		color: $button-blue !important;
 	}
+}
+
+#show-menu-button {
+	padding: 6px 12px;
+
+	background-color: #2aabd2;
 }
 
 #resource-toggler {
@@ -467,6 +488,12 @@ span.completed {
 
 #collapse-button {
 	margin-right: 10px;
+}
+
+#collapsible-menu.in {
+	.input-group {
+		padding-bottom: 8px;
+	}
 }
 
 .vjs-back-button {
@@ -576,6 +603,10 @@ p.rr-update {
 		text-align: center;
 		color: white;
 		background-color: black;
+	}
+
+	.btn-toolbar {
+		margin: 10px;
 	}
 
 	.search-result-list {

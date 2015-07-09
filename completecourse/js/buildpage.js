@@ -89,6 +89,9 @@ requirejs.config({
 define(["jquery", "handlebars", "text!viewer_template.html", "video-manager", "video-overlay", "toc-tree", "videojs", "popcorn", "popcorn.timebase", "bootstrap-toolkit"], function ($, Handlebars, viewerTemplate, VideoManager) {
 	var manifest;
 
+	var contentsPaneDesiredVisible = undefined;
+	var lastSize = undefined;
+
 	function initialize () {
 		onResize();
 
@@ -103,6 +106,17 @@ define(["jquery", "handlebars", "text!viewer_template.html", "video-manager", "v
 		 coachMarksShown = true;
 		 }
 		 */
+
+		$(".toc").on("playvideo", onPlayContent);
+	}
+
+	function onPlayContent () {
+		var currentSize = ResponsiveBootstrapToolkit.current();
+
+		if (currentSize == "xs") {
+			resizePanes(false, false);
+			matchToggleButtonToVisibility();
+		}
 	}
 
 	function onResize () {
@@ -116,6 +130,46 @@ define(["jquery", "handlebars", "text!viewer_template.html", "video-manager", "v
 		$("#contents .scroller").height(wh - 50 - 50);
 
 		$("#main_video").css("max-height", wh - 50);
+
+		doResponsiveLogic();
+	}
+
+	function matchToggleButtonToVisibility () {
+		if ($("#contents").hasClass("col-xs-0")) {
+			$("#toc-toggler").removeClass("open");
+		} else {
+			$("#toc-toggler").addClass("open");
+		}
+	}
+
+	// THEORY: hide the TOC every time we switch to xs
+	function doResponsiveLogic () {
+		ResponsiveBootstrapToolkit.changed(function () {
+			var currentSize = ResponsiveBootstrapToolkit.current();
+			if (currentSize != lastSize) {
+				if (currentSize == "xs") {
+					var desired = contentsPaneDesiredVisible;
+					if (desired == undefined) desired = false;
+
+					resizePanes(desired, false);
+
+					wasSmall = true;
+				} else {
+					var desired = contentsPaneDesiredVisible;
+					if (desired == undefined) desired = true;
+
+					resizePanes(desired, false);
+
+					wasSmall = false;
+				}
+
+				matchToggleButtonToVisibility();
+
+				lastSize = currentSize;
+			}
+
+			contentsPaneDesiredVisible = undefined;
+		});
 	}
 
 	function addLinkToCSS (url) {
@@ -200,6 +254,7 @@ define(["jquery", "handlebars", "text!viewer_template.html", "video-manager", "v
 	}
 
 	function resizePanes (contentsVisible, resourcesVisible) {
+		var xs = ResponsiveBootstrapToolkit.is("xs");
 		var md = ResponsiveBootstrapToolkit.is(">=md");
 
 		// xs = 3, 6, 3
@@ -208,6 +263,20 @@ define(["jquery", "handlebars", "text!viewer_template.html", "video-manager", "v
 		var contentsSize = 3, resourcesSize = md ? 2 : 3;
 
 		var videoSize = 12 - (contentsVisible ? contentsSize : 0) - (resourcesVisible ? resourcesSize : 0);
+
+		if (xs) {
+			if (contentsPaneDesiredVisible) {
+				contentsVisible = true;
+				videoSize = 0;
+				contentsSize = 12;
+				//$("#contents .scroller").show(0);
+			} else {
+				contentsVisible = false;
+				videoSize = 12;
+				contentsSize = 0;
+				//$("#contents .scroller").show(0);
+			}
+		}
 
 		if (contentsVisible) {
 			$("#contents").removeClass("col-xs-0").addClass("col-xs-" + contentsSize);
@@ -221,16 +290,19 @@ define(["jquery", "handlebars", "text!viewer_template.html", "video-manager", "v
 			$("#sidebar").removeClass("col-xs-3 col-xs-2").addClass("col-xs-0");
 		}
 
-		$("#video").removeClass("col-xs-6 col-xs-7 col-xs-8 col-xs-9 col-xs-11 col-xs-12").addClass("col-xs-" + videoSize);
+		$("#video").removeClass("col-xs-0 col-xs-6 col-xs-7 col-xs-8 col-xs-9 col-xs-11 col-xs-12").addClass("col-xs-" + videoSize);
 	}
 
 	function onToggleTOC () {
-		var contentsVisible =$("#contents .scroller").is(":visible");
+		contentsPaneDesiredVisible = !$("#toc-toggler").hasClass("open");
+
+		var contentsVisible = !$("#contents").hasClass("col-xs-0");
 		var resourcesVisible = $("#sidebar").is(":visible");
 
 		resizePanes(!contentsVisible, resourcesVisible);
 
-		$("#contents .scroller").toggle("slide");
+		//$("#contents .scroller").toggle("slide");
+
 		$("#toc-toggler").toggleClass("open");
 
 		onResize();
