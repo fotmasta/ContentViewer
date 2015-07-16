@@ -260,12 +260,27 @@ define(["lunr", "jquery.ui"], function (lunr) {
 			}
 
 			if (term != "") {
-				this.element.parent().find(".toc").hide();
-				this.element.parent().find(".search-results").show();
+				this.element.parent().find(".toc").hide("slide");
+				this.element.parent().find(".search-results").delay(300).show("slide");
+
+				var lbl = results.length + " hit" + (results.length != 1 ? "s" : "");
+
+				$("#hit-count").text(lbl);
+
+				// NOTE: this is a terrible kludge to try to get the search results to appear (a timeout missing or less than 500 would leave the .search-results with display: none, for some reason)
+				var me = this;
+				setTimeout(function () {
+					me.element.parent().find(".search-results").show("slide");
+				}, 500);
 			} else {
-				this.element.parent().find(".toc").show();
-				this.element.parent().find(".search-results").hide();
+				this.element.parent().find(".toc").delay(300).show("slide");
+				this.element.parent().find(".search-results").hide("slide");
 			}
+		},
+
+		closeSearch: function () {
+			this.element.parent().find(".toc").delay(300).show("slide");
+			this.element.parent().find(".search-results").hide("slide");
 		},
 
 		searchByTitles: function (term) {
@@ -320,7 +335,7 @@ define(["lunr", "jquery.ui"], function (lunr) {
 		},
 
 		expandOrCollapse: function (event) {
-			var vis = $(".toc > li > ul").is(":visible");
+			var vis = $(".toc-holder > li > ul").is(":visible");
 
 			if (vis) {
 				$(this.options.expander + " i").removeClass("fa-caret-up").addClass("fa-caret-down");

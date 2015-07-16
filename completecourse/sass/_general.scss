@@ -69,6 +69,7 @@ body {
 	height: 100%;
 	top: 50%;
 	transform: translateY(-50%);
+	-webkit-transform: translateY(-50%);
 	position: relative;
 }
 
@@ -286,6 +287,10 @@ body {
 			color: rgb(25, 24, 50);
 		}
 	}
+}
+
+.tree-toggler {
+	cursor: pointer;
 }
 
 .nav-list .nav-header {
@@ -602,7 +607,7 @@ p.rr-update {
 		padding: .5em 0;
 		text-align: center;
 		color: white;
-		background-color: black;
+		background-color: rgb(232, 100, 20);
 	}
 
 	.btn-toolbar {
@@ -621,7 +626,7 @@ p.rr-update {
 			}
 
 			&:hover {
-				background-color: blue;
+				background-color: rgb(174, 147, 133);
 				color: white;
 				cursor: pointer;
 			}
@@ -643,4 +648,8 @@ p.rr-update {
 			}
 		}
 	}
+}
+
+#hit-count {
+	color: rgb(98, 58, 37);
 }

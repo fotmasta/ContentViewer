@@ -1,4 +1,4 @@
-// TODO: full-text searching UI? (close search, re-do search, # of hits, prev/next hit)
+// TODO: full-text searching UI? (re-do search, prev/next hit)
 // TODO: highlight search term on page, with next/prev button in search box
 // TODO: short sub-sections don't get marked complete
 // TODO: (BUG) new Habitat projects open to video page at first (?)
@@ -39,3 +39,6 @@
 // DONE: responsive: show/hide full-screen
 // DONE: when xs and toc is clicked, hide toc
 // DONE: responsive: do something with search and account buttons and hide project text
+// DONE: Safari browser compatibility (video poster centering) [-wekbit prefix]
+// DONE: collapse all button not working
+// DONE: full-text searching: close search, # of hits

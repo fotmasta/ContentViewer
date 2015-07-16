@@ -32,6 +32,7 @@
   height: 100%;
   top: 50%;
   transform: translateY(-50%);
+  -webkit-transform: translateY(-50%);
   position: relative; }
 
 .iframe-holder {
@@ -178,6 +179,9 @@
     .nav-list > li > a:active, .nav-list > li > a.active {
       background-color: #C1C0E7;
       color: #191832; }
+
+.tree-toggler {
+  cursor: pointer; }
 
 .nav-list .nav-header {
   margin-right: -15px;
@@ -407,7 +411,7 @@ p.rr-update {
     padding: .5em 0;
     text-align: center;
     color: white;
-    background-color: black; }
+    background-color: #e86414; }
   .search-results .btn-toolbar {
     margin: 10px; }
   .search-results .search-result-list {
@@ -418,7 +422,7 @@ p.rr-update {
       .search-results .search-result-list .hit:nth-child(odd) {
         background-color: #eee; }
       .search-results .search-result-list .hit:hover {
-        background-color: blue;
+        background-color: #ae9385;
         color: white;
         cursor: pointer; }
       .search-results .search-result-list .hit .section-label {
@@ -433,5 +437,8 @@ p.rr-update {
         padding-left: 5em;
         left: 0;
         display: inline-block; }
+
+#hit-count {
+  color: #623a25; }
 
 /*# sourceMappingURL=main.css.map */
