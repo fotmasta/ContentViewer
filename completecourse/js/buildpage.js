@@ -195,6 +195,61 @@ define(["jquery", "handlebars", "text!viewer_template.html", "video-manager", "v
 		return metadata;
 	}
 
+	function NodeFromEPUB (t, depth) {
+		var a = t.find("content");
+		var href = a.attr("src");
+		var desc = t.find("navLabel text").html();
+		var hash = VideoManager.HashInURL(href);
+
+		var shortLabel = null;
+		var match = desc.match(/^(\d+)\./);
+		if (match) {
+			shortLabel = match[1];
+		}
+
+		var node = {
+			desc: desc,
+			src: manifest.folder + "/OEBPS/html/" + href,
+			hash: hash,
+			depth: depth,
+			short: shortLabel
+		};
+
+		return node;
+	}
+
+	function addFromEPUB (list, metadata, depth) {
+		for (var i = 0; i < list.length; i++) {
+			var t = list.eq(i);
+
+			var cur_depth = [];
+			if (depth.length) {
+				cur_depth = depth.slice();
+			}
+			cur_depth.push(i);
+
+			var node = NodeFromEPUB(t, cur_depth.slice());
+
+			metadata.push(node);
+
+			var children = t.children("navPoint");
+
+			addFromEPUB(children, metadata, cur_depth);
+		}
+	}
+
+	function convertEPUBTOCtoMetadata (data) {
+		var metadata = [];
+
+		var m = $(data).find("navMap");
+
+		var top = $(data).find("navMap > navPoint");
+
+		addFromEPUB(top, metadata, []);
+
+		return metadata;
+	}
+
 	function onLoadedTOC (metadata) {
 		$(".toc").TOCTree({ data: metadata.toc, expander: "#collapse-button" });
 
@@ -227,6 +282,18 @@ define(["jquery", "handlebars", "text!viewer_template.html", "video-manager", "v
 		VideoManager.loadMostRecentVideo();
 	}
 
+	function onEPUBTOCLoaded (data) {
+		var metadata = convertEPUBTOCtoMetadata(data);
+
+		$(".toc").TOCTree({ type: "epub", data: metadata, expander: "#collapse-button" });
+
+		VideoManager.initialize(metadata, "#video video", videojs("main_video"), [], manifest);
+
+		initialize();
+
+		VideoManager.loadMostRecentVideo();
+	}
+
 	function loadContent () {
 		switch (manifest.type) {
 			case "metadata":
@@ -243,6 +310,9 @@ define(["jquery", "handlebars", "text!viewer_template.html", "video-manager", "v
 				console.log("path = " + path);
 				require(["text!" + path], function () { console.log("was able to open toc"); });
 				*/
+				break;
+			case "epub":
+				$.get(manifest.folder + "/OEBPS/html/toc.ncx", onEPUBTOCLoaded);
 				break;
 		}
 	}

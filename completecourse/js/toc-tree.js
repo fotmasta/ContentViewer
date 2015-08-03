@@ -86,10 +86,14 @@ define(["lunr", "jquery.ui"], function (lunr) {
 
 			this.holder.empty();
 
-			if (this.options.type == "habitat")
+			if (this.options.type == "habitat") {
 				this.refreshFromHabitatData();
-			else
+			} else if (this.options.type == "epub") {
 				this.refreshFromMetadata();
+				this.collapseTOC();
+			} else {
+				this.refreshFromMetadata();
+			}
 
 			var p = $("<p>", { id: "query-summary", class: "blocky", text: "" });
 			this.holder.append(p);
@@ -151,6 +155,9 @@ define(["lunr", "jquery.ui"], function (lunr) {
 				} else {
 					if (this.options.type == "habitat") {
 						short.html(short_label);
+					} else if (this.options.type == "epub") {
+						short_label = depth[depth.length - 1];
+						short.addClass("invisible");
 					} else {
 						var shortcut = d.node.desc.toLowerCase();
 
@@ -334,17 +341,23 @@ define(["lunr", "jquery.ui"], function (lunr) {
 			}
 		},
 
+		collapseTOC: function () {
+			$(this.options.expander + " i").removeClass("fa-caret-up").addClass("fa-caret-down");
+			this.holder.find("> li > ul").hide(300);
+		},
+
+		expandTOC: function () {
+			$(this.options.expander + " i").removeClass("fa-caret-down").addClass("fa-caret-up");
+			this.holder.find("li ul").show(300);
+		},
+
 		expandOrCollapse: function (event) {
 			var vis = $(".toc-holder > li > ul").is(":visible");
 
 			if (vis) {
-				$(this.options.expander + " i").removeClass("fa-caret-up").addClass("fa-caret-down");
-				this.holder.find("> li > ul").hide(300);
-				//$(".toc > li > ul").hide(300);
+				this.collapseTOC();
 			} else {
-				$(this.options.expander + " i").removeClass("fa-caret-down").addClass("fa-caret-up");
-				this.holder.find("li ul").show(300);
-				//$(".toc li ul").show(300);
+				this.expandTOC();
 			}
 		}
 	});

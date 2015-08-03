@@ -1,3 +1,9 @@
+html {
+  overflow: hidden; }
+
+body {
+  overflow: hidden; }
+
 .col-xs-0 {
   float: left;
   width: 0; }

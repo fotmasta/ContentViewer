@@ -125,9 +125,13 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 		},
 
 		HashInURL: function (url) {
-			var n = url.lastIndexOf("#");
-			if (n != -1) return url.substr(n);
-			else return "";
+			if (url) {
+				var n = url.lastIndexOf("#");
+				if (n != -1) return url.substr(n);
+				else return "";
+			} else {
+				return "";
+			}
 		},
 
 		getCurrentIndex: function () {

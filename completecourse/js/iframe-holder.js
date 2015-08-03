@@ -39,9 +39,12 @@ define(["bootstrap-dialog", "jquery.ui"], function (BootstrapDialog) {
 				var h = me.iframe.contents()[0].body.scrollHeight;
 
 				// turn off scrolling on the iframe's content
+				// NOTE: I was tempted to comment this out for ePub content from CodeMantra to allow the scroll thumb to appear (but the disappearing thumb could be a Mac/Chrome thing)
 				me.iframe.contents().find("html").css("overflow", "hidden");
 
 				me.iframe.height(h);
+
+				me.iframe.scrollTop(1).scrollTop(0);
 
 				me.makeImagesModal();
 

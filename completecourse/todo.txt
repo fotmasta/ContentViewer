@@ -1,3 +1,7 @@
+// TODO: test CodeMantra epub on S3 [check] and then InformIT [OEBPS needs to be lowercase]
+// TODO: jumping to a link from within a CodeMantra ePub works but then scrolls to the top of the new page
+// TODO: for ePubs, make sure it can track sections
+// TODO: make identification of current section visually nicer-looking
 // TODO: full-text searching UI? (re-do search, prev/next hit)
 // TODO: highlight search term on page, with next/prev button in search box
 // TODO: short sub-sections don't get marked complete
@@ -42,3 +46,5 @@
 // DONE: Safari browser compatibility (video poster centering) [-wekbit prefix]
 // DONE: collapse all button not working
 // DONE: full-text searching: close search, # of hits
+// DONE: start with table of contents collapsed
+// DONE: load and display from CodeMantra (?) ePub
