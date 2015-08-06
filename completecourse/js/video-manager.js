@@ -71,6 +71,13 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 		this.player().currentTime(t - 10);
 	};
 
+	function getParameterByName (loc, name) {
+		name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+		var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+			results = regex.exec(loc);
+		return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+	}
+
 	var VideoManager = {
 		initialize: function (toc, el, player, markers, options) {
 			this.toc = toc;
@@ -103,6 +110,11 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 			$(".toc").on("playvideo", onPlayContent);
 
 			$("#video").scroll($.proxy(this.onScrollContent, this));
+
+			window.onpopstate = function (event) {
+				var loc = document.location.search;
+				VideoManager.tryToGotoLocationSearch(loc);
+			};
 
 			this.player.markers({
 				markerStyle: {
@@ -183,7 +195,17 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 			return Database.getCurrentTime();
 		},
 
+		tryToGotoLocationSearch: function (loc) {
+			// check for link from query parameter
+			var link = getParameterByName(loc, "link");
+			if (link) {
+				this.playFromTOC(link, { pause: true, history: false });
+			}
+		},
+
 		loadMostRecentVideo: function () {
+			this.tryToGotoLocationSearch(location.search);
+
 			var index = Database.getCurrentIndex();
 
 			if (index == undefined) {
@@ -217,6 +239,12 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 
 				if (index >= this.toc.length) return;
 			}
+
+			if (options && (options.history == undefined || options.history == true)) {
+				history.pushState(null, null, "?link=" + index);
+			}
+
+			this.syncTOCToContent(index);
 
 			// if this is iframe content, open it now; otherwise, it's video
 			if (this.toc[index].src) {
@@ -272,13 +300,22 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 			this.busyScrolling = false;
 		},
 
-		scrollToHash: function (iframe, index, immediate) {
-			if (index == undefined) {
-				index = this.currentIndex;
+		scrollToHash: function (iframe, options, immediate) {
+			var index, hash;
+
+			if (options.hash == undefined) {
+				if (options.index == undefined) {
+					index = this.currentIndex;
+				} else {
+					index = options.index;
+				}
+				hash = this.HashInURL(this.toc[index].src);
+			} else {
+				hash = options.hash;
 			}
+
 			immediate = (immediate == undefined) ? false : immediate;
 
-			var hash = this.HashInURL(this.toc[index].src);
 			var el = iframe.contents().find(hash);
 			var dest = 0;
 
@@ -329,7 +366,7 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 					// same page we're already on
 					existing.attr( { "data-index": index } ).show();
 
-					this.scrollToHash(existing, index);
+					this.scrollToHash(existing, { index: index });
 				} else {
 					var sel = $(".iframe-holder *");
 					sel.remove();
@@ -767,7 +804,7 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 
 			$(iframes.get().reverse()).each(function (index, item) {
 				var iframe = $(item);
-				var headers = iframe.contents().find("h1, h2, h3");
+				var headers = iframe.contents().find("h1, h2, h3, h4");
 				var headersOnScreen = iFrameElementsOnScreen(headers, iframe);
 				for (var i = headersOnScreen.length - 1; i >= 0; i--) {
 					var item = headersOnScreen[i];
@@ -838,7 +875,14 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 
 		onScrollContent: function () {
 			if (!this.busyScrolling) {
+				var curIndex = this.getCurrentIndex();
+
 				this.syncTOCToContent();
+
+				var newIndex = this.getCurrentIndex();
+				if (curIndex != newIndex) {
+					history.pushState(null, null, "?link=" + newIndex);
+				}
 
 				if (this.options.infinite_scrolling != false) {
 					this.checkForAutoAdvance();
@@ -846,8 +890,9 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 			}
 		},
 
-		syncTOCToContent: function () {
-			var index = this.findCurrentItem();
+		syncTOCToContent: function (index) {
+			if (index == undefined)
+				index = this.findCurrentItem();
 
 			if (index) {
 				if (index != this.getCurrentIndex()) {
@@ -855,6 +900,10 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 				}
 
 				var entry = $(".toc li[data-index=" + index + "]");
+
+				$(".toc .current").removeClass("current");
+				entry.addClass("current");
+
 				var scroller = $("#contents-pane .scroller");
 				var t = scroller.scrollTop();
 				var h = scroller.height();

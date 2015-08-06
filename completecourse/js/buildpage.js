@@ -209,7 +209,7 @@ define(["jquery", "handlebars", "text!viewer_template.html", "video-manager", "v
 
 		var node = {
 			desc: desc,
-			src: manifest.folder + "/OEBPS/html/" + href,
+			src: manifest.folder + "/oebps/html/" + href,
 			hash: hash,
 			depth: depth,
 			short: shortLabel
@@ -285,7 +285,7 @@ define(["jquery", "handlebars", "text!viewer_template.html", "video-manager", "v
 	function onEPUBTOCLoaded (data) {
 		var metadata = convertEPUBTOCtoMetadata(data);
 
-		$(".toc").TOCTree({ type: "epub", data: metadata, expander: "#collapse-button" });
+		$(".toc").TOCTree({ type: "epub", data: metadata, metadata: metadata, expander: "#collapse-button" });
 
 		VideoManager.initialize(metadata, "#video video", videojs("main_video"), [], manifest);
 
@@ -312,7 +312,7 @@ define(["jquery", "handlebars", "text!viewer_template.html", "video-manager", "v
 				*/
 				break;
 			case "epub":
-				$.get(manifest.folder + "/OEBPS/html/toc.ncx", onEPUBTOCLoaded);
+				$.get(manifest.folder + "/oebps/html/toc.ncx", onEPUBTOCLoaded);
 				break;
 		}
 	}

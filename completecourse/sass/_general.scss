@@ -295,6 +295,10 @@ body {
 	cursor: pointer;
 }
 
+.tree-toggler:not(.invisible) + span + .checked {
+	display: none;
+}
+
 .nav-list .nav-header {
 	margin-right: -15px;
 	margin-left: -8px;
@@ -409,7 +413,7 @@ body {
 .checked {
 	color: orange;
 	position: absolute;
-	left: -50px;
+	left: -15px;
 	top: 6px;
 	font-size: 16px;
 }
@@ -654,4 +658,20 @@ p.rr-update {
 
 #hit-count {
 	color: rgb(98, 58, 37);
+}
+
+div.indicator {
+	transform: translateX(-200px);
+	transition: transform linear .5s;
+}
+
+.toc .current > a .desc, .toc .current > label > a .desc {
+	div.indicator {
+		width: 100%;
+		content: "";
+		display: block;
+		height: 2px;
+		background-color: #719db7;
+		transform: translateX(0px);
+	}
 }

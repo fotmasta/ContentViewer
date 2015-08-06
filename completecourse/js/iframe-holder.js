@@ -36,24 +36,29 @@ define(["bootstrap-dialog", "jquery.ui"], function (BootstrapDialog) {
 			var me = this;
 
 			setTimeout(function () {
-				var h = me.iframe.contents()[0].body.scrollHeight;
+				if (me.iframe.contents()[0]) {
+					var h = me.iframe.contents()[0].body.scrollHeight;
 
-				// turn off scrolling on the iframe's content
-				// NOTE: I was tempted to comment this out for ePub content from CodeMantra to allow the scroll thumb to appear (but the disappearing thumb could be a Mac/Chrome thing)
-				me.iframe.contents().find("html").css("overflow", "hidden");
+					// turn off scrolling on the iframe's content
+					// NOTE: I was tempted to comment this out for ePub content from CodeMantra to allow the scroll thumb to appear (but the disappearing thumb could be a Mac/Chrome thing)
+					me.iframe.contents().find("html").css("overflow", "hidden");
 
-				me.iframe.height(h);
+					me.iframe.height(h);
 
-				me.iframe.scrollTop(1).scrollTop(0);
+					me.iframe.scrollTop(1).scrollTop(0);
 
-				me.makeImagesModal();
+					me.makeImagesModal();
 
-				// if we're auto-advancing, don't scroll to any hashtags
-				if (me.options.scrollTo) {
-					me.options.manager.scrollToHash(me.iframe, me.options.index, true);
+					// NOTE: if we're auto-advancing, don't scroll to any hashtags
+
+					if (me.options.scrollTo) {
+						// NOTE: this is grabbing the hash from the location; works for epubs, may have to be revised for Habitat
+						var hash = me.iframe[0].contentDocument.location.hash;
+						me.options.manager.scrollToHash(me.iframe, { hash: hash }, true);
+					}
+
+					me.options.manager.onIFrameLoaded(me);
 				}
-
-				me.options.manager.onIFrameLoaded(me);
 			}, 1000);
 		},
 

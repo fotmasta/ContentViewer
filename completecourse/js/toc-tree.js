@@ -140,6 +140,9 @@ define(["lunr", "jquery.ui"], function (lunr) {
 				var entry_text = d.node.desc;
 				var sp = $("<span>", {class: "desc", html: " " + entry_text});
 
+				var indicator = $("<div>", { class: "indicator" });
+				sp.append(indicator);
+
 				var short = $("<span>", {class: "level tree-toggler"});
 
 				var short_label;
@@ -218,6 +221,8 @@ define(["lunr", "jquery.ui"], function (lunr) {
 			}
 
 			this.addNodes( { counter: 0 }, nodes, this.holder, []);
+
+			this.nodes = nodes;
 		},
 		
 		launchVideo: function (index, event) {
