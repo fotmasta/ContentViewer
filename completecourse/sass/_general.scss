@@ -241,6 +241,7 @@ body {
 	overflow-y: scroll;
 	overflow-x: hidden;
 	height: 100%;
+	width: 100%;
 }
 
 .nav-list {
@@ -608,16 +609,32 @@ p.rr-update {
 .search-results {
 	display: none;
 
-	h3 {
-		margin: 0;
-		padding: .5em 0;
-		text-align: center;
-		color: white;
+	.row {
 		background-color: rgb(232, 100, 20);
 	}
 
+	.input-group {
+		border: none;
+		background: none;
+	}
+
+	input {
+		background: none;
+		color: white;
+		z-index: auto !important;
+	}
+
+	h3 {
+		margin: 0;
+		padding: .5em 0 .5em .5em;
+		color: white;
+
+		input {
+			display: inline-block;
+		}
+	}
+
 	.btn-toolbar {
-		margin: 10px;
 	}
 
 	.search-result-list {
@@ -626,6 +643,10 @@ p.rr-update {
 		.hit {
 			padding: .5em 1em;
 			position: relative;
+
+			p {
+				margin-bottom: 0;
+			}
 
 			&:nth-child(odd) {
 				background-color: #eee;
@@ -652,12 +673,18 @@ p.rr-update {
 				left: 0;
 				display: inline-block;
 			}
+
+			&.selected {
+				background-color: #e5cfc7;
+			}
 		}
 	}
 }
 
 #hit-count {
-	color: rgb(98, 58, 37);
+	color: #193E0A;
+	line-height: 30px;
+	margin-bottom: 0;
 }
 
 div.indicator {
@@ -674,4 +701,10 @@ div.indicator {
 		background-color: #719db7;
 		transform: translateX(0px);
 	}
+}
+
+button#search-close {
+	background: transparent;
+	color: white;
+	text-shadow: none;
 }

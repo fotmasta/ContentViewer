@@ -79,6 +79,8 @@ define(["lunr", "jquery.ui"], function (lunr) {
 
 			if (this.options.expander)
 				$(this.options.expander).click($.proxy(this.expandOrCollapse, this));
+
+			this.searchCounter = undefined;
 		},
 
 		refresh: function () {
@@ -252,6 +254,8 @@ define(["lunr", "jquery.ui"], function (lunr) {
 		},
 
 		search: function (term) {
+			this.searchCounter = undefined;
+
 			if (!this.searchIndex) {
 				return this.searchByTitles(term);
 			}
@@ -266,33 +270,92 @@ define(["lunr", "jquery.ui"], function (lunr) {
 				var node = findNodeForIndex(this.nodes, index);
 				var section_label = " <p class='section-label'>" + node.node.depth.join(".") + "</p>";
 				var hit_label = "<p class='hit-label'>" + hit.desc + "</p>";
-				var hitResult = $("<div>", { class: "hit", html: section_label + hit_label });
-				hitResult.click($.proxy(this.launchVideo, this, index));
+				var hitResult = $("<div>", { class: "hit", html: section_label + hit_label }).data("index", index);
+				var me = this;
+				hitResult.click(function (event) {
+					me.launchVideo($(this).data("index"), event);
+					$(".hit.selected").removeClass("selected");
+					$(this).addClass("selected");
+				});
 				$(".search-result-list").append(hitResult);
 			}
 
 			if (term != "") {
-				this.element.parent().find(".toc").hide("slide");
-				this.element.parent().find(".search-results").delay(300).show("slide");
-
-				var lbl = results.length + " hit" + (results.length != 1 ? "s" : "");
-
-				$("#hit-count").text(lbl);
-
-				// NOTE: this is a terrible kludge to try to get the search results to appear (a timeout missing or less than 500 would leave the .search-results with display: none, for some reason)
-				var me = this;
-				setTimeout(function () {
-					me.element.parent().find(".search-results").show("slide");
-				}, 500);
+				this.showSearchPane(results.length);
 			} else {
 				this.element.parent().find(".toc").delay(300).show("slide");
 				this.element.parent().find(".search-results").hide("slide");
 			}
 		},
 
+		showSearchPane: function (resultCount) {
+			this.element.parent().find(".toc").hide("slide");
+			this.element.parent().find(".search-results").delay(300).show("slide");
+
+			if (resultCount == undefined) {
+				$("#hit-count").text("");
+			} else {
+				var lbl = resultCount + " hit" + (resultCount != 1 ? "s" : "");
+
+				$("#hit-count").text(lbl);
+			}
+
+			// NOTE: this is a terrible kludge to try to get the search results to appear (a timeout missing or less than 500 would leave the .search-results with display: none, for some reason)
+			var me = this;
+			setTimeout(function () {
+				me.element.parent().find(".search-results").show("slide");
+			}, 500);
+		},
+
 		closeSearch: function () {
 			this.element.parent().find(".toc").delay(300).show("slide");
 			this.element.parent().find(".search-results").hide("slide");
+		},
+
+		searchNext: function (direction) {
+			if (this.searchCounter == undefined)
+				this.searchCounter = 0;
+			else {
+				var tt = $(".hit").length;
+
+				this.searchCounter += direction;
+
+				if (this.searchCounter < 0)
+					this.searchCounter = 0;
+				else if (this.searchCounter > tt - 1)
+					this.searchCounter = tt - 1;
+			}
+
+			$(".hit").eq(this.searchCounter).click();
+
+			// keep the selected hit scrolled in the middle
+			this.autoScrollSearchResults();
+		},
+
+		autoScrollSearchResults: function () {
+			var scroller = $(".search-results .scroller");
+			var t = scroller.scrollTop();
+			var h = scroller.height();
+			var entry = $(".hit.selected");
+			var p = entry.offset().top;
+			var desired_top = (h * .5);
+			var adj = p - desired_top;
+			var dest = (t + adj);
+			var currTarget = scroller.attr("data-scrolltarget");
+			var diff = (currTarget - dest);
+			if (currTarget == undefined || Math.abs(diff) > 20) {
+				scroller.attr("data-scrolltarget", dest);
+				scroller.stop().animate(
+					{
+						scrollTop: dest
+					},
+					{
+						duration: 1000,
+						complete: function () {
+						}
+					}
+				);
+			}
 		},
 
 		searchByTitles: function (term) {

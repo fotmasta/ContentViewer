@@ -380,6 +380,21 @@ define(["jquery", "handlebars", "text!viewer_template.html", "video-manager", "v
 
 	function onSearch () {
 		var term = $("#query").val();
+
+		$("#query-too").val(term);
+
+		if (term == "") {
+			$(".toc").TOCTree("showSearchPane");
+		} else {
+			$(".toc").TOCTree("search", term);
+		}
+	}
+
+	function onSearchToo () {
+		var term = $("#query-too").val();
+
+		$("#query").val(term);
+
 		$(".toc").TOCTree("search", term);
 	}
 
@@ -390,6 +405,14 @@ define(["jquery", "handlebars", "text!viewer_template.html", "video-manager", "v
 	function onClearSearch () {
 		$("#query").val("");
 		$(".toc").TOCTree("closeSearch", "");
+	}
+
+	function onSearchPrevious () {
+		$(".toc").TOCTree("searchNext", -1);
+	}
+
+	function onSearchNext () {
+		$(".toc").TOCTree("searchNext", 1);
 	}
 
 	function setProjectTitle (title) {
@@ -429,8 +452,12 @@ define(["jquery", "handlebars", "text!viewer_template.html", "video-manager", "v
 			$(".search-button").click(onSearch);
 			$(".search-results .close-btn").click(onCloseSearch);
 
-			$("#query").on("input", onSearch);
+			$("#query").on("input", onSearch).on("focus", onSearch);
+			$("#query-too").on("input", onSearchToo);
 			$("#clear-search-button").click(onClearSearch);
+
+			$("#search-previous").click(onSearchPrevious);
+			$("#search-next").click(onSearchNext);
 
 			$("#account-button").click(function () { window.open("//memberservices.informit.com/my_account/index.aspx"); });
 		},

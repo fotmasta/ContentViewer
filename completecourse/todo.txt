@@ -1,7 +1,6 @@
 // TODO: when scrolling, expand TOC for current section, if hidden
 // TODO: setSearchIndex is being called before TOCTree is initialized
 // TODO: designate start page for ePub? [hand edit?]
-// TODO: finish styling full-text search UI (re-do search, prev/next hit)
 // TODO: highlight search term on page, with next/prev button in search box
 // TODO: short sub-sections don't get marked complete
 // TODO: (BUG) new Habitat projects open to video page at first (?)
@@ -53,3 +52,4 @@
 // DONE: for ePubs, make sure it can track sections [h4 too]
 // DONE: make identification of current section visually nicer-looking
 // DONE: change history during scrolling of sections
+// DONE: finish styling full-text search UI (re-do search, prev/next hit)
