@@ -53,3 +53,4 @@
 // DONE: make identification of current section visually nicer-looking
 // DONE: change history during scrolling of sections
 // DONE: finish styling full-text search UI (re-do search, prev/next hit)
+// DONE: store localStorage data separately for each title (because localStorage is shared by domain)

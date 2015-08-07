@@ -6,6 +6,11 @@ define(["jquery.json"], function () {
 		currentIndex: undefined,
 
 		initialize: function (toc) {
+			// NOTE: store our app data in a key named for the folder this content came from (ie, test_my_google_apps)
+
+			var paths = window.location.pathname.split("/");
+			this.folder = paths[paths.length - 2];
+
 			this.items = new Array(toc.length);
 			for (var i = 0; i < this.items.length; i++) {
 				var item = { started: false, completed: false };
@@ -16,7 +21,7 @@ define(["jquery.json"], function () {
 		},
 
 		loadFromLocalStorage: function () {
-			var item = localStorage.getItem("PTG:db");
+			var item = localStorage.getItem(this.folder);
 			if (item) {
 				var db = $.evalJSON(item);
 
@@ -30,7 +35,7 @@ define(["jquery.json"], function () {
 
 			var to_json = $.toJSON(db);
 
-			localStorage.setItem("PTG:db", to_json);
+			localStorage.setItem(this.folder, to_json);
 		},
 
 		setItemProperty: function (index, property, value) {
