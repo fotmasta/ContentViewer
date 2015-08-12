@@ -6,6 +6,31 @@ define(["bootstrap-dialog", "jquery.ui"], function (BootstrapDialog) {
 		else return url;
 	}
 
+	function URLPageOnly (url) {
+		var n = url.lastIndexOf("/");
+		if (n != -1) return url.substr(n);
+		else return url;
+	}
+
+	function URLWithoutHash (url) {
+		if (url) {
+			var n = url.lastIndexOf("#");
+			if (n != -1) return url.substr(0, n);
+			else return url;
+		} else
+			return url;
+	}
+
+	function HashInURL (url) {
+		if (url) {
+			var n = url.lastIndexOf("#");
+			if (n != -1) return url.substr(n);
+			else return "";
+		} else {
+			return "";
+		}
+	}
+
 	function getAbsolutePath () {
 		var loc = window.location;
 		var pathName = loc.pathname.substring(0, loc.pathname.lastIndexOf('/'));
@@ -18,11 +43,23 @@ define(["bootstrap-dialog", "jquery.ui"], function (BootstrapDialog) {
 		_create: function () {
 			this.element.attr("data-index", this.options.index);
 
-			this.iframe = $("<iframe>", { src: this.options.src, frameborder: 0 });
+			var src = URLWithoutHash(this.options.src);
+
+			this.iframe = $("<iframe>", { src: src, frameborder: 0 });
 
 			this.iframe.load($.proxy(this.onLoaded, this));
 
 			this.element.append(this.iframe);
+
+			this.addStylesheet();
+		},
+
+		loadNewContent: function (options) {
+			this.options = options;
+
+			var src = URLWithoutHash(this.options.src);
+
+			this.iframe.attr("src", src).css("height", "auto");
 		},
 
 		onLoaded: function ()  {
@@ -32,6 +69,8 @@ define(["bootstrap-dialog", "jquery.ui"], function (BootstrapDialog) {
 				this.addPreviousButton();
 				this.addNextButton();
 			}
+
+			this.overrideLinks();
 
 			var me = this;
 
@@ -52,8 +91,10 @@ define(["bootstrap-dialog", "jquery.ui"], function (BootstrapDialog) {
 					// NOTE: if we're auto-advancing, don't scroll to any hashtags
 
 					if (me.options.scrollTo) {
-						// NOTE: this is grabbing the hash from the location; works for epubs, may have to be revised for Habitat
-						var hash = me.iframe[0].contentDocument.location.hash;
+						var hash = HashInURL(me.options.src);
+						if (me.options.hash)
+							hash = me.options.hash;
+
 						me.options.manager.scrollToHash(me.iframe, { hash: hash }, true);
 					}
 
@@ -117,6 +158,18 @@ define(["bootstrap-dialog", "jquery.ui"], function (BootstrapDialog) {
 
 				this.iframe.contents().find("body").append(a);
 			}
+		},
+
+		overrideLinks: function () {
+			// THEORY: don't override all links
+			this.iframe.contents().find("a[href]").click($.proxy(this.onClickLink, this));
+		},
+
+		onClickLink: function (event) {
+			event.preventDefault();
+			var href = $(event.target).attr("href");
+			// find the toc entry with this href and go there (including the link index # in our address bar)
+			this.options.manager.triggerInternalLink(href);
 		},
 
 		makeImagesModal: function () {

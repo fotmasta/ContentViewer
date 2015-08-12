@@ -361,6 +361,12 @@ define(["jquery", "handlebars", "text!viewer_template.html", "video-manager", "v
 		}
 
 		$("#video").removeClass("col-xs-0 col-xs-6 col-xs-7 col-xs-8 col-xs-9 col-xs-11 col-xs-12").addClass("col-xs-" + videoSize);
+
+		// let the content know if it's xs
+		$("iframe").contents().find(".habitat-body").removeClass("xs");
+		if (xs) {
+			$("iframe").contents().find(".habitat-body").addClass("xs");
+		}
 	}
 
 	function onToggleTOC () {

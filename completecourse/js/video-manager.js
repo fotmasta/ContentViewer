@@ -134,6 +134,8 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 
 			this.trackID = 1;
 			this.busyScrolling = false;
+
+			this.registerGoogleAnalytics(this.options.title);
 		},
 
 		HashInURL: function (url) {
@@ -228,7 +230,7 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 		playFirstVideo: function () {
 			var index = this.getFirstVideoFromTOC();
 			
-			this.playFromTOC(index);
+			this.playFromTOC(index, {});
 		},
 		
 		playFromTOC: function (index, options) {
@@ -245,6 +247,8 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 			}
 
 			this.syncTOCToContent(index);
+
+			this.sendGoogleAnalytics(this.toc[index].desc);
 
 			// if this is iframe content, open it now; otherwise, it's video
 			if (this.toc[index].src) {
@@ -296,6 +300,27 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 			this.addTriggersForThisVideo();
 		},
 
+		// THEORY: links within the epub need to be overridden so the iframe src gets updated and the location bar stays current
+		triggerInternalLink: function (href) {
+			var this_href = URLWithoutHash(href);
+
+			if (this_href) {
+				// try to find where this internal link is in the toc and go there
+				for (var i = 0; i < this.toc.length; i++) {
+					var other_href = URLWithoutHash(this.toc[i].src);
+					if (other_href.indexOf(this_href) != -1) {
+						var hash = VideoManager.HashInURL(href);
+						this.playFromTOC(i, {hash: hash});
+						break;
+					}
+				}
+			} else {
+				var iframe = $("iframe").eq(0);
+
+				this.scrollToHash(iframe, { hash: href }, false);
+			}
+		},
+
 		onDoneScrolling: function () {
 			this.busyScrolling = false;
 		},
@@ -334,18 +359,35 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 
 		onIFrameLoaded: function (iframe) {
 			waitingForAutoAdvance = false;
+			waitingForIFrameToLoad = false;
 		},
 
 		addIFrame: function (params) {
-			var iframe = $("<div>").iFrameHolder({
-				manager: this,
-				src: this.toc[params.index].src,
-				index: params.index,
-				scrollTo: params.scrollTo,
-				infinite_scrolling: this.options.infinite_scrolling,
-			});
+			if (this.iframe == undefined) {
+				var iframe = $("<div>").iFrameHolder({
+					manager: this,
+					src: this.toc[params.index].src,
+					index: params.index,
+					scrollTo: params.scrollTo,
+					infinite_scrolling: this.options.infinite_scrolling,
+					hash: params.hash
+				});
 
-			iframe.appendTo(".iframe-holder");
+				iframe.appendTo(".iframe-holder");
+
+				this.iframe = iframe;
+			} else {
+				var options = {
+					manager: this,
+					src: this.toc[params.index].src,
+					index: params.index,
+					scrollTo: params.scrollTo,
+					infinite_scrolling: this.options.infinite_scrolling,
+					hash: params.hash
+				};
+				waitingForIFrameToLoad = true;
+				this.iframe.iFrameHolder("loadNewContent", options);
+			}
 		},
 
 		playExtraFromTOC: function (index, options) {
@@ -354,7 +396,7 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 			if (options.replaceAll == true) {
 				// check to see if any of the current iframes have our source
 				var new_source = URLWithoutHash(this.toc[index].src);
-				var existing = $(".iframe-holder").find("iframe").map(function (index, item) {
+				var existing = $(".iframe-holder").find("iframe").map(function (ind, item) {
 					var src = $(item).attr("src");
 					if (new_source == URLWithoutHash(src)) {
 						return item;
@@ -366,12 +408,12 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 					// same page we're already on
 					existing.attr( { "data-index": index } ).show();
 
-					this.scrollToHash(existing, { index: index });
+					this.scrollToHash(existing, { index: index, hash: options.hash });
 				} else {
-					var sel = $(".iframe-holder *");
-					sel.remove();
+					//var sel = $(".iframe-holder *");
+					//sel.remove();
 
-					this.addIFrame( { index: index, scrollTo: true } );
+					this.addIFrame( { index: index, scrollTo: true, hash: options.hash } );
 				}
 
 				$("#main_video").hide();
@@ -597,14 +639,16 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 		},
 
 		removeAllTriggers: function () {
-			for (var i = 0; i < this.trackID; i++) {
-				//console.log("removing " + i);
-				this.pop.removeTrackEvent(i);
+			if (this.trackID && this.pop) {
+				for (var i = 0; i < this.trackID; i++) {
+					if (this.pop.removeTrackEvent)
+						this.pop.removeTrackEvent(i);
+				}
+
+				delete this.pop;
 			}
 
-			delete this.pop;
-
-			this.pop = Popcorn(this.el, { frameAnimation: true });
+			this.pop = Popcorn(this.el, {frameAnimation: true});
 
 			this.trackID = 1;
 		},
@@ -756,6 +800,8 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 		getPreviousSection: function (index) {
 			if (index == undefined) index = this.currentIndex;
 
+			index = parseInt(index);
+
 			// return the title of the next entry with a different src (ie, a different section)
 			var curSrc = URLWithoutHash(this.toc[index].src);
 
@@ -780,6 +826,8 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 
 		getNextSection: function (index) {
 			if (index == undefined) index = this.currentIndex;
+
+			index = parseInt(index);
 
 			// return the title of the next entry with a different src (ie, a different section)
 			var curSrc = URLWithoutHash(this.toc[index].src);
@@ -874,7 +922,7 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 		},
 
 		onScrollContent: function () {
-			if (!this.busyScrolling) {
+			if (!this.busyScrolling && !waitingForIFrameToLoad) {
 				var curIndex = this.getCurrentIndex();
 
 				this.syncTOCToContent();
@@ -903,6 +951,8 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 
 				$(".toc .current").removeClass("current");
 				entry.addClass("current");
+
+				entry.parents("li").find("ul").show(300);
 
 				var scroller = $("#contents-pane .scroller");
 				var t = scroller.scrollTop();
@@ -949,6 +999,27 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 					this.setCurrentIndex(obj.index);
 				}
 			}
+		},
+
+		registerGoogleAnalytics: function  (title) {
+			(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+				(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+				m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+			})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+			ga('create', 'UA-48406787-4', 'auto');
+
+			ga('set', {
+				'appName': title,
+			});
+
+			ga('send', 'screenview');
+		},
+
+		sendGoogleAnalytics: function (pagename) {
+			ga('send', 'screenview', {'screenName': pagename});
+
+			//ga('send', 'event', 'video', 'started');
 		}
 
 			

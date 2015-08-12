@@ -32,6 +32,10 @@ body {
 	#contents-pane {
 		border-right: 1px solid #ccc;
 
+		li {
+			cursor: pointer;
+		}
+
 		label:not(.nav-header) {
 			font-weight: 400;
 		}
@@ -308,8 +312,9 @@ body {
 .nav-header {
 	display: block;
 	padding: 3px 8px;
-	font-size: 11px;
-	font-weight: bold;
+	font-size: 13px;
+	/*font-weight: bold;*/
+	font-weight: normal;
 	line-height: 20px;
 	color: #999;
 	text-shadow: 0 1px 0 rgba(255,255,255,0.5);
@@ -370,7 +375,7 @@ body {
 	font-size: 12px;
 	padding: 2px 2px 0 2px;
 	font-family: sans-serif;
-	font-weight: bold;
+	/*font-weight: bold;*/
 	border-radius: 3px;
 	vertical-align: bottom;
 	min-width: 2em;
@@ -569,8 +574,11 @@ p.rr-update {
 }
 
 .habitat-body {
-	margin-left: 5em !important;
-	margin-right: 5em !important;
+
+	&:not(.xs) {
+		margin-left: 5em !important;
+		margin-right: 5em !important;
+	}
 
 	figure:not(.figure-table) {
 		max-width: 600px;
@@ -594,6 +602,13 @@ p.rr-update {
 	.objectiveset {
 		float: right;
 	}
+}
+
+// ePUB overrides:
+
+div.image img {
+	max-width: 50%;
+	max-height: 50%;
 }
 
 .image_popup {

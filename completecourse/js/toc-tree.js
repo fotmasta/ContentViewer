@@ -230,6 +230,12 @@ define(["lunr", "jquery.ui"], function (lunr) {
 		launchVideo: function (index, event) {
 			event.preventDefault();
 			this.element.trigger("playvideo", index);
+
+			// find the toc entry for this index and expand it
+			var li = this.element.find("li[data-index=" + index + "] ul");
+			if (li.length) {
+				li.show(300);
+			}
 		},
 		
 		_destroy: function () {
@@ -265,19 +271,23 @@ define(["lunr", "jquery.ui"], function (lunr) {
 			$(".search-result-list").empty();
 
 			for (var i = 0; i < results.length; i++) {
-				var index = results[i].ref;
+				var index = results[i].ref - 1;
 				var hit = this.options.metadata[index];
-				var node = findNodeForIndex(this.nodes, index);
-				var section_label = " <p class='section-label'>" + node.node.depth.join(".") + "</p>";
-				var hit_label = "<p class='hit-label'>" + hit.desc + "</p>";
-				var hitResult = $("<div>", { class: "hit", html: section_label + hit_label }).data("index", index);
-				var me = this;
-				hitResult.click(function (event) {
-					me.launchVideo($(this).data("index"), event);
-					$(".hit.selected").removeClass("selected");
-					$(this).addClass("selected");
-				});
-				$(".search-result-list").append(hitResult);
+				if (hit) {
+					var node = findNodeForIndex(this.nodes, index);
+					var label = node.node.depth.join(".");
+					var section_label = " <p class='section-label'>" + label + "</p>";
+					var hit_label = "<p class='hit-label'>" + hit.desc + "</p>";
+					var hitResult = $("<div>", {class: "hit", html: section_label + hit_label}).data("index", index);
+					var me = this;
+					hitResult.click(function (event) {
+						var index = $(this).data("index");
+						me.launchVideo(index, event);
+						$(".hit.selected").removeClass("selected");
+						$(this).addClass("selected");
+					});
+					$(".search-result-list").append(hitResult);
+				}
 			}
 
 			if (term != "") {
@@ -420,7 +430,7 @@ define(["lunr", "jquery.ui"], function (lunr) {
 		},
 
 		expandOrCollapse: function (event) {
-			var vis = $(".toc-holder > li > ul").is(":visible");
+			var vis = $(this.options.expander + " i").hasClass("fa-caret-up");
 
 			if (vis) {
 				this.collapseTOC();
