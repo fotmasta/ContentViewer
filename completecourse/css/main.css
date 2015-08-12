@@ -422,7 +422,8 @@ div.image img {
     height: 100%; }
 
 .search-results {
-  display: none; }
+  display: none;
+  background-color: #F7E1D1; }
   .search-results .row {
     background-color: #e86414; }
   .search-results .input-group {

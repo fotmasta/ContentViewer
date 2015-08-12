@@ -22,11 +22,22 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 
 	function URLWithoutHash (url) {
 		if (url) {
+			if (url.lastIndexOf) {
+
+			} else {
+				debugger;
+			}
 			var n = url.lastIndexOf("#");
 			if (n != -1) return url.substr(0, n);
 			else return url;
 		} else
 			return url;
+	}
+
+	function URLPageOnly (url) {
+		var n = url.lastIndexOf("/");
+		if (n != -1) return url.substr(n + 1);
+		else return url;
 	}
 
 	function iFrameElementsOnScreen (elements, iframe) {
@@ -850,6 +861,8 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 
 			var iframes = $("iframe:onScreen");
 
+			var curSrc = URLPageOnly(URLWithoutHash(this.toc[this.getCurrentIndex()].src));
+
 			$(iframes.get().reverse()).each(function (index, item) {
 				var iframe = $(item);
 				var headers = iframe.contents().find("h1, h2, h3, h4");
@@ -860,7 +873,10 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 					//var t = h.text().replace(/(\r\n|\n|\r)/gm,"").replace(/\s+/g, " ");
 					var t = h.text();
 					for (var j = 0; j < me.toc.length; j++) {
-						if (me.toc[j].desc == t) {
+						// THEORY: look for matching header text in this src file only
+						// WARNING: Habitat compatibility
+						var thisSrc = URLPageOnly(URLWithoutHash(me.toc[j].src));
+						if (me.toc[j].desc == t && curSrc == thisSrc) {
 							foundindex = j;
 							break;
 						}
