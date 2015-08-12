@@ -574,6 +574,8 @@ p.rr-update {
 }
 
 .habitat-body {
+	font-family: sans-serif;
+	line-height: 1.4em;
 
 	&:not(.xs) {
 		margin-left: 5em !important;
@@ -601,6 +603,10 @@ p.rr-update {
 
 	.objectiveset {
 		float: right;
+	}
+
+	span.highlight {
+		background-color: yellow;
 	}
 }
 

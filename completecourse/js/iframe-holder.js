@@ -86,6 +86,8 @@ define(["bootstrap-dialog", "jquery.ui"], function (BootstrapDialog) {
 
 					me.iframe.scrollTop(1).scrollTop(0);
 
+					me.highlight(me.options.highlight);
+
 					me.makeImagesModal();
 
 					// NOTE: if we're auto-advancing, don't scroll to any hashtags
@@ -120,6 +122,17 @@ define(["bootstrap-dialog", "jquery.ui"], function (BootstrapDialog) {
 				{ rel: "stylesheet", href: path + "/css/main.css", type: "text/css" }));
 
 			var $body = this.iframe.contents().find("body").addClass("habitat-body");
+		},
+
+		highlight: function (terms) {
+			if (terms) {
+				var allTerms = terms.split(" ");
+				this.iframe.contents().find("body").unhighlight().highlight(allTerms);
+			}
+		},
+
+		unhighlight: function () {
+			this.iframe.contents().find("body").unhighlight();
 		},
 
 		addPreviousButton: function () {

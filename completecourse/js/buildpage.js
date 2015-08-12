@@ -13,6 +13,7 @@ requirejs.config({
 		"jquery.ui": "jquery-ui.min",
 		"jquery.json": "jquery.json.min",
 		"jquery.onscreen": "jquery.onscreen",
+		"jquery.highlight": "jquery.highlight",
 		"bootstrap": "bootstrap",
 		"bootstrap-notify": "bootstrap-notify.min",
 		"bootstrap-dialog": "bootstrap-dialog.min",
@@ -36,6 +37,10 @@ requirejs.config({
 			deps: ['jquery']
 		},
 		"jquery.onscreen": {
+			export: "$",
+			deps: ['jquery']
+		},
+		"jquery.highlight": {
 			export: "$",
 			deps: ['jquery']
 		},
@@ -195,7 +200,7 @@ define(["jquery", "handlebars", "text!viewer_template.html", "video-manager", "v
 		return metadata;
 	}
 
-	function NodeFromEPUB (t, depth) {
+	function NodeFromEPUB (t, depth, parent) {
 		var a = t.find("content");
 		var href = a.attr("src");
 		var desc = t.find("navLabel text").html();
@@ -212,13 +217,14 @@ define(["jquery", "handlebars", "text!viewer_template.html", "video-manager", "v
 			src: manifest.folder + "/oebps/html/" + href,
 			hash: hash,
 			depth: depth,
-			short: shortLabel
+			short: shortLabel,
+			parent: parent
 		};
 
 		return node;
 	}
 
-	function addFromEPUB (list, metadata, depth) {
+	function addFromEPUB (parent, list, metadata, depth) {
 		for (var i = 0; i < list.length; i++) {
 			var t = list.eq(i);
 
@@ -228,13 +234,13 @@ define(["jquery", "handlebars", "text!viewer_template.html", "video-manager", "v
 			}
 			cur_depth.push(i);
 
-			var node = NodeFromEPUB(t, cur_depth.slice());
+			var node = NodeFromEPUB(t, cur_depth.slice(), parent);
 
 			metadata.push(node);
 
 			var children = t.children("navPoint");
 
-			addFromEPUB(children, metadata, cur_depth);
+			addFromEPUB(node, children, metadata, cur_depth);
 		}
 	}
 
@@ -245,7 +251,7 @@ define(["jquery", "handlebars", "text!viewer_template.html", "video-manager", "v
 
 		var top = $(data).find("navMap > navPoint");
 
-		addFromEPUB(top, metadata, []);
+		addFromEPUB(null, top, metadata, []);
 
 		return metadata;
 	}

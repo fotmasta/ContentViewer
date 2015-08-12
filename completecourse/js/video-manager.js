@@ -65,8 +65,13 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 		return $(visible);
 	}
 
-	function onPlayContent (element, depth) {
-		VideoManager.playFromTOC(depth, {});
+	function onPlayContent (element, options) {
+		var depth = options.depth;
+
+		var opts = {};
+		if (options.options) opts = options.options;
+
+		VideoManager.playFromTOC(depth, opts);
 	}
 
 	videojs.BackButton = videojs.Button.extend({});
@@ -118,7 +123,7 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 			this.player.on("ended", $.proxy(this.onVideoEnded, this));
 			this.player.on("timeupdate", $.proxy(this.saveCurrentVideoTime, this));
 
-			$(".toc").on("playvideo", onPlayContent);
+			$(".toc").on("playvideo", onPlayContent).on("closesearch", $.proxy(this.onCloseSearch, this));
 
 			$("#video").scroll($.proxy(this.onScrollContent, this));
 
@@ -381,7 +386,8 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 					index: params.index,
 					scrollTo: params.scrollTo,
 					infinite_scrolling: this.options.infinite_scrolling,
-					hash: params.hash
+					hash: params.hash,
+					highlight: params.highlight
 				});
 
 				iframe.appendTo(".iframe-holder");
@@ -394,7 +400,8 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 					index: params.index,
 					scrollTo: params.scrollTo,
 					infinite_scrolling: this.options.infinite_scrolling,
-					hash: params.hash
+					hash: params.hash,
+					highlight: params.highlight
 				};
 				waitingForIFrameToLoad = true;
 				this.iframe.iFrameHolder("loadNewContent", options);
@@ -420,11 +427,15 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 					existing.attr( { "data-index": index } ).show();
 
 					this.scrollToHash(existing, { index: index, hash: options.hash });
+
+					if (options.highlight) {
+						this.iframe.iFrameHolder("highlight", options.highlight);
+					}
 				} else {
 					//var sel = $(".iframe-holder *");
 					//sel.remove();
 
-					this.addIFrame( { index: index, scrollTo: true, hash: options.hash } );
+					this.addIFrame( { index: index, scrollTo: true, hash: options.hash, highlight: options.highlight } );
 				}
 
 				$("#main_video").hide();
@@ -1036,10 +1047,13 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 			ga('send', 'screenview', {'screenName': pagename});
 
 			//ga('send', 'event', 'video', 'started');
+		},
+
+		onCloseSearch: function () {
+			this.iframe.iFrameHolder("unhighlight");
 		}
 
-			
-	};
+};
 	
 	return VideoManager;
 	

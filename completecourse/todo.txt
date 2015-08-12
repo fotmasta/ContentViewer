@@ -1,5 +1,3 @@
-// TODO: search result toc #s should match the chapter numbers (not internal numbers)
-// TODO: highlight search term on page, with next/prev button in search box
 // TODO: replace the timeout in iframe-holder's height checking with imagesLoaded, etc to avoid the height flicker/readjustment
 // TODO: make all images the same scale??
 // TODO: auto-expanding the TOC doesn't seem to work (on server)
@@ -64,3 +62,6 @@
 // DONE: clicking on Index doesn't jump to the index page [iframe links don't set the iframe's src]
 // DONE: bug when clicking on Chapter 7, then Index, links do not work, page just jumps [try not unloading the iframe?] [does not happen in Safari!] [iFrame with hash causes jumping in Chrome]
 // DONE: when scrolling, look for sections in the current file to sync (not everywhere, in case section names are duplicated)
+// DONE: search result toc #s should match the chapter numbers (not internal numbers)
+// DONE: make default font sans
+// DONE: highlight search term on page, with next/prev button in search box

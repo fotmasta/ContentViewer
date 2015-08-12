@@ -1,4 +1,4 @@
-define(["lunr", "jquery.ui"], function (lunr) {
+define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 
 	// case-insensitive search (found on web)
 	$.extend($.expr[":"], {
@@ -66,6 +66,29 @@ define(["lunr", "jquery.ui"], function (lunr) {
 		}
 
 		return undefined;
+	}
+
+	function getShortLabel (node) {
+		var p = node;
+
+		while (p) {
+			if (p.short)
+				return p.short;
+			else
+				p = p.parent;
+		}
+		return null;
+	}
+
+	function MakeAShortLabelForSearchResults (node) {
+		var depths = node.node.depth.slice();
+		var short = getShortLabel(node.node);
+		if (short) {
+			depths[0] = short;
+		}
+
+		var label = depths.join(".");
+		return label;
 	}
 
 	$.widget("que.TOCTree", {
@@ -227,9 +250,9 @@ define(["lunr", "jquery.ui"], function (lunr) {
 			this.nodes = nodes;
 		},
 		
-		launchVideo: function (index, event) {
+		launchVideo: function (index, event, options) {
 			event.preventDefault();
-			this.element.trigger("playvideo", index);
+			this.element.trigger("playvideo", { depth: index, options: options });
 
 			// find the toc entry for this index and expand it
 			var li = this.element.find("li[data-index=" + index + "] ul");
@@ -275,14 +298,14 @@ define(["lunr", "jquery.ui"], function (lunr) {
 				var hit = this.options.metadata[index];
 				if (hit) {
 					var node = findNodeForIndex(this.nodes, index);
-					var label = node.node.depth.join(".");
+					var label = MakeAShortLabelForSearchResults(node);
 					var section_label = " <p class='section-label'>" + label + "</p>";
 					var hit_label = "<p class='hit-label'>" + hit.desc + "</p>";
 					var hitResult = $("<div>", {class: "hit", html: section_label + hit_label}).data("index", index);
 					var me = this;
 					hitResult.click(function (event) {
 						var index = $(this).data("index");
-						me.launchVideo(index, event);
+						me.launchVideo(index, event, { highlight: term });
 						$(".hit.selected").removeClass("selected");
 						$(this).addClass("selected");
 					});
@@ -320,6 +343,8 @@ define(["lunr", "jquery.ui"], function (lunr) {
 		closeSearch: function () {
 			this.element.parent().find(".toc").delay(300).show("slide");
 			this.element.parent().find(".search-results").hide("slide");
+
+			this.element.trigger("closesearch");
 		},
 
 		searchNext: function (direction) {
