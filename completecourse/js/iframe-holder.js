@@ -1,4 +1,4 @@
-define(["bootstrap-dialog", "jquery.ui"], function (BootstrapDialog) {
+define(["bootstrap-dialog", "imagesloaded", "jquery.ui"], function (BootstrapDialog, imagesLoaded) {
 
 	function URLWithoutPage (url) {
 		var n = url.lastIndexOf("/");
@@ -74,35 +74,39 @@ define(["bootstrap-dialog", "jquery.ui"], function (BootstrapDialog) {
 
 			var me = this;
 
-			setTimeout(function () {
-				if (me.iframe.contents()[0]) {
-					var h = me.iframe.contents()[0].body.scrollHeight;
+			imagesLoaded(this.iframe.contents().find("body"), $.proxy(this.onIframeContentsLoaded, this));
+		},
 
-					// turn off scrolling on the iframe's content
-					// NOTE: I was tempted to comment this out for ePub content from CodeMantra to allow the scroll thumb to appear (but the disappearing thumb could be a Mac/Chrome thing)
-					me.iframe.contents().find("html").css("overflow", "hidden");
+		onIframeContentsLoaded: function () {
+			var me = this;
 
-					me.iframe.height(h);
+			if (me.iframe.contents()[0]) {
+				var h = me.iframe.contents()[0].body.scrollHeight;
 
-					me.iframe.scrollTop(1).scrollTop(0);
+				// turn off scrolling on the iframe's content
+				// NOTE: I was tempted to comment this out for ePub content from CodeMantra to allow the scroll thumb to appear (but the disappearing thumb could be a Mac/Chrome thing)
+				me.iframe.contents().find("html").css("overflow", "hidden");
 
-					me.highlight(me.options.highlight);
+				me.iframe.height(h);
 
-					me.makeImagesModal();
+				me.iframe.scrollTop(1).scrollTop(0);
 
-					// NOTE: if we're auto-advancing, don't scroll to any hashtags
+				me.highlight(me.options.highlight);
 
-					if (me.options.scrollTo) {
-						var hash = HashInURL(me.options.src);
-						if (me.options.hash)
-							hash = me.options.hash;
+				me.makeImagesModal();
 
-						me.options.manager.scrollToHash(me.iframe, { hash: hash }, true);
-					}
+				// NOTE: if we're auto-advancing, don't scroll to any hashtags
 
-					me.options.manager.onIFrameLoaded(me);
+				if (me.options.scrollTo) {
+					var hash = HashInURL(me.options.src);
+					if (me.options.hash)
+						hash = me.options.hash;
+
+					me.options.manager.scrollToHash(me.iframe, { hash: hash }, true);
 				}
-			}, 1000);
+
+				me.options.manager.onIFrameLoaded(me);
+			}
 		},
 
 		addStylesheet: function () {
@@ -187,7 +191,7 @@ define(["bootstrap-dialog", "jquery.ui"], function (BootstrapDialog) {
 
 		makeImagesModal: function () {
 			// find image links within figures
-			var figs = this.iframe.contents().find("figure a img");
+			var figs = this.iframe.contents().find("figure a img, .image img");
 			var me = this;
 
 			figs.each(function (index, item) {
@@ -198,13 +202,27 @@ define(["bootstrap-dialog", "jquery.ui"], function (BootstrapDialog) {
 				}
 
 				var a = $(item).parent("a");
+
+				// ePUB:
+				if (!a.length) {
+					a = $(item);
+				}
+
 				var fullpath = me.iframe[0].contentWindow.location.href;
 				var path = URLWithoutPage(fullpath);
 
+				var imageURL = a.attr("href");
+
+				// ePUB:
+				if (!imageURL) {
+					imageURL = $(item).attr("src");
+				}
+
 				a.click(function (event) {
 					event.preventDefault();
+					event.stopImmediatePropagation();
 
-					var contents = '<iframe src="' + path + "/" + a.attr("href") + '" width="100%" height="__window height__" frameborder="0"></iframe>';
+					var contents = '<iframe src="' + path + "/" + imageURL + '" width="100%" height="__window height__" frameborder="0"></iframe>';
 
 					var wh = $(window).outerHeight();
 					contents = contents.replace("__window height__", (wh * .75));

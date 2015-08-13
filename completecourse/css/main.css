@@ -414,10 +414,12 @@ p.rr-update {
     float: right; }
   .habitat-body span.highlight {
     background-color: yellow; }
-
-div.image img {
-  max-width: 50%;
-  max-height: 50%; }
+  .habitat-body .sidebar-g .title, .habitat-body .sidebar-r .title {
+    font-size: 150%;
+    margin-bottom: 1em; }
+  .habitat-body div.image img {
+    max-width: 50%;
+    max-height: 50%; }
 
 .image_popup {
   display: flex;

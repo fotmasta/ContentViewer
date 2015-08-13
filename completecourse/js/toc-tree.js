@@ -348,18 +348,18 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 		},
 
 		searchNext: function (direction) {
-			if (this.searchCounter == undefined)
-				this.searchCounter = 0;
-			else {
-				var tt = $(".hit").length;
-
-				this.searchCounter += direction;
-
-				if (this.searchCounter < 0)
-					this.searchCounter = 0;
-				else if (this.searchCounter > tt - 1)
-					this.searchCounter = tt - 1;
+			var s = $(".hit.selected");
+			if (s.length) {
+				s = s.index() + direction;
+				if (s > $(".hit").length - 1)
+					s = 0;
+				else if (s < 0)
+					s = $(".hit").length - 1;
+			} else {
+				s = 0;
 			}
+
+			this.searchCounter = s;
 
 			$(".hit").eq(this.searchCounter).click();
 

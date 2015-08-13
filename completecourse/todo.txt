@@ -1,7 +1,4 @@
-// TODO: replace the timeout in iframe-holder's height checking with imagesLoaded, etc to avoid the height flicker/readjustment
 // TODO: make all images the same scale??
-// TODO: auto-expanding the TOC doesn't seem to work (on server)
-// TODO: (BUG) new Habitat projects open to video page at first (? localStorage bug?)
 // TODO: when scrolling through content, check off sections that might not have triggered the usual "completed" scrolling trigger (ie, check for sequential completions)
 // TODO: short sub-sections don't get marked complete
 // TODO: tighten up TOC look and feel (maybe: a's without tree-toggler don't have to be padded so far to the right)
@@ -65,3 +62,8 @@
 // DONE: search result toc #s should match the chapter numbers (not internal numbers)
 // DONE: make default font sans
 // DONE: highlight search term on page, with next/prev button in search box
+// DONE: auto-expanding the TOC doesn't seem to work (on server) [seems ok]
+// DONE: (BUG) new Habitat projects open to video page at first (? localStorage bug?) [seems ok]
+// DONE: replace the timeout in iframe-holder's height checking with imagesLoaded, etc to avoid the height flicker/readjustment
+// DONE: make ePub images clickable
+// DONE: next/prev in search use the currently selected item (if any)
