@@ -300,8 +300,15 @@ body {
 	cursor: pointer;
 }
 
+ul.toc-holder > li > .tree-toggler a .tree-toggler + .completed + .checked {
+	position: relative;
+	top: auto;
+	left: auto;
+	margin-left: .5em;
+}
+
 .tree-toggler:not(.invisible) + span + .checked {
-	display: none;
+	left: -50px;
 }
 
 .nav-list .nav-header {

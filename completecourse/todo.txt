@@ -67,3 +67,4 @@
 // DONE: replace the timeout in iframe-holder's height checking with imagesLoaded, etc to avoid the height flicker/readjustment
 // DONE: make ePub images clickable
 // DONE: next/prev in search use the currently selected item (if any)
+// DONE: item completion should be visible for "parent" items too (esp. videos) [still not crazy about the toc styling]
