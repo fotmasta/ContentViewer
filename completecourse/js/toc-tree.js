@@ -205,7 +205,7 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 
 				a.appendTo(linkholder);
 
-				a.click($.proxy(this.launchVideo, this, params.counter));
+				a.click($.proxy(this.launchVideo, this, params.counter, { toggle: true }));
 
 				short.click(function (event) {
 					event.preventDefault();
@@ -250,14 +250,21 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 			this.nodes = nodes;
 		},
 		
-		launchVideo: function (index, event, options) {
+		launchVideo: function (index, options, event) {
 			event.preventDefault();
 			this.element.trigger("playvideo", { depth: index, options: options });
 
-			// find the toc entry for this index and expand it
-			var li = this.element.find("li[data-index=" + index + "] ul");
-			if (li.length) {
-				li.show(300);
+			if (options && options.toggle) {
+				var li = this.element.find("li[data-index=" + index + "] > ul");
+				if (li.length) {
+					li.toggle(300);
+				}
+			} else {
+				// find the toc entry for this index and expand it
+				var li = this.element.find("li[data-index=" + index + "] ul");
+				if (li.length) {
+					li.show(300);
+				}
 			}
 		},
 		
@@ -305,7 +312,7 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 					var me = this;
 					hitResult.click(function (event) {
 						var index = $(this).data("index");
-						me.launchVideo(index, event, { highlight: term });
+						me.launchVideo(index, { highlight: term }, event);
 						$(".hit.selected").removeClass("selected");
 						$(this).addClass("selected");
 					});

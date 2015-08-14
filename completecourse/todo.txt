@@ -68,5 +68,5 @@
 // DONE: make ePub images clickable
 // DONE: next/prev in search use the currently selected item (if any)
 // DONE: item completion should be visible for "parent" items too (esp. videos) [still not crazy about the toc styling]
-// TODONT: click toc heading toggles it [doesn't really work well in sync with auto-opening based on content]
+// DONE: click toc heading toggles it [might get overridden by auto-opening based on content scrolling]
 // DONE: completion of parent in TOC is only checked if all children have been checked [cosmetic only; each section can be complete but displays half-complete symbol until all children are complete]
