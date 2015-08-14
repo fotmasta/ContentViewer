@@ -294,7 +294,7 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 			$(".search-result-list").empty();
 
 			for (var i = 0; i < results.length; i++) {
-				var index = results[i].ref - 1;
+				var index = results[i].ref;
 				var hit = this.options.metadata[index];
 				if (hit) {
 					var node = findNodeForIndex(this.nodes, index);
@@ -425,13 +425,73 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 		},
 
 		markCompleted: function (index) {
+			this.options.data[index].completed = true;
+
 			var el = this.holder.find("[data-index=" + index + "]");
 			var a = el.find("> label a, > a");
 			var checked = a.find("i.checked");
 			checked.remove();
-			a.append("<i class='checked fa fa-check-circle fa-lg'></i>");
 
-			a.find("span.desc").addClass("completed");
+			// use half-circle to show that some children still need to be completed
+			if (el.find("ul li").length) {
+				var childrenComplete = this.checkForAllChildrenComplete(index);
+				if (childrenComplete) {
+					a.append("<i class='checked fa fa-check-circle fa-lg'></i>");
+				} else {
+					a.append("<i class='checked fa fa-adjust fa-flip-horizontal fa-lg'></i>");
+				}
+			} else {
+				a.append("<i class='checked fa fa-check-circle fa-lg'></i>");
+			}
+
+			a.find("span.desc").removeClass("completed").addClass("completed");
+
+			// now check parents, grandparents, etc. to see if they can now be considered complete
+			var p = this.options.data[index].parent;
+
+			while (p) {
+				if (p.completed) {
+					this.markCompleted(p.index);
+
+					p = p.parent;
+				} else
+					p = null;
+			}
+		},
+
+		checkForAllChildrenComplete: function (index) {
+			return this.checkChildrenComplete(index);
+		},
+
+		checkChildrenComplete: function (index) {
+			var thisParent = this.options.data[index];
+
+			var ok = true;
+			for (var i = 0; i < this.options.data.length; i++) {
+				var childNode = this.options.data[i];
+				if (childNode.parent == thisParent) {
+					var complete = this.options.data[childNode.index].completed;
+					if (!complete) {
+						ok = false;
+						break;
+					} else {
+						// check children
+						for (var j = 0; j < this.options.data.length; j++) {
+							if (this.options.data[j].parent == childNode) {
+								complete = this.checkChildrenComplete(j);
+								if (!complete) {
+									ok = false;
+									break;
+								}
+							}
+						}
+					}
+					if (!ok)
+						break;
+				}
+			}
+
+			return ok;
 		},
 
 		setStatus: function (items) {
