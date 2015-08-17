@@ -43,6 +43,8 @@ body {
 		// only display the badge for new/updated top-level sections
 		label a .desc .badge {
 			display: inline-block !important;
+			background-color: #92DCA6;
+			color: #2C6767;
 		}
 
 		a {
@@ -381,7 +383,7 @@ ul.toc-holder > li > .tree-toggler a .tree-toggler + .completed + .checked {
 	color: white;
 	font-size: 12px;
 	padding: 2px 2px 0 2px;
-	font-family: sans-serif;
+	font-family: 'Source Sans Pro', sans-serif;
 	/*font-weight: bold;*/
 	border-radius: 3px;
 	vertical-align: bottom;
@@ -574,14 +576,26 @@ span.completed {
 	}
 }
 
-p.rr-update {
-	background-color: rgba(255, 0, 255, 0.21);
-	padding: .5em;
-	margin-left: -.5em;
+.cup-update {
+	background-color: #BEF3BC;
+	padding: 1em .5em;
+
+	&:after {
+		content: "Updated";
+		display: block;
+		position: absolute;
+		left: -1.5em;
+		top: -1em;
+		padding: 0 1em;
+		border-radius: 1em;
+		font-size: 10px;
+		background-color: #3B3F63;
+		color: #D3E4E4;
+	}
 }
 
 .habitat-body {
-	font-family: sans-serif;
+	font-family: 'Source Sans Pro', sans-serif;
 	line-height: 1.4em;
 
 	&:not(.xs) {

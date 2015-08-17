@@ -39,7 +39,7 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 			var anchor = d.find("> a");
 			var label = anchor.text();
 
-			if (anchor.hasClass("rr-updated")) {
+			if (anchor.hasClass("cup-update")) {
 				label += " <span class='badge'>new</span>";
 			}
 

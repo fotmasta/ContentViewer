@@ -970,8 +970,11 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 				index = this.findCurrentItem();
 
 			if (index) {
+				var isNew = false;
+
 				if (index != this.getCurrentIndex()) {
 					this.setCurrentIndex(index);
+					isNew = true;
 				}
 
 				var entry = $(".toc li[data-index=" + index + "]");
@@ -979,7 +982,8 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 				$(".toc .current").removeClass("current");
 				entry.addClass("current");
 
-				entry.parents("li").find("ul").show(300);
+				if (isNew)
+					entry.parents("li").find("ul").show(300);
 
 				var scroller = $("#contents-pane .scroller");
 				var t = scroller.scrollTop();

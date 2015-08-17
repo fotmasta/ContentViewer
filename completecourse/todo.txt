@@ -1,3 +1,4 @@
+// TODO: demo updated/changed content for Greg
 // TODO: make all images the same scale??
 // TODO: when scrolling through content, check off sections that might not have triggered the usual "completed" scrolling trigger (ie, check for sequential completions)
 // TODO: short sub-sections don't get marked complete
@@ -70,3 +71,4 @@
 // DONE: item completion should be visible for "parent" items too (esp. videos) [still not crazy about the toc styling]
 // DONE: click toc heading toggles it [might get overridden by auto-opening based on content scrolling]
 // DONE: completion of parent in TOC is only checked if all children have been checked [cosmetic only; each section can be complete but displays half-complete symbol until all children are complete]
+// DONE: clicking on TOC headings still toggles incorrectly sometimes [VideoManager.syncTOCToContent opens current content]

@@ -448,6 +448,7 @@ define(["jquery", "handlebars", "text!viewer_template.html", "video-manager", "v
 			addLinkToCSS(baseURL + "css/bootstrap-dialog.min.css");
 			addLinkToCSS(baseURL + "css/videojs.markers.min.css");
 			addLinkToCSS(baseURL + "css/main.css");
+			addLinkToCSS("http://fonts.googleapis.com/css?family=Source+Sans+Pro");
 
 			manifest = options;
 
