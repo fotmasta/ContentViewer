@@ -1,3 +1,5 @@
+@import url(https://fonts.googleapis.com/css?family=Source+Sans+Pro);
+
 $video-background-color: white;
 $blue-color: #719db7;
 $quiz-color: #569E39;
@@ -9,6 +11,7 @@ html {
 
 body {
 	overflow: hidden;
+	font-family: "Source Sans Pro", "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
 .col-xs-0 {
@@ -41,10 +44,27 @@ body {
 		}
 
 		// only display the badge for new/updated top-level sections
-		label a .desc .badge {
-			display: inline-block !important;
-			background-color: #92DCA6;
-			color: #2C6767;
+		label a .desc {
+			.badge {
+				display: inline-block !important;
+			}
+		}
+
+		.badge {
+			&.new {
+				background-color: #E8DB18;
+				color: #9C5110;
+			}
+
+			&.change {
+				background-color: #92DCA6;
+				color: #2C6767;
+			}
+
+			&.delete {
+				background-color: #FF0000;
+				color: #DAE423;
+			}
 		}
 
 		a {
@@ -55,8 +75,13 @@ body {
 				display: inline-block;
 				padding-left: 5px;
 
-				.badge {
+				.badge:not(.delete) {
 					display: none;
+				}
+
+				&.deleted {
+					color: red;
+					text-decoration: line-through;
 				}
 			}
 		}
@@ -576,24 +601,6 @@ span.completed {
 	}
 }
 
-.cup-update {
-	background-color: #BEF3BC;
-	padding: 1em .5em;
-
-	&:after {
-		content: "Updated";
-		display: block;
-		position: absolute;
-		left: -1.5em;
-		top: -1em;
-		padding: 0 1em;
-		border-radius: 1em;
-		font-size: 10px;
-		background-color: #3B3F63;
-		color: #D3E4E4;
-	}
-}
-
 .habitat-body {
 	font-family: 'Source Sans Pro', sans-serif;
 	line-height: 1.4em;
@@ -758,4 +765,11 @@ button#search-close {
 	background: transparent;
 	color: white;
 	text-shadow: none;
+}
+
+/* CUP styling overrides */
+
+section.cup-new:before {
+	left: 0;
+	top: 0;
 }

@@ -68,6 +68,10 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 	function onPlayContent (element, options) {
 		var depth = options.depth;
 
+		if (options.markCurrent) {
+			VideoManager.markItemCompleted(options.markCurrent);
+		}
+
 		var opts = {};
 		if (options.options) opts = options.options;
 
@@ -391,6 +395,8 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 				});
 
 				iframe.appendTo(".iframe-holder");
+
+				iframe.on("jump", onPlayContent);
 
 				this.iframe = iframe;
 			} else {

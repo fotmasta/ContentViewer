@@ -142,17 +142,10 @@ define(["bootstrap-dialog", "imagesloaded", "jquery.ui"], function (BootstrapDia
 		addPreviousButton: function () {
 			var obj = this.options.manager.getPreviousSection(this.options.index);
 
-			var me = this;
-
 			if (obj) {
 				// add a next button
-				var a = $('<button class="button button-a"><h4>Previous </h4>' + obj.title + '</button>');
-				a.click(function (event) {
-					event.preventDefault();
-					// NOTE: not sure at all why me.options.manager.getCurrentIndex() is undefined here; reference problem?
-					me.options.manager.markItemCompleted(me.options.index);
-					me.options.manager.playFromTOC(obj.index, {replaceAll: true});
-				});
+				var a = $('<button class="button button-a"><h4>Previous </h4>' + obj.title + '</button>').data("goto-index", obj.index);
+				a.click($.proxy(this.onClickJumpButton, this));
 
 				this.iframe.contents().find("body").prepend(a);
 			}
@@ -161,20 +154,22 @@ define(["bootstrap-dialog", "imagesloaded", "jquery.ui"], function (BootstrapDia
 		addNextButton: function () {
 			var obj = this.options.manager.getNextSection(this.options.index);
 
-			var me = this;
-
 			if (obj) {
 				// add a next button
-				var a = $('<button class="button button-a"><h4>Next Up </h4>' + obj.title + '</button>');
-				a.click(function (event) {
-					event.preventDefault();
-					// NOTE: not sure at all why me.options.manager.getCurrentIndex() is undefined here; reference problem?
-					me.options.manager.markItemCompleted(me.options.index);
-					me.options.manager.playFromTOC(obj.index, {replaceAll: true});
-				});
+				var a = $('<button class="button button-a"><h4>Next Up </h4>' + obj.title + '</button>').data("goto-index", obj.index);
+				a.click($.proxy(this.onClickJumpButton, this));
 
 				this.iframe.contents().find("body").append(a);
 			}
+		},
+
+		onClickJumpButton: function (event) {
+			event.preventDefault();
+
+			var next = $(event.currentTarget).data("goto-index");
+			var cur = this.options.manager.getCurrentIndex();
+
+			$(this.element).trigger("jump", { depth: next, options: { markCurrent: cur, replaceAll: true } });
 		},
 
 		overrideLinks: function () {
@@ -185,8 +180,14 @@ define(["bootstrap-dialog", "imagesloaded", "jquery.ui"], function (BootstrapDia
 		onClickLink: function (event) {
 			event.preventDefault();
 			var href = $(event.target).attr("href");
-			// find the toc entry with this href and go there (including the link index # in our address bar)
-			this.options.manager.triggerInternalLink(href);
+
+			// external link
+			if  (href.indexOf("http:") != -1 || href.indexOf("mailto") != -1) {
+				window.open(href, "_blank");
+			} else {
+				// find the toc entry with this href and go there (including the link index # in our address bar)
+				this.options.manager.triggerInternalLink(href);
+			}
 		},
 
 		makeImagesModal: function () {

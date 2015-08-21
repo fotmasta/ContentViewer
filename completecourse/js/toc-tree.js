@@ -39,13 +39,24 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 			var anchor = d.find("> a");
 			var label = anchor.text();
 
-			if (anchor.hasClass("cup-update")) {
-				label += " <span class='badge'>new</span>";
+			var extra_classes = "";
+
+			if (anchor.hasClass("cup-new")) {
+				label += " <span class='badge new'>new</span>";
+			}
+
+			if (anchor.hasClass("cup-change")) {
+				label += " <span class='badge change'>updated</span>";
+			}
+
+			if (anchor.hasClass("cup-delete")) {
+				label += " <span class='badge delete'>deleted</span>";
+				extra_classes += "deleted";
 			}
 
 			var node = { desc: label, href: anchor.attr("href") };
 
-			var obj = { node: node, children: [] };
+			var obj = { node: node, children: [], extra_classes: extra_classes };
 
 			nodes[i] = obj;
 
@@ -163,8 +174,9 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 				var a = $("<a>").attr("href", d.node.href);
 
 				var entry_text = d.node.desc;
-				var sp = $("<span>", {class: "desc", html: " " + entry_text});
+				var sp = $("<span>", {class: "desc " + d.extra_classes, html: " " + entry_text});
 
+				// horizontal line to indicate current selection in TOC
 				var indicator = $("<div>", { class: "indicator" });
 				sp.append(indicator);
 

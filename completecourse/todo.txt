@@ -1,4 +1,6 @@
-// TODO: demo updated/changed content for Greg
+// TODO: visual indicator that a TOC entry has children
+// TODO: sizing of Habitat content with quizzes isn't correct (CIB InDesign 1.5)
+// TODO: after updates are made, how will the "completion tracking" cope with toc indexes having changed numbers?
 // TODO: make all images the same scale??
 // TODO: when scrolling through content, check off sections that might not have triggered the usual "completed" scrolling trigger (ie, check for sequential completions)
 // TODO: short sub-sections don't get marked complete
@@ -72,3 +74,6 @@
 // DONE: click toc heading toggles it [might get overridden by auto-opening based on content scrolling]
 // DONE: completion of parent in TOC is only checked if all children have been checked [cosmetic only; each section can be complete but displays half-complete symbol until all children are complete]
 // DONE: clicking on TOC headings still toggles incorrectly sometimes [VideoManager.syncTOCToContent opens current content]
+// DONE: for epubs, load toc from tocncx.html (instead of toc.ncx) because Firefox refused to follow the redirect [302 status: "moved"]
+// DONE: external links need to be NOT overridden
+// DONE: demo updated/changed content for Greg [deleted content = rollover to see; deleted chapter; change log]

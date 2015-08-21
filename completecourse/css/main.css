@@ -1,8 +1,10 @@
+@import url(https://fonts.googleapis.com/css?family=Source+Sans+Pro);
 html {
   overflow: hidden; }
 
 body {
-  overflow: hidden; }
+  overflow: hidden;
+  font-family: "Source Sans Pro", "Helvetica Neue", Helvetica, Arial, sans-serif; }
 
 .col-xs-0 {
   float: left;
@@ -24,17 +26,27 @@ body {
     #contents #contents-pane label:not(.nav-header) {
       font-weight: 400; }
     #contents #contents-pane label a .desc .badge {
-      display: inline-block !important;
+      display: inline-block !important; }
+    #contents #contents-pane .badge.new {
+      background-color: #E8DB18;
+      color: #9C5110; }
+    #contents #contents-pane .badge.change {
       background-color: #92DCA6;
       color: #2C6767; }
+    #contents #contents-pane .badge.delete {
+      background-color: #FF0000;
+      color: #DAE423; }
     #contents #contents-pane a {
       color: #719db7;
       display: block; }
       #contents #contents-pane a span.desc {
         display: inline-block;
         padding-left: 5px; }
-        #contents #contents-pane a span.desc .badge {
+        #contents #contents-pane a span.desc .badge:not(.delete) {
           display: none; }
+        #contents #contents-pane a span.desc.deleted {
+          color: red;
+          text-decoration: line-through; }
     #contents #contents-pane label a.active span {
       color: black; }
 
@@ -396,21 +408,6 @@ span.completed {
   .button-a:hover {
     background: #A2D1E7; }
 
-.cup-update {
-  background-color: #BEF3BC;
-  padding: 1em .5em; }
-  .cup-update:after {
-    content: "Updated";
-    display: block;
-    position: absolute;
-    left: -1.5em;
-    top: -1em;
-    padding: 0 1em;
-    border-radius: 1em;
-    font-size: 10px;
-    background-color: #3B3F63;
-    color: #D3E4E4; }
-
 .habitat-body {
   font-family: 'Source Sans Pro', sans-serif;
   line-height: 1.4em; }
@@ -513,5 +510,10 @@ button#search-close {
   background: transparent;
   color: white;
   text-shadow: none; }
+
+/* CUP styling overrides */
+section.cup-new:before {
+  left: 0;
+  top: 0; }
 
 /*# sourceMappingURL=main.css.map */
