@@ -111,6 +111,13 @@ body {
 	height: auto;
 	overflow: hidden;
 	*/
+	background-color: #E5F0F1;
+
+	& > div {
+		max-width: 1024px;
+		margin: 0 auto;
+		background-color: white;
+	}
 
 	iframe {
 		width: 100%;

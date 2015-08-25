@@ -77,3 +77,5 @@
 // DONE: for epubs, load toc from tocncx.html (instead of toc.ncx) because Firefox refused to follow the redirect [302 status: "moved"]
 // DONE: external links need to be NOT overridden
 // DONE: demo updated/changed content for Greg [deleted content = rollover to see; deleted chapter; change log]
+// TODONT: send page title to Google Analytics (not link #) [it's there: Secondary dimension: Screen Name]
+// DONE: max-width for iframe for better readability?

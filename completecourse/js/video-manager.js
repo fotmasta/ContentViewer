@@ -1054,7 +1054,11 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 		},
 
 		sendGoogleAnalytics: function (pagename) {
-			ga('send', 'screenview', {'screenName': pagename});
+			// NOTE: 8/25/15 switched from screenview to pageview
+
+			//ga('send', 'screenview', {'screenName': pagename});
+
+			ga('send', 'pageview', {'title': pagename});
 
 			//ga('send', 'event', 'video', 'started');
 		},

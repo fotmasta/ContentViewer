@@ -61,7 +61,12 @@ body {
   /*
   height: auto;
   overflow: hidden;
-  */ }
+  */
+  background-color: #E5F0F1; }
+  .iframe-holder > div {
+    max-width: 1024px;
+    margin: 0 auto;
+    background-color: white; }
   .iframe-holder iframe {
     width: 100%; }
 
