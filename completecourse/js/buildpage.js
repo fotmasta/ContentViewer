@@ -190,8 +190,11 @@ define(["jquery", "handlebars", "text!viewer_template.html", "video-manager", "v
 			var a = $(item);
 			var href = a.attr("href");
 			var hash = VideoManager.HashInURL(href);
+
+			var desc = a.text();
+
 			return {
-				desc: a.text(),
+				desc: desc,
 				src: manifest.folder + "/ops/" + href,
 				hash: hash
 			};
@@ -206,10 +209,17 @@ define(["jquery", "handlebars", "text!viewer_template.html", "video-manager", "v
 		var desc = t.find("navLabel text").html();
 		var hash = VideoManager.HashInURL(href);
 
+		// THEORY: grab Chapter or Part numbers from the ePub section descriptions (also grabbed during conversion
+
 		var shortLabel = null;
 		var match = desc.match(/^(\d+)\./);
 		if (match) {
 			shortLabel = match[1];
+		} else {
+			match = desc.match(/^Part (.*):/);
+			if (match) {
+				shortLabel = match[1];
+			}
 		}
 
 		var node = {
@@ -279,7 +289,7 @@ define(["jquery", "handlebars", "text!viewer_template.html", "video-manager", "v
 	function onHabitatTOCLoaded (data) {
 		var metadata = convertHabitatTOCtoMetadata(data);
 
-		$(".toc").TOCTree({ type: "habitat", data: data, metadata: metadata, expander: "#collapse-button" });
+		$(".toc").TOCTree({ type: "habitat", skin: manifest.skin, data: data, metadata: metadata, expander: "#collapse-button" });
 
 		VideoManager.initialize(metadata, "#video video", videojs("main_video"), [], manifest);
 

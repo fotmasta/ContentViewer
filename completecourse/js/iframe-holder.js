@@ -62,6 +62,13 @@ define(["bootstrap-dialog", "imagesloaded", "jquery.ui"], function (BootstrapDia
 			this.iframe.attr("src", src).css("height", "auto");
 		},
 
+		sizeToFitToBottom: function () {
+			var bottomb = this.iframe.contents().find(".button-a#next-button");
+			var h = Math.round(bottomb.offset().top + bottomb.outerHeight());
+
+			this.iframe.height(h);
+		},
+
 		onLoaded: function ()  {
 			this.addStylesheet();
 
@@ -75,21 +82,37 @@ define(["bootstrap-dialog", "imagesloaded", "jquery.ui"], function (BootstrapDia
 			var me = this;
 
 			imagesLoaded(this.iframe.contents().find("body"), $.proxy(this.onIframeContentsLoaded, this));
+
+			$(this.iframe[0].contentWindow).off("resize");
+
+			// THEORY: account for the iframe resizing
+			$(this.iframe[0].contentWindow).on("resize", $.proxy(this.sizeToFitToBottom, this));
+
+			// THEORY: account for the iframe's Inkling widgets resizing themselves
+			this.iframe[0].contentWindow.addEventListener("message", $.proxy(this.receiveMessage, this));
+		},
+
+		receiveMessage: function (event) {
+			// Inkling widget resize event
+			if (event.data && event.data.type && event.data.type == "size") {
+				this.sizeToFitToBottom();
+			}
 		},
 
 		onIframeContentsLoaded: function () {
 			var me = this;
 
 			if (me.iframe.contents()[0]) {
-				var h = me.iframe.contents()[0].body.scrollHeight;
+				//var h = me.iframe.contents()[0].body.scrollHeight;
 
 				// turn off scrolling on the iframe's content
 				// NOTE: I was tempted to comment this out for ePub content from CodeMantra to allow the scroll thumb to appear (but the disappearing thumb could be a Mac/Chrome thing)
 				me.iframe.contents().find("html").css("overflow", "hidden");
 
-				me.iframe.height(h);
+				//me.iframe.height(h);
 
-				me.iframe.scrollTop(1).scrollTop(0);
+				//me.iframe.scrollTop(1).scrollTop(0);
+				me.sizeToFitToBottom();
 
 				me.highlight(me.options.highlight);
 
@@ -144,7 +167,7 @@ define(["bootstrap-dialog", "imagesloaded", "jquery.ui"], function (BootstrapDia
 
 			if (obj) {
 				// add a next button
-				var a = $('<button class="button button-a"><h4>Previous </h4>' + obj.title + '</button>').data("goto-index", obj.index);
+				var a = $('<button class="button button-a header-prev-button"><h4>Previous </h4>' + obj.title + '</button>').data("goto-index", obj.index);
 				a.click($.proxy(this.onClickJumpButton, this));
 
 				this.iframe.contents().find("body").prepend(a);
@@ -156,7 +179,7 @@ define(["bootstrap-dialog", "imagesloaded", "jquery.ui"], function (BootstrapDia
 
 			if (obj) {
 				// add a next button
-				var a = $('<button class="button button-a"><h4>Next Up </h4>' + obj.title + '</button>').data("goto-index", obj.index);
+				var a = $('<button id="next-button" class="button button-a"><h4>Next Up </h4>' + obj.title + '</button>').data("goto-index", obj.index);
 				a.click($.proxy(this.onClickJumpButton, this));
 
 				this.iframe.contents().find("body").append(a);

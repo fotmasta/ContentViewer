@@ -3,7 +3,6 @@ html {
   overflow: hidden; }
 
 body {
-  overflow: hidden;
   font-family: "Source Sans Pro", "Helvetica Neue", Helvetica, Arial, sans-serif; }
 
 .col-xs-0 {
@@ -61,8 +60,7 @@ body {
   /*
   height: auto;
   overflow: hidden;
-  */
-  background-color: #E5F0F1; }
+  */ }
   .iframe-holder > div {
     max-width: 1024px;
     margin: 0 auto;
@@ -73,8 +71,9 @@ body {
 #video {
   padding: 0;
   transition: width .5s linear;
-  background-color: white;
-  overflow: scroll; }
+  background-color: #E5F0F1;
+  overflow: scroll;
+  -webkit-overflow-scrolling: touch; }
   #video .overlay {
     position: absolute;
     top: 0;

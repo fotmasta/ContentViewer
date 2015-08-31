@@ -10,7 +10,6 @@ html {
 }
 
 body {
-	overflow: hidden;
 	font-family: "Source Sans Pro", "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
@@ -111,7 +110,6 @@ body {
 	height: auto;
 	overflow: hidden;
 	*/
-	background-color: #E5F0F1;
 
 	& > div {
 		max-width: 1024px;
@@ -129,9 +127,10 @@ body {
 	
 	transition: width .5s linear;
 	
-	background-color: $video-background-color;
+	background-color: #E5F0F1; //$video-background-color;
 
 	overflow: scroll;
+	-webkit-overflow-scrolling: touch;
 
 	.overlay {
 		position: absolute;

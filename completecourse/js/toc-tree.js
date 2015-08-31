@@ -7,6 +7,20 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 		}
 	});
 
+	function romanize (num) {
+		if (!+num)
+			return false;
+		var digits = String(+num).split(""),
+			key = ["","C","CC","CCC","CD","D","DC","DCC","DCCC","CM",
+				"","X","XX","XXX","XL","L","LX","LXX","LXXX","XC",
+				"","I","II","III","IV","V","VI","VII","VIII","IX"],
+			roman = "",
+			i = 3;
+		while (i--)
+			roman = (key[+digits.pop() + (i * 10)] || "") + roman;
+		return Array(+digits.join("") + 1).join("M") + roman;
+	}
+
 	function setNodeAtDepth  (nodes, depth, node) {
 		var depths = depth.toString().split(",");
 		var curLevel = nodes;
@@ -24,20 +38,22 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 		}
 	}
 
-	function convertHabitatDataToNodes (data) {
+	function convertHabitatDataToNodes (options, data) {
 		var nodes = [];
 
-		addChildNodes(nodes, data.find("> li"));
+		addChildNodes(options, nodes, data.find("> li"));
 
 		return nodes;
 	}
 
-	function addChildNodes (nodes, children) {
+	function addChildNodes (options, nodes, children) {
 		for (var i = 0; i < children.length; i++) {
 			var d = children.eq(i);
 
 			var anchor = d.find("> a");
 			var label = anchor.text();
+
+			var labelText = label;
 
 			var extra_classes = "";
 
@@ -54,13 +70,22 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 				extra_classes += "deleted";
 			}
 
-			var node = { desc: label, href: anchor.attr("href") };
+			var shortLabel = undefined;
+
+			if (options.skin.trim() == "CIB") {
+				var match = labelText.match(/^Chapter (\d+):/);
+				if (match) {
+					shortLabel = match[1];
+				}
+			}
+
+			var node = { desc: label, href: anchor.attr("href"), short: shortLabel };
 
 			var obj = { node: node, children: [], extra_classes: extra_classes };
 
 			nodes[i] = obj;
 
-			addChildNodes(obj.children, d.find("> ol > li"));
+			addChildNodes(options, obj.children, d.find("> ol > li"));
 		}
 	}
 
@@ -136,11 +161,27 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 		},
 
 		addNodes: function (params, nodes, dest, depth) {
+			var otherIndex = 1;
+
 			for (var i = 0; i < nodes.length; i++) {
 				var d = nodes[i];
 
 				var new_depth = depth.slice();
-				new_depth.push(i + 1);
+
+				if (this.options.skin.trim() == "CIB") {
+					if (d.node.short) {
+						new_depth.push(d.node.short);
+					} else {
+						if (depth.length == 0) {
+							new_depth.push(romanize(otherIndex));
+							otherIndex++;
+						} else {
+							new_depth.push(i + 1);
+						}
+					}
+				} else {
+					new_depth.push(i + 1);
+				}
 
 				if (d) {
 					this.addParentNode(params, d, dest, new_depth);
@@ -183,7 +224,7 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 				var short = $("<span>", {class: "level tree-toggler"});
 
 				var short_label;
-				if (depth.length <= 3) {
+				if (depth.length <= 4) {
 					short_label = depth.join(".");
 				} else {
 					short_label = depth[depth.length - 1];
@@ -194,10 +235,11 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 					short.html(d.node.short);
 				} else {
 					if (this.options.type == "habitat") {
+						short_label = depth[depth.length - 1];
 						short.html(short_label);
 					} else if (this.options.type == "epub") {
 						short_label = depth[depth.length - 1];
-						short.addClass("invisible");
+						short.html(short_label).addClass("invisible");
 					} else {
 						var shortcut = d.node.desc.toLowerCase();
 
@@ -241,7 +283,7 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 				ol = $(this.options.data).children().eq(1);
 			}
 
-			var nodes = convertHabitatDataToNodes(ol);
+			var nodes = convertHabitatDataToNodes(this.options, ol);
 
 			this.nodes = nodes;
 

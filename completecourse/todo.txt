@@ -1,6 +1,5 @@
 // TODO: visual indicator that a TOC entry has children
-// TODO: sizing of Habitat content with quizzes isn't correct (CIB InDesign 1.5)
-// TODO: after updates are made, how will the "completion tracking" cope with toc indexes having changed numbers?
+// TODO: after updates are made, how will the "completion tracking" cope with toc indexes having changed numbers? [internal id's?]
 // TODO: make all images the same scale??
 // TODO: when scrolling through content, check off sections that might not have triggered the usual "completed" scrolling trigger (ie, check for sequential completions)
 // TODO: short sub-sections don't get marked complete
@@ -79,3 +78,7 @@
 // DONE: demo updated/changed content for Greg [deleted content = rollover to see; deleted chapter; change log]
 // TODONT: send page title to Google Analytics (not link #) [it's there: Secondary dimension: Screen Name]
 // DONE: max-width for iframe for better readability?
+// DONE: better way to grab numbers for the TOC
+// DONE: spell out the TOC numbering strategies for various styles/skins (data loading, toctree; habitat, epub, CIB skin) [Google Doc]
+// DONE: sizing of Habitat content with quizzes/widgets isn't correct (CIB InDesign 1.5)
+// DONE: widgets that resize the page need to be accounted for (CIB InDesign 18.7.1)
