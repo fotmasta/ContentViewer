@@ -418,6 +418,9 @@ span.completed {
   .habitat-body:not(.xs) {
     margin-left: 5em !important;
     margin-right: 5em !important; }
+  .habitat-body.xs {
+    margin-left: 10px !important;
+    margin-right: 10px !important; }
   .habitat-body figure:not(.figure-table) {
     max-width: 600px;
     margin: 2.5em auto; }

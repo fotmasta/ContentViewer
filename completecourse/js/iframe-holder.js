@@ -103,6 +103,15 @@ define(["bootstrap-dialog", "imagesloaded", "jquery.ui"], function (BootstrapDia
 			var me = this;
 
 			if (me.iframe.contents()[0]) {
+
+				var xs = ResponsiveBootstrapToolkit.is("xs");
+
+				// let the content know if it's xs (this is also done when resizing but needs to be done here for initial loading)
+				me.iframe.contents().find(".habitat-body").removeClass("xs");
+				if (xs) {
+					me.iframe.contents().find(".habitat-body").addClass("xs");
+				}
+
 				//var h = me.iframe.contents()[0].body.scrollHeight;
 
 				// turn off scrolling on the iframe's content

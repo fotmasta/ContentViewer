@@ -409,6 +409,7 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 					hash: params.hash,
 					highlight: params.highlight
 				};
+
 				waitingForIFrameToLoad = true;
 				this.iframe.iFrameHolder("loadNewContent", options);
 			}

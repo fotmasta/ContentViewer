@@ -616,6 +616,11 @@ span.completed {
 		margin-right: 5em !important;
 	}
 
+	&.xs {
+		margin-left: 10px !important;
+		margin-right: 10px !important;
+	}
+
 	figure:not(.figure-table) {
 		max-width: 600px;
 		margin: 2.5em auto;

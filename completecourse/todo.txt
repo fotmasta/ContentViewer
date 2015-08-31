@@ -1,3 +1,4 @@
+// TODO: wide images don't fit in the zoomed popup
 // TODO: visual indicator that a TOC entry has children
 // TODO: after updates are made, how will the "completion tracking" cope with toc indexes having changed numbers? [internal id's?]
 // TODO: make all images the same scale??
@@ -82,3 +83,5 @@
 // DONE: spell out the TOC numbering strategies for various styles/skins (data loading, toctree; habitat, epub, CIB skin) [Google Doc]
 // DONE: sizing of Habitat content with quizzes/widgets isn't correct (CIB InDesign 1.5)
 // DONE: widgets that resize the page need to be accounted for (CIB InDesign 18.7.1)
+// DONE: xs needs a very small margin
+// DONE: xs isn't set when first loaded
