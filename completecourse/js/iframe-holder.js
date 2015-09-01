@@ -47,6 +47,8 @@ define(["bootstrap-dialog", "imagesloaded", "jquery.ui"], function (BootstrapDia
 
 			this.iframe = $("<iframe>", { src: src, frameborder: 0 });
 
+			this.element.css("display", "none");
+
 			this.iframe.load($.proxy(this.onLoaded, this));
 
 			this.element.append(this.iframe);
@@ -59,12 +61,19 @@ define(["bootstrap-dialog", "imagesloaded", "jquery.ui"], function (BootstrapDia
 
 			var src = URLWithoutHash(this.options.src);
 
+			this.iframe.hide(0);
+
 			this.iframe.attr("src", src).css("height", "auto");
 		},
 
 		sizeToFitToBottom: function () {
 			var bottomb = this.iframe.contents().find(".button-a#next-button");
-			var h = Math.round(bottomb.offset().top + bottomb.outerHeight());
+			var h;
+			if (bottomb.length) {
+				h = Math.round(bottomb.offset().top + bottomb.outerHeight());
+			} else {
+				h = this.iframe.contents().find("body").outerHeight();
+			}
 
 			this.iframe.height(h);
 		},
@@ -126,6 +135,11 @@ define(["bootstrap-dialog", "imagesloaded", "jquery.ui"], function (BootstrapDia
 				me.highlight(me.options.highlight);
 
 				me.makeImagesModal();
+
+				this.element.show(0);
+
+				me.iframe.removeClass("fadeIn animated").hide(0);
+				me.iframe.addClass("fadeIn animated").show(0);
 
 				// NOTE: if we're auto-advancing, don't scroll to any hashtags
 

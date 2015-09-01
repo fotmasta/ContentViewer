@@ -85,3 +85,4 @@
 // DONE: widgets that resize the page need to be accounted for (CIB InDesign 18.7.1)
 // DONE: xs needs a very small margin
 // DONE: xs isn't set when first loaded
+// DONE: smoother visual transition to new pages
