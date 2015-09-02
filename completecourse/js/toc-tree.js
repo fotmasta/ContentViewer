@@ -72,7 +72,7 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 
 			var shortLabel = undefined;
 
-			if (options.skin.trim() == "CIB") {
+			if (options.skin && options.skin.trim() == "CIB") {
 				var match = labelText.match(/^Chapter (\d+):/);
 				if (match) {
 					shortLabel = match[1];
@@ -168,7 +168,7 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 
 				var new_depth = depth.slice();
 
-				if (this.options.skin.trim() == "CIB") {
+				if (this.options.skin && this.options.skin.trim() == "CIB") {
 					if (d.node.short) {
 						new_depth.push(d.node.short);
 					} else {

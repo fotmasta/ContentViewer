@@ -53,7 +53,7 @@ define(["bootstrap-dialog", "imagesloaded", "jquery.ui"], function (BootstrapDia
 
 			this.element.append(this.iframe);
 
-			this.addStylesheet();
+			//this.addStylesheet();
 		},
 
 		loadNewContent: function (options) {

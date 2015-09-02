@@ -413,8 +413,7 @@ span.completed {
     background: #A2D1E7; }
 
 .habitat-body {
-  font-family: 'Source Sans Pro', sans-serif;
-  line-height: 1.4em; }
+  font-family: 'Source Sans Pro', sans-serif; }
   .habitat-body:not(.xs) {
     margin-left: 5em !important;
     margin-right: 5em !important; }
