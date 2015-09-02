@@ -86,3 +86,4 @@
 // DONE: xs needs a very small margin
 // DONE: xs isn't set when first loaded
 // DONE: smoother visual transition to new pages
+// DONE: visual indicator that a page is loading

@@ -380,6 +380,8 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 		onIFrameLoaded: function (iframe) {
 			waitingForAutoAdvance = false;
 			waitingForIFrameToLoad = false;
+
+			$(".loading-indicator").hide();
 		},
 
 		addIFrame: function (params) {
@@ -413,6 +415,8 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 				waitingForIFrameToLoad = true;
 				this.iframe.iFrameHolder("loadNewContent", options);
 			}
+
+			$(".loading-indicator").show();
 		},
 
 		playExtraFromTOC: function (index, options) {
