@@ -519,7 +519,7 @@ button#search-close {
 
 /* loading indicator: */
 .loading-indicator {
-  position: fixed;
+  position: absolute;
   top: 50%;
   left: 50%;
   transform: scale(2) translate(-25%, -25%);
