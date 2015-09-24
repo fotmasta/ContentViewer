@@ -20,7 +20,7 @@ requirejs.config({
 		"imagesloaded": "imagesloaded.pkgd.min",
 		"popcorn": "popcorn-complete.min",
 		"bootstrap-toolkit": "bootstrap-toolkit.min",
-		"videojs": "video.dev",
+		"videojs": "video",
 		"videojs-markers": "videojs-markers",
 		"handlebars": "handlebars-v3.0.3",
 		"lunr": "lunr.min"
@@ -267,7 +267,7 @@ define(["jquery", "handlebars", "text!viewer_template.html", "video-manager", "v
 	}
 
 	function onLoadedTOC (metadata) {
-		$(".toc").TOCTree({ data: metadata.toc, expander: "#collapse-button" });
+		$(".toc").TOCTree({ data: metadata.toc, metadata: metadata, expander: "#collapse-button" });
 
 		$(".resource-list").TOCTree();
 

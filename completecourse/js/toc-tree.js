@@ -158,6 +158,12 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 
 			var p = $("<p>", { id: "query-summary", class: "blocky", text: "" });
 			this.holder.append(p);
+
+			if (this.options.metadata.zipFile) {
+				var b = $('<button id="all-download" class="btn btn-success download-button" title="Download all video."><i class="fa fa-cloud-download"></i></button>');
+				b.click($.proxy(this.onClickDownload, this, this.options.metadata.zipFile));
+				$("#header-nav .navbar-brand").append(b);
+			}
 		},
 
 		addNodes: function (params, nodes, dest, depth) {
@@ -251,6 +257,13 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 							short.html(d.node.desc.substr(0, 1));
 						}
 					}
+				}
+
+				if (d.node.download) {
+					linkholder.addClass("has-download");
+					var dl = $("<button class='btn btn-success download-button' title='Download this section.'><i class='fa fa-cloud-download'></i></button>");
+					dl.click($.proxy(this.onClickDownload, this, d.node.download));
+					linkholder.append(dl);
 				}
 
 				a.append(short);
@@ -583,6 +596,10 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 			} else {
 				this.expandTOC();
 			}
+		},
+
+		onClickDownload: function (file, event) {
+			this.element.trigger("downloadvideo", file);
 		}
 	});
 });

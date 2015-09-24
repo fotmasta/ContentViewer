@@ -68,7 +68,7 @@ body {
 
 		a {
 			color: $blue-color;
-			display: block;
+			/*display: block;*/
 
 			span.desc {
 				display: inline-block;
@@ -229,7 +229,6 @@ body {
 			top: 27px;
 			left: -30px;
 		}
-
 	}
 
 	.nav-tabs > li.active > a {
@@ -327,10 +326,34 @@ body {
 			color: rgb(25, 24, 50);
 		}
 	}
+
+	.nav-header:hover > a > button.download-button {
+	}
+
+	li:hover > a > button.download-button {
+	}
+
 }
 
 .tree-toggler {
 	cursor: pointer;
+}
+
+ul.toc-holder {
+	margin: 5px 0;
+
+	.download-button {
+		position: absolute;
+		right: 4px;
+		top: 50%;
+		transform: translateY(-50%);
+	}
+}
+
+#header-nav {
+	.download-button {
+		margin-left: 10px;
+	}
 }
 
 ul.toc-holder > li > .tree-toggler a .tree-toggler + .completed + .checked {
@@ -345,20 +368,23 @@ ul.toc-holder > li > .tree-toggler a .tree-toggler + .completed + .checked {
 }
 
 .nav-list .nav-header {
+	/*
 	margin-right: -15px;
 	margin-left: -8px;
+	*/
 }
 
 .nav-header {
 	display: block;
-	padding: 3px 8px;
+	/*padding: 3px 8px;*/
 	font-size: 13px;
-	/*font-weight: bold;*/
+	/*margin: 0;*/
 	font-weight: normal;
 	line-height: 20px;
 	color: #999;
 	text-shadow: 0 1px 0 rgba(255,255,255,0.5);
 	text-transform: uppercase;
+	position: relative;
 }
 
 .toc {
@@ -775,6 +801,20 @@ button#search-close {
 	background: transparent;
 	color: white;
 	text-shadow: none;
+}
+
+.download-button {
+	padding: 0px 4px;
+	z-index: 1;
+
+	&:focus, &:active {
+		outline: none !important;
+	}
+}
+
+// make room for the download button
+.has-download {
+	padding-right: 45px;
 }
 
 /* loading indicator: */

@@ -1,5 +1,5 @@
-// TODO: wide images don't fit in the zoomed popup
 // TODO: visual indicator that a TOC entry has children
+// TODO: wide images don't fit in the zoomed popup
 // TODO: after updates are made, how will the "completion tracking" cope with toc indexes having changed numbers? [internal id's?]
 // TODO: make all images the same scale??
 // TODO: when scrolling through content, check off sections that might not have triggered the usual "completed" scrolling trigger (ie, check for sequential completions)
@@ -87,3 +87,4 @@
 // DONE: xs isn't set when first loaded
 // DONE: smoother visual transition to new pages
 // DONE: visual indicator that a page is loading
+// DONE: download option for video toc entries

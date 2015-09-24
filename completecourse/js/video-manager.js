@@ -131,6 +131,8 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 
 			$("#video").scroll($.proxy(this.onScrollContent, this));
 
+			$(".toc").on("downloadvideo", $.proxy(this.onDownloadVideo, this));
+
 			window.onpopstate = function (event) {
 				var loc = document.location.search;
 				VideoManager.tryToGotoLocationSearch(loc);
@@ -826,6 +828,27 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 			});
 		},
 
+		onDownloadVideo: function (event, file) {
+			$.notify({
+				// options
+				message: 'Video Download ' + file + ' starting ...',
+			}, {
+				// settings
+				type: 'success',
+				allow_dismiss: false,
+				placement: {
+					from: "bottom",
+					align: "left"
+				},
+				delay: 3000,
+				z_index: 5000,
+				animate: {
+					enter: 'animated fadeInDown',
+					exit: 'animated fadeOutUp'
+				}
+			});
+		},
+
 		isShowingAll: function () {
 			return this.pop.SHOWING_ALL;
 		},
@@ -1071,8 +1094,7 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 		onCloseSearch: function () {
 			this.iframe.iFrameHolder("unhighlight");
 		}
-
-};
+	};
 	
 	return VideoManager;
 	
