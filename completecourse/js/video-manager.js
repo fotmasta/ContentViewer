@@ -1113,13 +1113,15 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 				m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
 			})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
+			// my ga code:
 			ga('create', 'UA-48406787-4', 'auto');
 
-			ga('set', {
-				'appName': title,
-			});
+			// andy's code:
+			ga('create', 'UA-433761-35', 'auto');
 
-			ga('send', 'screenview');
+			ga('set', {
+				'appName': title
+			});
 		},
 
 		sendGoogleAnalytics: function (pagename) {
