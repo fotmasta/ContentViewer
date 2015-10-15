@@ -72,7 +72,7 @@ body {
 
 			span.desc {
 				display: inline-block;
-				padding-left: 5px;
+				padding-left: 16px;
 
 				.badge:not(.delete) {
 					display: none;
@@ -340,7 +340,8 @@ body {
 }
 
 ul.toc-holder {
-	margin: 5px 0;
+	margin: 5px 5px 5px 0;
+	padding-left: 0;
 
 	.download-button {
 		position: absolute;
@@ -389,6 +390,24 @@ ul.toc-holder > li > .tree-toggler a .tree-toggler + .completed + .checked {
 
 .toc {
 	overflow: hidden;
+
+	.dropper {
+		position: absolute;
+		left: 4px;
+		top: 4px;
+
+		&.opened {
+			display: inline-block;
+		}
+
+		&.closed {
+			display: none;
+		}
+
+		&:hover {
+			transform: scale(1.5);
+		}
+	}
 }
 
 .navbar-brand {
@@ -948,6 +967,11 @@ button#search-close {
 		  -webkit-transform: scale(1);
 		  transform: scale(1);
 	  }
+}
+
+// hide the "Click here to view code image" things leftover from codeMantra ePubs
+.codelink {
+	display: none;
 }
 
 /* CUP styling overrides */

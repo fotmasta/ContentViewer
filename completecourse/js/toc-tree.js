@@ -116,6 +116,41 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 		return null;
 	}
 
+	function toggleDropper (event) {
+		event.preventDefault();
+		event.stopPropagation();
+
+		var link = $(this).parents("li").eq(0);
+		var tree = link.children("ul.tree");
+
+		refreshDropperStatus(link);
+
+		tree.toggle(300);
+	}
+
+	function refreshDropperStatus (link, toggle) {
+		if (toggle == undefined) toggle = true;
+
+		var tree = link.find("ul.tree");
+
+		$.each(tree, function (index, element) {
+			var el = $(element);
+
+			var li = el.parent("li");
+
+			var vis = el.css("display") == "block";
+			if (index == 0 && toggle) vis = !vis;
+
+			if (vis) {
+				el.parent("li").find(".dropper.opened").first().show(0);
+				el.parent("li").find(".dropper.closed").first().hide(0);
+			} else {
+				el.parent("li").find(".dropper.opened").first().hide(0);
+				el.parent("li").find(".dropper.closed").first().show(0);
+			}
+		});
+	}
+
 	function MakeAShortLabelForSearchResults (node) {
 		var depths = node.node.depth.slice();
 		var short = getShortLabel(node.node);
@@ -210,6 +245,13 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 					li.append(lbl);
 					linkholder = lbl;
 
+					var dropper = $("<i>", { class: "dropper opened fa fa-caret-down"});
+					dropper.click(toggleDropper);
+					linkholder.append(dropper);
+					dropper = $("<i>", { class: "dropper closed fa fa-caret-right"});
+					dropper.click(toggleDropper);
+					linkholder.append(dropper);
+
 					var ul = $("<ul>", {class: "nav nav-list tree"});
 					li.append(ul);
 				} else {
@@ -221,7 +263,11 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 				var a = $("<a>").attr("href", d.node.href);
 
 				var entry_text = d.node.desc;
-				var sp = $("<span>", {class: "desc " + d.extra_classes, html: " " + entry_text});
+
+				var classes = "desc";
+				if (d.extra_classes) classes += " " + d.extra_classes;
+
+				var sp = $("<span>", {class: classes, html: " " + entry_text});
 
 				// horizontal line to indicate current selection in TOC
 				var indicator = $("<div>", { class: "indicator" });
@@ -274,11 +320,7 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 
 				a.click($.proxy(this.launchVideo, this, params.counter, { toggle: true }));
 
-				short.click(function (event) {
-					event.preventDefault();
-					event.stopPropagation();
-					$(this).parents("li").eq(0).children('ul.tree').toggle(300);
-				});
+				//short.click(toggleDropper);
 
 				params.counter++;
 			}
@@ -324,13 +366,17 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 			if (options && options.toggle) {
 				var li = this.element.find("li[data-index=" + index + "] > ul");
 				if (li.length) {
+					var parent_li = this.element.find("li[data-index=" + index + "]");
+					refreshDropperStatus(parent_li);
 					li.toggle(300);
 				}
 			} else {
 				// find the toc entry for this index and expand it
-				var li = this.element.find("li[data-index=" + index + "] ul");
+				var li = this.element.find("li[data-index=" + index + "] > ul");
 				if (li.length) {
 					li.show(300);
+					var parent_li = this.element.find("li[data-index=" + index + "]");
+					refreshDropperStatus(parent_li, false);
 				}
 			}
 		},
@@ -581,11 +627,15 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 		collapseTOC: function () {
 			$(this.options.expander + " i").removeClass("fa-caret-up").addClass("fa-caret-down");
 			this.holder.find("> li > ul").hide(300);
+			this.holder.find(".dropper.opened").hide(0);
+			this.holder.find(".dropper.closed").show(0);
 		},
 
 		expandTOC: function () {
 			$(this.options.expander + " i").removeClass("fa-caret-down").addClass("fa-caret-up");
 			this.holder.find("li ul").show(300);
+			this.holder.find(".dropper.opened").show(0);
+			this.holder.find(".dropper.closed").hide(0);
 		},
 
 		expandOrCollapse: function (event) {

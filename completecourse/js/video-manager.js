@@ -343,6 +343,29 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 			}
 		},
 
+		findInternalLink: function (href) {
+			var this_href = URLWithoutHash(href);
+
+			if (this_href) {
+				// try to find where this internal link is in the toc and go there
+				for (var i = 0; i < this.toc.length; i++) {
+					var other_href = URLWithoutHash(this.toc[i].src);
+					if (other_href.indexOf(this_href) != -1) {
+						return true;
+					}
+				}
+			} else {
+				// is it in the DOM?
+				debugger;
+
+				var iframe = $("iframe").eq(0);
+
+				this.scrollToHash(iframe, { hash: href }, false);
+			}
+
+			return false;
+		},
+
 		onDoneScrolling: function () {
 			this.busyScrolling = false;
 		},
@@ -791,6 +814,19 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 					break;
 			}
 		},
+
+		openExtraPage: function (url) {
+			var contents = '<iframe src="' + url + '" width="100%" height="__window height__" frameborder="0"></frame>';
+
+			var wh = $(window).outerHeight();
+			contents = contents.replace("__window height__", (wh * .75));
+
+			BootstrapDialog.show({
+				/*title: "Try This…",*/
+				message: contents,
+				size: BootstrapDialog.SIZE_WIDE
+			});
+		},
 		
 		onClipboard: function (event) {
 			event.stopPropagation();
@@ -1016,8 +1052,13 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 				$(".toc .current").removeClass("current");
 				entry.addClass("current");
 
-				if (isNew)
-					entry.parents("li").find("ul").show(300);
+				if (isNew) {
+					/*
+					entry.parents("li").find("> ul").show(300);
+					entry.parents("li").find("> ul .dropper.opened").show(0);
+					entry.parents("li").find("> ul .dropper.closed").hide(0);
+					*/
+				}
 
 				var scroller = $("#contents-pane .scroller");
 				var t = scroller.scrollTop();

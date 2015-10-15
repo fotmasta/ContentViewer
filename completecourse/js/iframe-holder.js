@@ -232,7 +232,12 @@ define(["bootstrap-dialog", "imagesloaded", "jquery.ui"], function (BootstrapDia
 				window.open(href, "_blank");
 			} else {
 				// find the toc entry with this href and go there (including the link index # in our address bar)
-				this.options.manager.triggerInternalLink(href);
+				var found = this.options.manager.findInternalLink(href);
+				if (found)
+					this.options.manager.triggerInternalLink(href);
+				else {
+					this.options.manager.openExtraPage(href);
+				}
 			}
 		},
 
