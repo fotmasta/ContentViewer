@@ -318,7 +318,8 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 
 				a.appendTo(linkholder);
 
-				a.click($.proxy(this.launchVideo, this, params.counter, { toggle: true }));
+				// 10/16/15: turned off toggling when clicking a toc link
+				a.click($.proxy(this.launchVideo, this, params.counter, { toggle: false }));
 
 				//short.click(toggleDropper);
 

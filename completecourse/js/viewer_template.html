@@ -23,75 +23,76 @@
 </nav>
 
 <div id="main" class="container-fluid invisible">
-    <div class="row">
-        <div id="contents" class="col-xs-3">
-            <div class="toc" id="contents-pane">
-                <div class="course-progress">
-                    <button id="collapse-button" title="Expand or collapse entire video list." class="btn btn-primary btn-xs pull-left"><i class="fa fa-lg fa-caret-up"></i></button>
-                    <div class="progress" data-progress="0% Complete">
-                        <div id="completed-progress" class="progress-bar progress-bar-warning" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%">
-                        </div>
-                    </div>
-                    <div class="clearfix"></div>
-                </div>
-                <div class="scroller">
-                    <ul class="nav nav-list toc-holder">
-                    </ul>
-                </div>
-            </div>
-	        <div class="search-results">
-		        <div class="row">
-			        <div class="col-xs-6">
-				        <div class="input-group form-control">
-					        <span class="input-group-addon" id="basic-addon1">Search</span>
-					        <input id="query-too" type="text" class="form-control">
-				        </div>
-			        </div>
-			        <div class="col-xs-6">
-				        <div class="input-group form-control">
-				        <div class="btn-toolbar pull-right" role="toolbar">
-					        <div class="btn-group" role="group">
-						        <label id="hit-count">15 hits</label>
-					        </div>
-					        <div class="btn-group btn-group-sm" role="group">
+	<div class="row">
+		<div id="contents" class="col-xs-3">
+			<div class="toc" id="contents-pane">
+				<div class="course-progress">
+					<button id="collapse-button" title="Expand or collapse entire video list." class="btn btn-primary btn-xs pull-left"><i class="fa fa-lg fa-caret-up"></i></button>
+					<div class="progress" data-progress="0% Complete">
+						<div id="completed-progress" class="progress-bar progress-bar-warning" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%">
+						</div>
+					</div>
+					<div class="clearfix"></div>
+				</div>
+				<div class="scroller">
+					<ul class="nav nav-list toc-holder">
+					</ul>
+				</div>
+			</div>
+			<div class="search-results">
+				<div class="row">
+					<div class="col-xs-6">
+						<div class="input-group form-control">
+							<span class="input-group-addon" id="basic-addon1">Search</span>
+							<input id="query-too" type="text" class="form-control">
+						</div>
+					</div>
+					<div class="col-xs-6">
+						<div class="input-group form-control">
+						<div class="btn-toolbar pull-right" role="toolbar">
+							<div class="btn-group" role="group">
+								<label id="hit-count">15 hits</label>
+							</div>
+							<div class="btn-group btn-group-sm" role="group">
 								<button type="button" id="search-previous" class="btn btn-info">
 									<i class="fa fa-caret-left"></i>
 								</button>
 								<button type="button" id="search-next" class="btn btn-info">
 									<i class="fa fa-caret-right"></i>
 								</button>
-					        </div>
-					        <div class="btn-group btn-group-sm" role="group">
-						        <button type="button" id="search-close" class="btn btn-default close-btn">
-							        <i class="fa fa-close"></i>
-						        </button>
-					        </div>
-				        </div>
-				        </div>
-			        </div>
-		        </div>
-		        <div class="scroller">
-			        <ul class="search-result-list">
-			        </ul>
-		        </div>
-	        </div>
-        </div>
-        <div id="video" class="col-xs-9">
-            <div class="video-holder">
-                <div class="overlay"></div>
-                <video class="video-js vjs-default-skin vjs-big-play-centered" id="main_video" controls>
-                </video>
-            </div>
-            <div class="iframe-holder">
-            </div>
-        </div>
-        <div id="sidebar" class="col-xs-0">
-            <div class="scroller">
-                <ul class="nav nav-list resource-list">
-                </ul>
-            </div>
-        </div>
-    </div>
+							</div>
+							<div class="btn-group btn-group-sm" role="group">
+								<button type="button" id="search-close" class="btn btn-default close-btn">
+									<i class="fa fa-close"></i>
+								</button>
+							</div>
+						</div>
+						</div>
+					</div>
+				</div>
+				<div class="scroller">
+					<ul class="search-result-list">
+					</ul>
+				</div>
+			</div>
+		</div>
+		<div id="video" class="col-xs-9">
+			<div class="video-holder">
+				<div class="overlay"></div>
+				<video class="video-js vjs-default-skin vjs-big-play-centered" id="main_video" controls>
+					<!--<track kind="subtitles" src="../test_gamedesign_video/media/tts/gamedesign.vtt" srclang="en" label="English" default></track>-->
+				</video>
+			</div>
+			<div class="iframe-holder">
+			</div>
+		</div>
+		<div id="sidebar" class="col-xs-0">
+			<div class="scroller">
+				<ul class="nav nav-list resource-list">
+				</ul>
+			</div>
+		</div>
+	</div>
 
 	<div class="loading-indicator">
 		<div class="sk-circle">

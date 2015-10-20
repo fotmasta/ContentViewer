@@ -126,6 +126,7 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 
 			this.player.on("ended", $.proxy(this.onVideoEnded, this));
 			this.player.on("timeupdate", $.proxy(this.saveCurrentVideoTime, this));
+			this.player.on("loadedmetadata", $.proxy(this.onLoadedMetadata, this));
 
 			$(".toc").on("playvideo", onPlayContent).on("closesearch", $.proxy(this.onCloseSearch, this));
 
@@ -1114,9 +1115,9 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 			})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
 			// my ga code:
-			ga('create', 'UA-48406787-4', 'auto');
+			//ga('create', 'UA-48406787-4', 'auto');
 
-			// andy's code:
+			// andy's code (effective 10/16/15):
 			ga('create', 'UA-433761-35', 'auto');
 
 			ga('set', {
@@ -1136,6 +1137,31 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 
 		onCloseSearch: function () {
 			this.iframe.iFrameHolder("unhighlight");
+		},
+
+		// after loading video, add any closed captioning
+		onLoadedMetadata: function (event) {
+			var captions = this.toc[this.currentIndex].captions;
+
+			if (captions) {
+				$(this.el).find("track").remove();
+
+				var track = document.createElement("track");
+				track.kind = "captions";
+				track.label = "English";
+				track.srclang = "en";
+				track.src = captions;
+
+				/* to auto-show captions:
+				function ontrackadded(event) {
+					event.track.mode = "showing";
+				}
+
+				this.player.textTracks().onaddtrack = ontrackadded;
+				*/
+
+				$(this.el).append(track);
+			}
 		}
 	};
 	

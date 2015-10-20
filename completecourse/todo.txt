@@ -90,3 +90,4 @@
 // DONE: hide codeMantra "click here to view the code" links
 // DONE: visual indicator that a TOC entry has children
 // DONE: toggling dropper when selecting an entry isn't working
+// DONE: add optional closed captioning file to the toc.js
