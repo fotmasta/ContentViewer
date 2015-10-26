@@ -91,3 +91,4 @@
 // DONE: visual indicator that a TOC entry has children
 // DONE: toggling dropper when selecting an entry isn't working
 // DONE: add optional closed captioning file to the toc.js
+// DONE: where did the video BackButton go? (lost with change away from video.dev.js?) [yes]

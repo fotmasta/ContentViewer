@@ -45,7 +45,7 @@ define(["bootstrap-dialog", "imagesloaded", "jquery.ui"], function (BootstrapDia
 
 			var src = URLWithoutHash(this.options.src);
 
-			this.iframe = $("<iframe>", { src: src, frameborder: 0 });
+			this.iframe = $("<iframe>", { src: src, frameborder: 0, "allowfullscreen": true });
 
 			this.element.css("display", "none");
 

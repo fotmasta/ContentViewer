@@ -78,6 +78,8 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 		VideoManager.playFromTOC(depth, opts);
 	}
 
+	// rather than having to add this custom button to the video.js build (in v4 at least), I just added the button manually (below)
+	/*
 	videojs.BackButton = videojs.Button.extend({});
 
 	videojs.BackButton.prototype.buttonText = 'Back 10';
@@ -90,6 +92,7 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 		var t = this.player().currentTime();
 		this.player().currentTime(t - 10);
 	};
+	*/
 
 	function getParameterByName (loc, name) {
 		name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
@@ -117,7 +120,18 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 
 			this.pop = Popcorn(el, { frameAnimation: true });
 
+			/*
 			var backButton = new videojs.BackButton(this.player);
+			this.player.controlBar.addChild(backButton);
+			*/
+
+			// add the Back Button manually
+			var backButton = new videojs.Button(this.player);
+			backButton.addClass("vjs-back-button");
+			backButton.on("click", function () {
+				var t = this.player().currentTime();
+				this.player().currentTime(t - 10);
+			});
 			this.player.controlBar.addChild(backButton);
 
 			//  NOTE: Not sure why this stopped working and I had to switch to the straight HTML5 event
