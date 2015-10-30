@@ -293,6 +293,8 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 						short_label = depth[depth.length - 1];
 						short.html(short_label).addClass("invisible");
 					} else {
+						short.addClass("invisible");
+						/* not using this (was for videos)
 						var shortcut = d.node.desc.toLowerCase();
 
 						if (shortcut == "introduction") {
@@ -302,6 +304,7 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 						} else {
 							short.html(d.node.desc.substr(0, 1));
 						}
+						*/
 					}
 				}
 
@@ -650,7 +653,8 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 		},
 
 		onClickDownload: function (file, event) {
-			this.element.trigger("downloadvideo", file);
+			var ifrm = $("#downloader");
+			ifrm.attr("src", file);
 		}
 	});
 });
