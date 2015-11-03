@@ -222,15 +222,25 @@ ul.toc-holder {
 #header-nav .download-button {
   margin-left: 10px; }
 
+.checked {
+  color: orange;
+  position: absolute;
+  margin-left: .5em;
+  margin-top: 3px; }
+
+/*
 ul.toc-holder > li > .tree-toggler a .tree-toggler + .completed + .checked {
-  position: relative;
-  top: auto;
-  left: auto;
-  margin-left: .5em; }
-
+	position: relative;
+	top: auto;
+	left: auto;
+	margin-left: .5em;
+}
+*/
+/*
 .tree-toggler:not(.invisible) + span + .checked {
-  left: -50px; }
-
+	left: -50px;
+}
+*/
 .nav-list .nav-header {
   /*
   margin-right: -15px;
@@ -323,13 +333,6 @@ ul.toc-holder > li > .tree-toggler a .tree-toggler + .completed + .checked {
   #resource-toggler.open {
     background: white !important;
     color: #337ab7 !important; }
-
-.checked {
-  color: orange;
-  position: absolute;
-  left: -15px;
-  top: 6px;
-  font-size: 16px; }
 
 span.completed {
   font-weight: 200;

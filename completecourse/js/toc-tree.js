@@ -406,11 +406,17 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 			this.searchIndex = lunr.Index.load(data);
 		},
 
+		hasSearchIndex: function () {
+			return this.searchIndex != undefined;
+		},
+
 		search: function (term) {
 			this.searchCounter = undefined;
 
 			if (!this.searchIndex) {
-				return this.searchByTitles(term);
+				this.searchByTitles(term);
+				this.element.parent().find(".toc").show("slide");
+				return;
 			}
 
 			var results = this.searchIndex.search(term);
@@ -465,10 +471,14 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 		},
 
 		closeSearch: function () {
-			this.element.parent().find(".toc").delay(300).show("slide");
-			this.element.parent().find(".search-results").hide("slide");
+			if (!this.searchIndex) {
+				this.searchByTitles("");
+			} else {
+				this.element.parent().find(".toc").delay(300).show("slide");
+				this.element.parent().find(".search-results").hide("slide");
 
-			this.element.trigger("closesearch");
+				this.element.trigger("closesearch");
+			}
 		},
 
 		searchNext: function (direction) {
@@ -525,7 +535,7 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 
 			if (term != "") {
 				if (results.toShow.length) {
-					$("#query-summary").text("Count: " + results.toShow.length);
+					$("#query-summary").text("Search Results: " + results.toShow.length);
 				} else {
 					$("#query-summary").text("No matching titles. Try a different search?");
 				}
@@ -542,17 +552,18 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 		markStarted: function (index) {
 			var el = this.holder.find("[data-index=" + index + "]");
 			// only mark the first link (not the children)
-			var a = el.find("a").first();
+			var a = el.find("a").first().find("span.desc");
 			var checked = a.find("i.checked");
 			checked.remove();
-			a.append("<i class='checked fa fa-adjust fa-flip-horizontal fa-lg'></i>");
+
+			a.find(".indicator").before("<i class='checked fa fa-adjust fa-flip-horizontal'></i>");
 		},
 
 		markCompleted: function (index) {
 			this.options.data[index].completed = true;
 
 			var el = this.holder.find("[data-index=" + index + "]");
-			var a = el.find("> label a, > a");
+			var a = el.find("> label a span.desc, > a span.desc");
 			var checked = a.find("i.checked");
 			checked.remove();
 
@@ -560,15 +571,19 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 			if (el.find("ul li").length) {
 				var childrenComplete = this.checkForAllChildrenComplete(index);
 				if (childrenComplete) {
-					a.append("<i class='checked fa fa-check-circle fa-lg'></i>");
+					a.find(".indicator").before("<i class='checked fa fa-check-circle'></i>");
+					//a.append("<i class='checked fa fa-check-circle fa-lg'></i>");
 				} else {
-					a.append("<i class='checked fa fa-adjust fa-flip-horizontal fa-lg'></i>");
+					a.find(".indicator").before("<i class='checked fa fa-adjust fa-flip-horizontal'></i>");
+					//a.append("<i class='checked fa fa-adjust fa-flip-horizontal fa-lg'></i>");
 				}
 			} else {
-				a.append("<i class='checked fa fa-check-circle fa-lg'></i>");
+				a.find(".indicator").before("<i class='checked fa fa-check-circle'></i>");
+				//a.append("<i class='checked fa fa-check-circle fa-lg'></i>");
 			}
 
-			a.find("span.desc").removeClass("completed").addClass("completed");
+			//a.find("span.desc").removeClass("completed").addClass("completed");
+			a.removeClass("completed").addClass("completed");
 
 			// now check parents, grandparents, etc. to see if they can now be considered complete
 			var p = this.options.data[index].parent;

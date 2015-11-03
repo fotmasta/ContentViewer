@@ -357,16 +357,31 @@ ul.toc-holder {
 	}
 }
 
+// THEORY: put all completed marks /after/ the description
+.checked {
+	color: orange;
+	position: absolute;
+	//left: -15px;
+	//top: 6px;
+	//font-size: 16px;
+	margin-left: .5em;
+	margin-top: 3px;
+}
+
+/*
 ul.toc-holder > li > .tree-toggler a .tree-toggler + .completed + .checked {
 	position: relative;
 	top: auto;
 	left: auto;
 	margin-left: .5em;
 }
+*/
 
+/*
 .tree-toggler:not(.invisible) + span + .checked {
 	left: -50px;
 }
+*/
 
 .nav-list .nav-header {
 	/*
@@ -499,14 +514,6 @@ ul.toc-holder > li > .tree-toggler a .tree-toggler + .completed + .checked {
 		background: white !important;
 		color: $button-blue !important;
 	}
-}
-
-.checked {
-	color: orange;
-	position: absolute;
-	left: -15px;
-	top: 6px;
-	font-size: 16px;
 }
 
 span.completed {

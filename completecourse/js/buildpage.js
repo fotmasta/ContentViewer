@@ -405,7 +405,7 @@ define(["jquery", "handlebars", "text!viewer_template.html", "video-manager", "v
 
 		$("#query-too").val(term);
 
-		if (term == "") {
+		if (term == "" && $(".toc").TOCTree("hasSearchIndex")) {
 			$(".toc").TOCTree("showSearchPane");
 		} else {
 			$(".toc").TOCTree("search", term);

@@ -54,7 +54,7 @@
 // DONE: Google Analytics [I think so]
 // DONE: designate start page for ePub? [hand edit]
 // DONE: when scrolling, expand TOC for current section, if hidden
-// TODO: if a TOC entry has no number, it's not expandable (like the Prologue) [clicking on entry expands it]
+// DONE: if a TOC entry has no number, it's not expandable (like the Prologue) [clicking on entry expands it]
 // DONE: search isn't grabbing the right text (ex: ch08lev1sec3 should be Working with Chat Hangouts, and not include the text "Admin Console") [n-1 problem, I think]
 // DONE: setSearchIndex is being called before TOCTree is initialized [not seeing this anymore; localStorage issue?]
 // DONE: expanding/collapsing arrows get confused (by auto-expanding)
@@ -92,3 +92,6 @@
 // DONE: toggling dropper when selecting an entry isn't working
 // DONE: add optional closed captioning file to the toc.js
 // DONE: where did the video BackButton go? (lost with change away from video.dev.js?) [yes]
+// DONE: search for video has a bug? [Web Editions UI]
+// DONE: zipfile downloading for video, best method? [iframe with file as src, downloads automatically]
+// DONE: videos don't seem to be marking as "complete" [2nd level with short labels; moved completion marks to absolute, right of description (might overlap download buttons sometimes)]

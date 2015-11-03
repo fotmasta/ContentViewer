@@ -1150,7 +1150,8 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 		},
 
 		onCloseSearch: function () {
-			this.iframe.iFrameHolder("unhighlight");
+			if (this.iframe && this.iframe.iFrameHolder)
+				this.iframe.iFrameHolder("unhighlight");
 		},
 
 		// after loading video, add any closed captioning
