@@ -98,3 +98,4 @@
 // DONE: videos don't seem to be marking as "complete" [2nd level with short labels; moved completion marks to absolute, right of description (might overlap download buttons sometimes)]
 // DONE: resize quiz iframes after loading [min-height = window height]
 // DONE: make quiz iframes go away when clicking on another section
+// DONE: event for Captivate quiz being completed? [found a way to get the % score of the quiz]

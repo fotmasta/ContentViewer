@@ -92,7 +92,6 @@ define(["bootstrap-dialog", "imagesloaded", "jquery.ui"], function (BootstrapDia
 
 			switch (this.options.type) {
 				case "metadata":
-					console.log("ok");
 					this.element.show(0);
 
 					var wh = $(window).outerHeight();
@@ -102,7 +101,18 @@ define(["bootstrap-dialog", "imagesloaded", "jquery.ui"], function (BootstrapDia
 					this.iframe.addClass("fadeIn animated").show(0);
 
 					this.iframe[0].contentWindow.addEventListener("moduleReadyEvent", function (evt) {
-						console.log("module ready");
+						var interfaceObj = evt.Data;
+						if (interfaceObj) {
+							var eventEmitterObj = interfaceObj.getEventEmitter();
+							if (eventEmitterObj) {
+								// NOTE: this didn't seem to trigger
+								eventEmitterObj.removeEventListener("CPAPI_QUESTIONSUBMIT");
+								eventEmitterObj.addEventListener("CPAPI_QUESTIONSUBMIT", function (e) {
+									var percent = me.iframe[0].contentWindow.cpAPIInterface.getVariableValue("cpInfoPercentage");
+									//console.log("percent = " + percent);
+								});
+							}
+						}
 					});
 
 					this.options.manager.onIFrameLoaded(me);
