@@ -90,15 +90,36 @@ define(["bootstrap-dialog", "imagesloaded", "jquery.ui"], function (BootstrapDia
 
 			var me = this;
 
-			imagesLoaded(this.iframe.contents().find("body"), $.proxy(this.onIframeContentsLoaded, this));
+			switch (this.options.type) {
+				case "metadata":
+					console.log("ok");
+					this.element.show(0);
 
-			$(this.iframe[0].contentWindow).off("resize");
+					var wh = $(window).outerHeight();
+					this.iframe.css("min-height", wh);
 
-			// THEORY: account for the iframe resizing
-			$(this.iframe[0].contentWindow).on("resize", $.proxy(this.sizeToFitToBottom, this));
+					this.iframe.removeClass("fadeIn animated").hide(0);
+					this.iframe.addClass("fadeIn animated").show(0);
 
-			// THEORY: account for the iframe's Inkling widgets resizing themselves
-			this.iframe[0].contentWindow.addEventListener("message", $.proxy(this.receiveMessage, this));
+					this.iframe[0].contentWindow.addEventListener("moduleReadyEvent", function (evt) {
+						console.log("module ready");
+					});
+
+					this.options.manager.onIFrameLoaded(me);
+					break;
+				default:    // epub, habitat
+					imagesLoaded(this.iframe.contents().find("body"), $.proxy(this.onIframeContentsLoaded, this));
+
+					$(this.iframe[0].contentWindow).off("resize");
+
+					// THEORY: account for the iframe resizing
+					$(this.iframe[0].contentWindow).on("resize", $.proxy(this.sizeToFitToBottom, this));
+
+					// THEORY: account for the iframe's Inkling widgets resizing themselves
+					this.iframe[0].contentWindow.addEventListener("message", $.proxy(this.receiveMessage, this));
+
+					break;
+			}
 		},
 
 		receiveMessage: function (event) {

@@ -322,6 +322,8 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 			$(".iframe-holder").hide();
 			$(".video-holder").show();
 
+			$("#main_video").show();
+
 			if (options && options.pause) {
 			} else {
 				this.player.play();
@@ -433,7 +435,8 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 					scrollTo: params.scrollTo,
 					infinite_scrolling: this.options.infinite_scrolling,
 					hash: params.hash,
-					highlight: params.highlight
+					highlight: params.highlight,
+					type: params.type
 				});
 
 				iframe.appendTo(".iframe-holder");
@@ -449,7 +452,8 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 					scrollTo: params.scrollTo,
 					infinite_scrolling: this.options.infinite_scrolling,
 					hash: params.hash,
-					highlight: params.highlight
+					highlight: params.highlight,
+					type: params.type
 				};
 
 				waitingForIFrameToLoad = true;
@@ -486,7 +490,7 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 					//var sel = $(".iframe-holder *");
 					//sel.remove();
 
-					this.addIFrame( { index: index, scrollTo: true, hash: options.hash, highlight: options.highlight } );
+					this.addIFrame( { index: index, scrollTo: true, hash: options.hash, highlight: options.highlight, type: this.options.type } );
 				}
 
 				$("#main_video").hide();

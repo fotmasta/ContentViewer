@@ -1,3 +1,4 @@
+// TODO: non-video header TOC entries should be obvious and/or not clickable
 // TODO: after updates are made, how will the "completion tracking" cope with toc indexes having changed numbers? [internal id's?]
 // TODO: wide images don't fit in the zoomed popup
 // TODO: make all images the same scale??
@@ -95,3 +96,5 @@
 // DONE: search for video has a bug? [Web Editions UI]
 // DONE: zipfile downloading for video, best method? [iframe with file as src, downloads automatically]
 // DONE: videos don't seem to be marking as "complete" [2nd level with short labels; moved completion marks to absolute, right of description (might overlap download buttons sometimes)]
+// DONE: resize quiz iframes after loading [min-height = window height]
+// DONE: make quiz iframes go away when clicking on another section
