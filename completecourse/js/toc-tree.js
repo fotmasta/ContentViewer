@@ -311,6 +311,7 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 				if (d.node.download) {
 					linkholder.addClass("has-download");
 					var dl = $("<button class='btn btn-success download-button' title='Download this section.'><i class='fa fa-cloud-download'></i></button>");
+					dl.attr("title", "Download: " + d.node.desc);
 					dl.click($.proxy(this.onClickDownload, this, d.node.download));
 					linkholder.append(dl);
 				}
