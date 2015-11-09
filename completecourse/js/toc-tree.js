@@ -671,6 +671,8 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 		onClickDownload: function (file, event) {
 			var ifrm = $("#downloader");
 			ifrm.attr("src", file);
+
+			ga("send", "event", "interface", "download", file);
 		}
 	});
 });

@@ -1151,6 +1151,7 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 			ga('send', 'pageview', {'title': pagename});
 
 			//ga('send', 'event', 'video', 'started');
+			//ga('send', 'event', data.category, data.action, data.label);
 		},
 
 		onCloseSearch: function () {
