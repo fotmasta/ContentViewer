@@ -1,9 +1,13 @@
 var baseURL;
 
-if (window.location.hostname == "localhost") {
-	baseURL = "../completecourse/";
-} else {
-	baseURL = "https://s3.amazonaws.com/storefronts/streaming-video/completecourse/";
+if (window.getInformITBaseURL)
+	baseURL = window.getInformITBaseURL();
+else {
+	if (window.location.hostname == "localhost") {
+		baseURL = "../completecourse/";
+	} else {
+		baseURL = "https://s3.amazonaws.com/storefronts/streaming-video/completecourse/";
+	}
 }
 
 requirejs.config({
@@ -267,7 +271,7 @@ define(["jquery", "handlebars", "text!viewer_template.html", "video-manager", "v
 	}
 
 	function onLoadedTOC (metadata) {
-		$(".toc").TOCTree({ data: metadata.toc, metadata: metadata, expander: "#collapse-button" });
+		$(".toc").TOCTree({ type: "video", data: metadata.toc, metadata: metadata, expander: "#collapse-button" });
 
 		$(".resource-list").TOCTree();
 

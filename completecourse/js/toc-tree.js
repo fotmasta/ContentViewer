@@ -241,7 +241,7 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 				dest.append(li);
 
 				if (d && d.children && d.children.length > 0) {
-					var lbl = $("<label>", {class: "tree-toggler nav-header"});
+					var lbl = $("<div>", {class: "tree-toggler nav-header toc-label"});
 					li.append(lbl);
 					linkholder = lbl;
 
@@ -254,6 +254,10 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 
 					var ul = $("<ul>", {class: "nav nav-list tree"});
 					li.append(ul);
+
+					for (var i = 0; i < d.children.length; i++) {
+						d.children[i].node.parent = d.node;
+					}
 				} else {
 					linkholder = li;
 				}
@@ -267,13 +271,13 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 				var classes = "desc";
 				if (d.extra_classes) classes += " " + d.extra_classes;
 
-				var sp = $("<span>", {class: classes, html: " " + entry_text});
+				var sp = $("<span>", {class: classes, html: entry_text});
 
 				// horizontal line to indicate current selection in TOC
 				var indicator = $("<div>", { class: "indicator" });
 				sp.append(indicator);
 
-				var short = $("<span>", {class: "level tree-toggler"});
+				var short = $("<span>", {class: "level short tree-toggler"});
 
 				var short_label;
 				if (depth.length <= 4) {
@@ -322,10 +326,19 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 
 				a.appendTo(linkholder);
 
-				// 10/16/15: turned off toggling when clicking a toc link
-				a.click($.proxy(this.launchVideo, this, params.counter, { toggle: false }));
-
-				//short.click(toggleDropper);
+				switch (this.options.type) {
+					case "video": // ie, video
+						if (d.node.video) {
+							a.click($.proxy(this.launchVideo, this, params.counter, {toggle: false}));
+						} else {
+							linkholder.addClass("header");
+							a.click(toggleDropper);
+						}
+						break;
+					default:
+						a.click($.proxy(this.launchVideo, this, params.counter, {toggle: false}));
+						break;
+				}
 
 				params.counter++;
 			}
@@ -553,11 +566,13 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 		markStarted: function (index) {
 			var el = this.holder.find("[data-index=" + index + "]");
 			// only mark the first link (not the children)
-			var a = el.find("a").first().find("span.desc");
-			var checked = a.find("i.checked");
+			//var a = el.find("a").first().find("span.desc");
+			//var checked = a.find("i.checked");
+			var checked = el.find("> i.checked");
 			checked.remove();
 
-			a.find(".indicator").before("<i class='checked fa fa-adjust fa-flip-horizontal'></i>");
+			//a.find(".indicator").before("<i class='checked fa fa-adjust fa-flip-horizontal'></i>");
+			el.append("<i class='checked fa fa-adjust fa-flip-horizontal'></i>");
 		},
 
 		markCompleted: function (index) {
@@ -565,28 +580,29 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 
 			var el = this.holder.find("[data-index=" + index + "]");
 			var a = el.find("> label a span.desc, > a span.desc");
-			var checked = a.find("i.checked");
+			//var checked = a.find("i.checked");
+			var checked = el.find("> i.checked");
 			checked.remove();
 
 			// use half-circle to show that some children still need to be completed
 			if (el.find("ul li").length) {
 				var childrenComplete = this.checkForAllChildrenComplete(index);
 				if (childrenComplete) {
-					a.find(".indicator").before("<i class='checked fa fa-check-circle'></i>");
-					//a.append("<i class='checked fa fa-check-circle fa-lg'></i>");
+					//a.find(".indicator").before("<i class='checked fa fa-check-circle'></i>");
+					el.append("<i class='checked fa fa-check-circle'></i>");
 				} else {
-					a.find(".indicator").before("<i class='checked fa fa-adjust fa-flip-horizontal'></i>");
-					//a.append("<i class='checked fa fa-adjust fa-flip-horizontal fa-lg'></i>");
+					//a.find(".indicator").before("<i class='checked fa fa-adjust fa-flip-horizontal'></i>");
+					el.append("<i class='checked fa fa-adjust fa-flip-horizontal'></i>");
 				}
 			} else {
-				a.find(".indicator").before("<i class='checked fa fa-check-circle'></i>");
-				//a.append("<i class='checked fa fa-check-circle fa-lg'></i>");
+				//a.find(".indicator").before("<i class='checked fa fa-check-circle'></i>");
+				el.append("<i class='checked fa fa-check-circle'></i>");
 			}
 
-			//a.find("span.desc").removeClass("completed").addClass("completed");
 			a.removeClass("completed").addClass("completed");
 
 			// now check parents, grandparents, etc. to see if they can now be considered complete
+			// TODO: is this code used for ePubs?
 			var p = this.options.data[index].parent;
 
 			while (p) {

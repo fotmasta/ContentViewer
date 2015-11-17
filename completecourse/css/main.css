@@ -20,11 +20,15 @@ body {
   padding: 0; }
   #contents #contents-pane {
     border-right: 1px solid #ccc; }
+    #contents #contents-pane .toc-label {
+      margin-bottom: 0; }
     #contents #contents-pane li {
-      cursor: pointer; }
-    #contents #contents-pane label:not(.nav-header) {
+      cursor: pointer;
+      padding-left: 20px;
+      padding-bottom: 5px; }
+    #contents #contents-pane .toc-label:not(.nav-header) {
       font-weight: 400; }
-    #contents #contents-pane label a .desc .badge {
+    #contents #contents-pane .toc-label a .desc .badge {
       display: inline-block !important; }
     #contents #contents-pane .badge.new {
       background-color: #E8DB18;
@@ -36,17 +40,17 @@ body {
       background-color: #FF0000;
       color: #DAE423; }
     #contents #contents-pane a {
+      display: table-row;
       color: #719db7;
-      /*display: block;*/ }
+      /*padding-left: 30px;*/ }
       #contents #contents-pane a span.desc {
-        display: inline-block;
-        padding-left: 16px; }
+        display: table-cell; }
         #contents #contents-pane a span.desc .badge:not(.delete) {
           display: none; }
         #contents #contents-pane a span.desc.deleted {
           color: red;
           text-decoration: line-through; }
-    #contents #contents-pane label a.active span {
+    #contents #contents-pane .toc-label a.active span {
       color: black; }
 
 .video-holder {
@@ -178,7 +182,6 @@ body {
   width: 100%; }
 
 .nav-list {
-  padding-left: 35px;
   position: relative; }
   .nav-list li.active {
     background-color: #f0f0f7; }
@@ -189,13 +192,13 @@ body {
     overflow: hidden;
     background-color: #e5e5e5;
     border-bottom: 1px solid #fff; }
-  .nav-list > li > label > a:active, .nav-list > li > label > a.active {
+  .nav-list > li > .toc-label > a:active, .nav-list > li > .toc-label > a.active {
     background-color: #C1C0E7;
     color: #191832; }
   .nav-list > li > a {
     padding: 3px 0;
     margin-left: 0;
-    /* NOTE: Added this because elements using animate.css were disappearing */
+    /* // NOTE: Added this because elements using animate.css were disappearing */
     animation-fill-mode: none;
     -webkit-animation-fill-mode: none; }
     .nav-list > li > a:hover, .nav-list > li > a:hover:focus {
@@ -206,16 +209,25 @@ body {
     .nav-list > li > a:active, .nav-list > li > a.active {
       background-color: #C1C0E7;
       color: #191832; }
+  .nav-list .header {
+    font-weight: bold;
+    color: #333; }
+    .nav-list .header .desc {
+      color: #1D1A58; }
 
 .tree-toggler {
-  cursor: pointer; }
+  cursor: pointer;
+  margin-right: 6px; }
+
+.short.invisible {
+  display: none; }
 
 ul.toc-holder {
-  margin: 5px 5px 5px 0;
-  padding-left: 0; }
+  margin: 5px 55px 5px 0px;
+  padding-right: 0; }
   ul.toc-holder .download-button {
     position: absolute;
-    right: 4px;
+    right: -58px;
     top: 50%;
     transform: translateY(-50%); }
 
@@ -225,22 +237,11 @@ ul.toc-holder {
 .checked {
   color: orange;
   position: absolute;
+  top: 0;
+  right: -20px;
   margin-left: .5em;
   margin-top: 3px; }
 
-/*
-ul.toc-holder > li > .tree-toggler a .tree-toggler + .completed + .checked {
-	position: relative;
-	top: auto;
-	left: auto;
-	margin-left: .5em;
-}
-*/
-/*
-.tree-toggler:not(.invisible) + span + .checked {
-	left: -50px;
-}
-*/
 .nav-list .nav-header {
   /*
   margin-right: -15px;
@@ -263,8 +264,8 @@ ul.toc-holder > li > .tree-toggler a .tree-toggler + .completed + .checked {
   overflow: hidden; }
   .toc .dropper {
     position: absolute;
-    left: 4px;
-    top: 4px; }
+    top: 4px;
+    left: -14px; }
     .toc .dropper.opened {
       display: inline-block; }
     .toc .dropper.closed {
@@ -288,10 +289,10 @@ ul.toc-holder > li > .tree-toggler a .tree-toggler + .completed + .checked {
     border-color: black; }
 
 [data-notify="progressbar"] {
-  margin-bottom: 0px;
+  margin-bottom: 0;
   position: absolute;
-  bottom: 0px;
-  left: 0px;
+  bottom: 0;
+  left: 0;
   width: 100%;
   height: 5px;
   display: none; }
@@ -300,19 +301,15 @@ ul.toc-holder > li > .tree-toggler a .tree-toggler + .completed + .checked {
   max-width: 350px; }
 
 .level {
-  display: inline-block;
+  display: block;
   background-color: #719db7;
   color: white;
   font-size: 12px;
-  padding: 2px 2px 0 2px;
   font-family: 'Source Sans Pro', sans-serif;
-  /*font-weight: bold;*/
   border-radius: 3px;
-  vertical-align: bottom;
-  min-width: 2em;
-  text-align: center;
-  position: absolute;
-  left: -30px; }
+  vertical-align: middle;
+  padding: 0 6px 0 6px;
+  text-align: center; }
 
 #toc-toggler {
   margin: 8px 0 0 8px; }
@@ -532,7 +529,7 @@ div.indicator {
   transform: translateX(-200px);
   transition: transform linear .5s; }
 
-.toc .current > a .desc div.indicator, .toc .current > label > a .desc div.indicator {
+.toc .current > a .desc div.indicator, .toc .current > .toc-label > a .desc div.indicator {
   width: 100%;
   content: "";
   display: block;
@@ -546,13 +543,13 @@ button#search-close {
   text-shadow: none; }
 
 .download-button {
-  padding: 0px 4px;
+  padding: 0 4px;
   z-index: 1; }
   .download-button:focus, .download-button:active {
     outline: none !important; }
 
 .has-download {
-  padding-right: 45px; }
+  /*padding-right: 45px;*/ }
 
 /* loading indicator: */
 .loading-indicator {

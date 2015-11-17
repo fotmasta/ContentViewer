@@ -197,9 +197,17 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 			}
 		},
 
+		currentItemHasContent: function () {
+			if (this.currentIndex != undefined) {
+				return this.toc[this.currentIndex].src != undefined;
+			} else {
+				return false;
+			}
+		},
+
 		setCurrentIndex: function (index) {
 			// THEORY: when switching, mark the current section completed (should probably be: have we scrolled past everything)
-			if (!this.currentItemIsVideo()) {
+			if (!this.currentItemIsVideo() && this.currentItemHasContent()) {
 				if (this.currentIndex != undefined && this.currentIndex != index) {
 					this.markItemCompleted(this.currentIndex);
 				}
@@ -562,6 +570,20 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 		markItemCompleted: function (index) {
 			Database.setItemProperty(index, "completed", true);
 			$(".toc").TOCTree("markCompleted", index);
+
+			// for videos, check to see if all of this item's parent's children are complete
+			switch (this.options.type) {
+				case "metadata": // ie, video
+					var p = this.toc[index].parent;
+					if (p) {
+						var p_index = p.index;
+						var p_complete = $(".toc").TOCTree("checkForAllChildrenComplete", p_index);
+						if (p_complete) {
+							this.markItemCompleted(p_index);
+						}
+					}
+					break;
+			}
 
 			this.updateProgress();
 		},
