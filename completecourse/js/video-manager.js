@@ -2,6 +2,7 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 
 	// NOTE: I don't understand why I couldn't use this.waitingForAutoAdvance; somehow the instance of VideoManager passed into iframe-holder wasn't the same (!)
 	waitingForAutoAdvance = false;
+	waitingForIFrameToLoad = false;
 
 	String.prototype.toHHMMSS = function () {
 		var sec_num = parseInt(this, 10);
@@ -35,9 +36,12 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 	}
 
 	function URLPageOnly (url) {
-		var n = url.lastIndexOf("/");
-		if (n != -1) return url.substr(n + 1);
-		else return url;
+		if (url) {
+			var n = url.lastIndexOf("/");
+			if (n != -1) return url.substr(n + 1);
+			else return url;
+		} else
+			return url;
 	}
 
 	function iFrameElementsOnScreen (elements, iframe) {

@@ -105,3 +105,4 @@
 // DONE: in both old and new TOC stylings: download button click area is way too big [default functionality of a label element; switched to a div]
 // DONE: video title header TOC entries without video should be obvious [made them toggle the section]
 // DONE: non-video header TOC entries should not be completed (until children are all completed) [need to test if children completing it works]
+// DONE: added breakout_of_frame to avoid iframe scrolling issues on iPad (and possibly other issues)

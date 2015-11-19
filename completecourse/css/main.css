@@ -55,9 +55,13 @@ body {
 
 .video-holder {
   height: 100%;
+  width: 100%;
+  display: block;
+  /*
   top: 50%;
   transform: translateY(-50%);
   -webkit-transform: translateY(-50%);
+  */
   position: relative; }
 
 .iframe-holder {
@@ -76,7 +80,7 @@ body {
   padding: 0;
   transition: width .5s linear;
   background-color: #E5F0F1;
-  overflow: scroll;
+  overflow: auto;
   -webkit-overflow-scrolling: touch; }
   #video .overlay {
     position: absolute;
@@ -337,7 +341,8 @@ span.completed {
 
 .video-js {
   width: 100% !important;
-  height: 100% !important; }
+  height: 100% !important;
+  display: block; }
 
 /*
 .video-js:after {

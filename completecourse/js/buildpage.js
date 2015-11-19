@@ -487,12 +487,25 @@ define(["jquery", "handlebars", "text!viewer_template.html", "video-manager", "v
 			$("#search-next").click(onSearchNext);
 
 			$("#account-button").click(function () { window.open("//memberservices.informit.com/my_account/index.aspx"); });
+
+			// this should get rid of the extra vertical scrollbar on the InformIT site for IE users
+			if (window.parent) {
+				window.parent.document.body.style.overflow = "hidden";
+			}
 		},
 
 		setSearchIndex: function (data) {
 			$(".toc").TOCTree("setSearchIndex", data);
 		}
 	};
+
+	function breakout_of_frame () {
+		if (top.location != location) {
+			top.location.href = document.location.href;
+		}
+	}
+
+	breakout_of_frame();
 
 	return BuildPage;
 });

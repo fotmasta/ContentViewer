@@ -256,7 +256,8 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 					li.append(ul);
 
 					for (var i = 0; i < d.children.length; i++) {
-						d.children[i].node.parent = d.node;
+						if (d.children[i] && d.children[i].node)
+							d.children[i].node.parent = d.node;
 					}
 				} else {
 					linkholder = li;
@@ -328,7 +329,7 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 
 				switch (this.options.type) {
 					case "video": // ie, video
-						if (d.node.video) {
+						if (d.node.video || d.node.src) {
 							a.click($.proxy(this.launchVideo, this, params.counter, {toggle: false}));
 						} else {
 							linkholder.addClass("header");
@@ -417,7 +418,8 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 		},
 
 		setSearchIndex: function (data) {
-			this.searchIndex = lunr.Index.load(data);
+			if (data)
+				this.searchIndex = lunr.Index.load(data);
 		},
 
 		hasSearchIndex: function () {
