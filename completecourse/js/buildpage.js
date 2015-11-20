@@ -27,7 +27,8 @@ requirejs.config({
 		"videojs": "video",
 		"videojs-markers": "videojs-markers",
 		"handlebars": "handlebars-v3.0.3",
-		"lunr": "lunr.min"
+		"lunr": "lunr.min",
+		"firebase": "https://cdn.firebase.com/js/client/2.3.2/firebase"
 	},
 	shim: {
 		"jquery": {
@@ -83,6 +84,9 @@ requirejs.config({
 		},
 		"handlebars": {
 			exports: "Handlebars"
+		},
+		"firebase": {
+			export: "Firebase"
 		}
 	},
 	// this fixed the "appending .js" problem I was getting on informit.com
@@ -95,7 +99,7 @@ requirejs.config({
 	}
 });
 
-define(["jquery", "handlebars", "text!viewer_template.html", "video-manager", "video-overlay", "toc-tree", "videojs", "popcorn", "popcorn.timebase", "bootstrap-toolkit"], function ($, Handlebars, viewerTemplate, VideoManager) {
+define(["jquery", "handlebars", "text!viewer_template.html", "video-manager", "video-overlay", "toc-tree", "videojs", "popcorn", "popcorn.timebase", "bootstrap-toolkit", "comments"], function ($, Handlebars, viewerTemplate, VideoManager) {
 	var manifest;
 
 	var contentsPaneDesiredVisible = undefined;
@@ -446,6 +450,10 @@ define(["jquery", "handlebars", "text!viewer_template.html", "video-manager", "v
 		$("title").text(title);
 	}
 
+	function onOpenComments () {
+		$("#comments-panel").toggle("slide", {direction: "right"});
+	}
+
 	var BuildPage = {
 		build: function (options) {
 			var template = Handlebars.compile(viewerTemplate);
@@ -487,6 +495,10 @@ define(["jquery", "handlebars", "text!viewer_template.html", "video-manager", "v
 			$("#search-next").click(onSearchNext);
 
 			$("#account-button").click(function () { window.open("//memberservices.informit.com/my_account/index.aspx"); });
+
+			$("#show-comments-button").click(onOpenComments);
+
+			$("#comments-panel").Comments();
 
 			// this should get rid of the extra vertical scrollbar on the InformIT site for IE users
 			if (window.parent) {

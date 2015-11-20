@@ -8,6 +8,9 @@
 	</div>
 	<div class="collapse navbar-collapse" id="collapsible-menu">
 		<div id="search-bar" class="nav navbar-form navbar-right" role="search">
+			<button id="show-comments-button" title="Show comments." data-coach-pos="bottom" class="btn btn-primary">
+				<span class="fa fa-comment"></span>
+			</button>
 			<div class="input-group">
 				<div class="input-group-btn">
 					<button id="clear-search-button" class="btn btn-primary" title="Clear search text."><span class="fa fa-times-circle-o fa-lg"></span></button>
@@ -110,6 +113,45 @@
 		</div>
 	</div>
 
+</div>
+
+<div id="comments-panel">
+	<div id="comments-entry" class="panel panel-success">
+		<div class="panel-heading"><i class="fa fa-comments-o fa-2x pull-right"></i> <span>Comments or Questions?</span></div>
+		<div class="panel-body">
+			<div id="comments-entry">
+				<div class="form-inline">
+					<div class="container-fluid">
+						<div class="row">
+							<div class="form-group col-xs-6">
+								<input type="text" class="form-control" id="commentName" placeholder="Name">
+							</div>
+							<div class="form-group col-xs-6">
+								<input type="email" class="form-control" id="commentEmail" placeholder="Email">
+							</div>
+							<div class="col-xs-12">
+								<textarea class="form-control" rows="3" id="commentText" placeholder="Comment or question?"></textarea>
+								<button id="submit-comment" class="btn btn-success pull-right">Submit</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div id="comments-pane">
+		<ul class="nav nav-tabs" role="tablist">
+			<li role="presentation" class="active">
+				<a role="tab">All <small>13</small></a>
+			</li>
+			<li role="presentation">
+				<a role="tab">This Chapter <small>5</small></a>
+			</li>
+		</ul>
+
+		<div class="tab-content">
+		</div>
+	</div>
 </div>
 
 <div id="coach-marks">
