@@ -182,7 +182,7 @@ define(["bootstrap-dialog", "imagesloaded", "jquery.ui"], function (BootstrapDia
 					me.options.manager.scrollToHash(me.iframe, { hash: hash }, true);
 				}
 
-				me.options.manager.onIFrameLoaded(me);
+				me.options.manager.onIFrameLoaded(me.iframe);
 			}
 		},
 

@@ -1,4 +1,5 @@
 @import url(https://fonts.googleapis.com/css?family=Source+Sans+Pro);
+@import url(https://fonts.googleapis.com/icon?family=Material+Icons);
 
 $video-background-color: white;
 $blue-color: #719db7;
@@ -705,6 +706,19 @@ span.completed {
 		background-color: yellow;
 	}
 
+	.comment-anchor {
+		font-family: "Material Icons";
+		display: block;
+		position: absolute;
+		left: 5px;
+		color: #288C32;
+		cursor: pointer;
+
+		&:hover {
+			color: #3acb48;
+		}
+	}
+
 	// ePUB overrides:
 
 	.sidebar-g, .sidebar-r {
@@ -992,8 +1006,43 @@ button#search-close {
 	background-color: white;
 	border-left: 3px solid #288C32;
 	padding: 10px;
-	overflow-y: scroll;
+	overflow: visible;
 	box-shadow: -5px 0 20px black;
+
+	#comments-content {
+		height: 100%;
+		overflow: auto;
+	}
+
+	#close-button {
+		position: absolute;
+		left: -32px;
+		top: 30px;
+		border: 2px solid #288C32;
+		border-radius: 5px 0 0 5px;
+		border-right: none;
+		background-color: white;
+		width: 30px;
+		height: 40px;
+		line-height: 40px;
+		text-align: center;
+		vertical-align: middle;
+		color: #288C32;
+		box-sizing: content-box;
+
+		&:hover {
+			color: #39c647;
+			cursor: pointer;
+		}
+
+		&:active {
+			color: black;
+		}
+
+		.fa {
+			line-height: inherit;
+		}
+	}
 
 	.panel-heading {
 		span {
@@ -1023,13 +1072,11 @@ button#search-close {
 	.comment {
 		.comment-name {
 			font-weight: bold;
+			color: #999;
 
 			small {
 				margin-left: 1em;
 			}
-		}
-
-		.comment-date {
 		}
 
 		.comment-text {

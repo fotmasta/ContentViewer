@@ -1,8 +1,6 @@
-define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-markers", "jquery.onscreen", "iframe-holder"], function (BootstrapDialog, Database) {
+define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-markers", "jquery.onscreen", "iframe-holder", "jquery.ui"], function (BootstrapDialog, Database) {
 
 	// NOTE: I don't understand why I couldn't use this.waitingForAutoAdvance; somehow the instance of VideoManager passed into iframe-holder wasn't the same (!)
-	waitingForAutoAdvance = false;
-	waitingForIFrameToLoad = false;
 
 	String.prototype.toHHMMSS = function () {
 		var sec_num = parseInt(this, 10);
@@ -20,6 +18,16 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 		
 		return time;
 	};
+
+	function HashInURL (url) {
+		if (url) {
+			var n = url.lastIndexOf("#");
+			if (n != -1) return url.substr(n);
+			else return "";
+		} else {
+			return "";
+		}
+	}
 
 	function URLWithoutHash (url) {
 		if (url) {
@@ -73,13 +81,14 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 		var depth = options.depth;
 
 		if (options.markCurrent) {
-			VideoManager.markItemCompleted(options.markCurrent);
+			$("#video").VideoManager("markItemCompleted", options.markCurrent);
 		}
 
 		var opts = {};
 		if (options.options) opts = options.options;
 
-		VideoManager.playFromTOC(depth, opts);
+		// bit of a calling kludge here:
+		$("#video").VideoManager("playFromTOC", depth, opts);
 	}
 
 	// rather than having to add this custom button to the video.js build (in v4 at least), I just added the button manually (below)
@@ -105,7 +114,11 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 		return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
 	}
 
-	var VideoManager = {
+	$.widget("que.VideoManager", {
+		_create: function () {
+			this.initialize(this.options.toc, this.options.el, this.options.player, this.options.markers, this.options.options);
+		},
+
 		initialize: function (toc, el, player, markers, options) {
 			this.toc = toc;
 			this.el = el;
@@ -122,12 +135,12 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 
 			this.updateProgress();
 
-			this.pop = Popcorn(el, { frameAnimation: true });
+			this.pop = Popcorn(el, {frameAnimation: true});
 
 			/*
-			var backButton = new videojs.BackButton(this.player);
-			this.player.controlBar.addChild(backButton);
-			*/
+			 var backButton = new videojs.BackButton(this.player);
+			 this.player.controlBar.addChild(backButton);
+			 */
 
 			// add the Back Button manually
 			var backButton = new videojs.Button(this.player);
@@ -154,7 +167,7 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 
 			window.onpopstate = function (event) {
 				var loc = document.location.search;
-				VideoManager.tryToGotoLocationSearch(loc);
+				$("#video").VideoManager("tryToGotoLocationSearch", loc);
 			};
 
 			this.player.markers({
@@ -175,18 +188,14 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 
 			this.trackID = 1;
 			this.busyScrolling = false;
+			this.waitingForAutoAdvance = false;
+			this.waitingForIFrameToLoad = false;
 
 			this.registerGoogleAnalytics(this.options.title);
 		},
 
-		HashInURL: function (url) {
-			if (url) {
-				var n = url.lastIndexOf("#");
-				if (n != -1) return url.substr(n);
-				else return "";
-			} else {
-				return "";
-			}
+		instance: function () {
+			return this;
 		},
 
 		getCurrentIndex: function () {
@@ -250,19 +259,21 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 			// check for link from query parameter
 			var link = getParameterByName(loc, "link");
 			if (link) {
-				this.playFromTOC(link, { pause: true, history: false });
+				this.playFromTOC(link, {pause: true, history: false});
+				return true;
 			}
+			return false;
 		},
 
 		loadMostRecentVideo: function () {
-			this.tryToGotoLocationSearch(location.search);
+			var found = this.tryToGotoLocationSearch(location.search);
 
 			var index = Database.getCurrentIndex();
 
 			if (index == undefined) {
 				this.loadFirstVideo();
-			} else {
-				this.playFromTOC(index, { pause: true, time: this.getCurrentVideoTime() } );
+			} else if (!found) {
+				this.playFromTOC(index, {pause: true, time: this.getCurrentVideoTime()});
 			}
 		},
 
@@ -273,15 +284,15 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 				index = 0;
 			}
 
-			this.playFromTOC(index, { pause: true });
+			this.playFromTOC(index, {pause: true});
 		},
 
 		playFirstVideo: function () {
 			var index = this.getFirstVideoFromTOC();
-			
+
 			this.playFromTOC(index, {});
 		},
-		
+
 		playFromTOC: function (index, options) {
 			if (options && options.skipToNextSource) {
 				while (index < this.toc.length && URLWithoutHash(this.toc[index].src) == options.previousSource) {
@@ -318,7 +329,7 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 			var src = this.toc[index].video;
 
 			if (src.indexOf(".mov") != -1 || src.indexOf(".mp4") != -1) {
-				this.player.src({type: "video/mp4", src: src });
+				this.player.src({type: "video/mp4", src: src});
 			} else {
 				this.player.src([
 					{type: "video/mp4", src: src + ".mp4"},
@@ -368,7 +379,7 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 			} else {
 				var iframe = $("iframe").eq(0);
 
-				this.scrollToHash(iframe, { hash: href }, false);
+				this.scrollToHash(iframe, {hash: href}, false);
 			}
 		},
 
@@ -389,7 +400,7 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 
 				var iframe = $("iframe").eq(0);
 
-				this.scrollToHash(iframe, { hash: href }, false);
+				this.scrollToHash(iframe, {hash: href}, false);
 			}
 
 			return false;
@@ -408,7 +419,7 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 				} else {
 					index = options.index;
 				}
-				hash = this.HashInURL(this.toc[index].src);
+				hash = VideoManager.HashInURL(this.toc[index].src);
 			} else {
 				hash = options.hash;
 			}
@@ -426,16 +437,23 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 			if (immediate) {
 				$("#video").scrollTop(dest);
 			} else {
-				this.busyScrolling = true;
-				$("#video").stop().animate({scrollTop: dest}, { duration: 1000, complete: $.proxy(this.onDoneScrolling, this) });
+				// this should stop it from overriding the scroll-to-hash that comes next with an actual hash
+				if (dest != 0)
+					this.busyScrolling = true;
+					$("#video").stop().animate({scrollTop: dest}, {
+						duration: 1000,
+						complete: $.proxy(this.onDoneScrolling, this)
+					});
 			}
 		},
 
 		onIFrameLoaded: function (iframe) {
-			waitingForAutoAdvance = false;
-			waitingForIFrameToLoad = false;
+			this.waitingForAutoAdvance = false;
+			this.waitingForIFrameToLoad = false;
 
 			$(".loading-indicator").hide();
+
+			$("#comments-panel").Comments("showComments", iframe);
 		},
 
 		addIFrame: function (params) {
@@ -468,7 +486,7 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 					type: params.type
 				};
 
-				waitingForIFrameToLoad = true;
+				this.waitingForIFrameToLoad = true;
 				this.iframe.iFrameHolder("loadNewContent", options);
 			}
 
@@ -491,9 +509,9 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 
 				if (existing.length) {
 					// same page we're already on
-					existing.attr( { "data-index": index } ).show();
+					existing.attr({"data-index": index}).show();
 
-					this.scrollToHash(existing, { index: index, hash: options.hash });
+					this.scrollToHash(existing, {index: index, hash: options.hash});
 
 					if (options.highlight) {
 						this.iframe.iFrameHolder("highlight", options.highlight);
@@ -502,7 +520,13 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 					//var sel = $(".iframe-holder *");
 					//sel.remove();
 
-					this.addIFrame( { index: index, scrollTo: true, hash: options.hash, highlight: options.highlight, type: this.options.type } );
+					this.addIFrame({
+						index: index,
+						scrollTo: true,
+						hash: options.hash,
+						highlight: options.highlight,
+						type: this.options.type
+					});
 				}
 
 				$("#main_video").hide();
@@ -518,7 +542,7 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 			this.removeAllTriggers();
 			this.addTriggersForThisVideo();
 		},
-		
+
 		getFirstVideoFromTOC: function () {
 			for (var i = 0; i < this.toc.length; i++) {
 				var d = this.toc[i];
@@ -526,10 +550,10 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 					return i;
 				}
 			}
-		
+
 			return undefined;
 		},
-		
+
 		advanceTOC: function (options) {
 			if (this.currentIndex < this.toc.length - 1) {
 				this.playFromTOC(this.currentIndex + 1, options);
@@ -552,7 +576,7 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 			var previousSrc = URLWithoutHash(this.toc[this.currentIndex].src);
 
 			//this.advanceTOC( { previousSource: previousSrc, skipToNextSource: true } );
-			this.advanceTOC( { previousSource: previousSrc, skipToNextSource: true, replaceAll: false } );
+			this.advanceTOC({previousSource: previousSrc, skipToNextSource: true, replaceAll: false});
 		},
 
 		markItemStarted: function (index) {
@@ -623,7 +647,7 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 
 			this.player.markers.reset(mz);
 		},
-		
+
 		addMarkers: function (showAllMarkers) {
 			this.addTimelineMarkers();
 
@@ -631,7 +655,7 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 
 			var data = [];
 			var counter = 0;
-			
+
 			for (var i = 0; i < this.markers.length; i++) {
 				var m = this.markers[i];
 
@@ -667,58 +691,58 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 					item.id = i;
 
 					data.push(item);
-/*
+					/*
 
-//					var el = $("<div>", { class: "alert trackalert" }).attr("role", "alert");
-					var el = $("<div>", { class: "trackalert" });
-					if (!showAllMarkers) el.addClass("x-hidden");
+					 //					var el = $("<div>", { class: "alert trackalert" }).attr("role", "alert");
+					 var el = $("<div>", { class: "trackalert" });
+					 if (!showAllMarkers) el.addClass("x-hidden");
 
 
-					var r = $("<div>", { class: "row"}).appendTo(el);
+					 var r = $("<div>", { class: "row"}).appendTo(el);
 
-					var d1 = $("<div>", { class: "col-xs-9" }).appendTo(r);
-					var d2 = $("<div>", { class: "col-xs-3" }).appendTo(r);
+					 var d1 = $("<div>", { class: "col-xs-9" }).appendTo(r);
+					 var d2 = $("<div>", { class: "col-xs-3" }).appendTo(r);
 
-					var defaultPlacement = true;
+					 var defaultPlacement = true;
 
-					switch (m.type) {
-						case "code":
-							//el.addClass("alert-danger");
-							break;
-						case "sandbox":
-							//el.addClass("alert-info");
-							break;
-						case "quiz":
-							//el.addClass("alert-warning");
-							break;
-						case "files":
-							//el.addClass("alert-danger");
-							break;
-						case "epub":
-							var coverURL = "epubs/" + m.src + "/OEBPS/html/graphics/" + m.cover;
+					 switch (m.type) {
+					 case "code":
+					 //el.addClass("alert-danger");
+					 break;
+					 case "sandbox":
+					 //el.addClass("alert-info");
+					 break;
+					 case "quiz":
+					 //el.addClass("alert-warning");
+					 break;
+					 case "files":
+					 //el.addClass("alert-danger");
+					 break;
+					 case "epub":
+					 var coverURL = "epubs/" + m.src + "/OEBPS/html/graphics/" + m.cover;
 
-							//el.addClass("alert-success");
+					 //el.addClass("alert-success");
 
-							var cover = $("<img>", { src: coverURL, class: "tiny-thumbnail" });
-							d2.append(cover);
+					 var cover = $("<img>", { src: coverURL, class: "tiny-thumbnail" });
+					 d2.append(cover);
 
-							break;
-						case "extra":
-							//el.addClass("alert-danger");
-							break;
-					}
+					 break;
+					 case "extra":
+					 //el.addClass("alert-danger");
+					 break;
+					 }
 
-					$("<span>", {class: "badge", text: String(m.start).toHHMMSS()}).appendTo(d1);
+					 $("<span>", {class: "badge", text: String(m.start).toHHMMSS()}).appendTo(d1);
 
-					$("<span>", {html: " " + txt}).appendTo(d1);
+					 $("<span>", {html: " " + txt}).appendTo(d1);
 
-					el.click($.proxy(this.onClickMarker, this, i));
+					 el.click($.proxy(this.onClickMarker, this, i));
 
-					container.append(el);
+					 container.append(el);
 
-					if (!m.elements) m.elements = {};
-					m.elements.alert = el;
-*/
+					 if (!m.elements) m.elements = {};
+					 m.elements.alert = el;
+					 */
 					m.alert = i;
 				}
 			}
@@ -727,16 +751,18 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 				$(".resource-list").TOCTree("option", "data", data);
 			}
 		},
-		
+
 		addTriggersForThisVideo: function () {
 			var curDepth = this.toc[this.currentIndex].depth;
-			
+
 			for (var i = 0; i < this.markers.length; i++) {
 				var m = this.markers[i];
 				if (m.depth == curDepth) {
 					//var el = m.elements ? m.elements.alert : undefined;
-					this.pop.timebase( { start: m.start, end: m.end, alert: m.alert, id: this.trackID++, text: m.text,
-						callback: $.proxy(this.onClickMarker, this, i) } );
+					this.pop.timebase({
+						start: m.start, end: m.end, alert: m.alert, id: this.trackID++, text: m.text,
+						callback: $.proxy(this.onClickMarker, this, i)
+					});
 				}
 			}
 		},
@@ -755,18 +781,18 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 
 			this.trackID = 1;
 		},
-		
+
 		onClickMarker: function (index) {
 			this.player.pause();
-			
+
 			var me = this;
-			
+
 			var m = this.markers[index];
-			
+
 			switch (m.type) {
 				case "code":
 					var contents = m.html;
-					
+
 					BootstrapDialog.show({
 						title: "Code Listing",
 						message: contents,
@@ -774,75 +800,75 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 						onshown: function (dialog) {
 							dialog.getModalBody().find(".code-listing").prepend('<span class="btn-clipboard">Copy</span>');
 							dialog.getModalBody().find(".btn-clipboard").click($.proxy(me.onClipboard, me));
-        			    },
+						},
 					});
-					
+
 					break;
-					
+
 				case "sandbox":
 					var contents = m.html;
-					
+
 					var wh = $(window).outerHeight();
 					contents = contents.replace("__window height__", (wh * .75));
-					
+
 					BootstrapDialog.show({
 						title: "Sandbox",
 						message: contents,
 						size: BootstrapDialog.SIZE_WIDE,
 					});
-					
+
 					break;
-					
+
 				case "quiz":
 					var contents = "Quiz goes here.";
-					
+
 					BootstrapDialog.show({
 						title: "Quiz",
 						message: contents,
 						size: BootstrapDialog.SIZE_WIDE,
 					});
-					
+
 					break;
-					
+
 				case "files":
 					var contents = "<ul><li>File1.cpp</li><li>File2.cpp</li><li>Data_input.txt</li></ul>";
-					
+
 					BootstrapDialog.show({
 						title: "Project Files",
 						message: contents,
 						size: BootstrapDialog.SIZE_WIDE,
-						buttons: [ { label: 'Download All', action: $.proxy(me.onDownload, me) } ]
+						buttons: [{label: 'Download All', action: $.proxy(me.onDownload, me)}]
 					});
-					
+
 					break;
-					
-                case "epub":
-	                var coverURL = "epubs/" + m.src + "/OEBPS/html/graphics/" + m.cover;
-	                var cover = "<img class='img-thumbnail' src='" + coverURL + "'/>";
 
-	                var contents = '<div class="row"><div class="col-xs-2"><a class="center-block text-center" href="https://www.informit.com/store/learning-node.js-a-hands-on-guide-to-building-web-applications-9780321910578" target="_blank">' + cover + '<p class="small">Link to the Book</p></a></div><div class="col-xs-10"><iframe src="epubs/' + m.src + '/OEBPS/html/' + m.page + '" width="100%" height="__window height__" frameborder="0"></iframe></div></div>';
-	                var wh = $(window).outerHeight();
-	                contents = contents.replace("__window height__", (wh * .75));
+				case "epub":
+					var coverURL = "epubs/" + m.src + "/OEBPS/html/graphics/" + m.cover;
+					var cover = "<img class='img-thumbnail' src='" + coverURL + "'/>";
 
-                    BootstrapDialog.show({
-                        title: "<span class='lead'>Read more.</span> An excerpt from <strong>" + m.title + "</strong>",
-	                    message: contents,
-                        size: BootstrapDialog.SIZE_WIDE
-	                    /* To inject CSS:
-	                    onshown: function (dialogRef) {
-		                    var frm = $("iframe")[0].contentDocument;
-		                    var otherhead = frm.getElementsByTagName("head")[0];
-		                    var link = frm.createElement("link");
-		                    link.setAttribute("rel", "stylesheet");
-		                    link.setAttribute("type", "text/css");
-		                    link.setAttribute("href", "http://fonts.googleapis.com/css?family=Bitter");
-		                    otherhead.appendChild(link);
-		                    var body = frm.getElementsByTagName("body")[0];
-		                    console.log(body);
-	                    }*/
-                    });
+					var contents = '<div class="row"><div class="col-xs-2"><a class="center-block text-center" href="https://www.informit.com/store/learning-node.js-a-hands-on-guide-to-building-web-applications-9780321910578" target="_blank">' + cover + '<p class="small">Link to the Book</p></a></div><div class="col-xs-10"><iframe src="epubs/' + m.src + '/OEBPS/html/' + m.page + '" width="100%" height="__window height__" frameborder="0"></iframe></div></div>';
+					var wh = $(window).outerHeight();
+					contents = contents.replace("__window height__", (wh * .75));
 
-                    break;
+					BootstrapDialog.show({
+						title: "<span class='lead'>Read more.</span> An excerpt from <strong>" + m.title + "</strong>",
+						message: contents,
+						size: BootstrapDialog.SIZE_WIDE
+						/* To inject CSS:
+						 onshown: function (dialogRef) {
+						 var frm = $("iframe")[0].contentDocument;
+						 var otherhead = frm.getElementsByTagName("head")[0];
+						 var link = frm.createElement("link");
+						 link.setAttribute("rel", "stylesheet");
+						 link.setAttribute("type", "text/css");
+						 link.setAttribute("href", "http://fonts.googleapis.com/css?family=Bitter");
+						 otherhead.appendChild(link);
+						 var body = frm.getElementsByTagName("body")[0];
+						 console.log(body);
+						 }*/
+					});
+
+					break;
 
 				case "extra":
 					var contents = '<iframe src="' + m.src + '" width="100%" height="__window height__" frameborder="0"></frame>';
@@ -872,14 +898,14 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 				size: BootstrapDialog.SIZE_WIDE
 			});
 		},
-		
+
 		onClipboard: function (event) {
 			event.stopPropagation();
-		
+
 			$.notify({
 				// options
 				message: 'Code copied to clipboard.',
-			},{
+			}, {
 				// settings
 				type: 'info',
 				allow_dismiss: false,
@@ -888,10 +914,10 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 				animate: {
 					enter: 'animated fadeInDown',
 					exit: 'animated fadeOutUp'
-				},			
-			});		
+				},
+			});
 		},
-		
+
 		onDownload: function (event) {
 			$.notify({
 				// options
@@ -954,7 +980,7 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 							break;
 						}
 					}
-					return { index: indexToReturn, title: this.toc[indexToReturn].desc, src: nextSrc };
+					return {index: indexToReturn, title: this.toc[indexToReturn].desc, src: nextSrc};
 				}
 			}
 
@@ -972,7 +998,7 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 			for (var i = index + 1; i < this.toc.length; i++) {
 				var nextSrc = URLWithoutHash(this.toc[i].src);
 				if (nextSrc != curSrc) {
-					return { index: i, title: this.toc[i].desc, src: nextSrc };
+					return {index: i, title: this.toc[i].desc, src: nextSrc};
 				}
 			}
 
@@ -1064,7 +1090,7 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 		},
 
 		onScrollContent: function () {
-			if (!this.busyScrolling && !waitingForIFrameToLoad) {
+			if (!this.busyScrolling && !this.waitingForIFrameToLoad) {
 				var curIndex = this.getCurrentIndex();
 
 				this.syncTOCToContent();
@@ -1098,11 +1124,11 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 				entry.addClass("current");
 
 				if (isNew) {
-					/*
 					entry.parents("li").find("> ul").show(300);
-					entry.parents("li").find("> ul .dropper.opened").show(0);
-					entry.parents("li").find("> ul .dropper.closed").hide(0);
-					*/
+					/*
+					 entry.parents("li").find("> ul .dropper.opened").show(0);
+					 entry.parents("li").find("> ul .dropper.closed").hide(0);
+					 */
 				}
 
 				var scroller = $("#contents-pane .scroller");
@@ -1137,26 +1163,33 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 
 			var distToScroll = h_container - h_scroller;
 
-			if (waitingForAutoAdvance) return;
+			if (this.waitingForAutoAdvance) return;
 
 			if (distToScroll >= 0) {
 				var obj = this.getNextSection();
 
 				if (obj) {
-					waitingForAutoAdvance = true;
+					this.waitingForAutoAdvance = true;
 
-					this.addIFrame({index: obj.index, scrollTo: false });
+					this.addIFrame({index: obj.index, scrollTo: false});
 
 					this.setCurrentIndex(obj.index);
 				}
 			}
 		},
 
-		registerGoogleAnalytics: function  (title) {
-			(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-				(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-				m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-			})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+		registerGoogleAnalytics: function (title) {
+			(function (i, s, o, g, r, a, m) {
+				i['GoogleAnalyticsObject'] = r;
+				i[r] = i[r] || function () {
+					(i[r].q = i[r].q || []).push(arguments)
+				}, i[r].l = 1 * new Date();
+				a = s.createElement(o),
+					m = s.getElementsByTagName(o)[0];
+				a.async = 1;
+				a.src = g;
+				m.parentNode.insertBefore(a, m)
+			})(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
 
 			// my ga code:
 			//ga('create', 'UA-48406787-4', 'auto');
@@ -1199,18 +1232,24 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 				track.src = captions;
 
 				/* to auto-show captions:
-				function ontrackadded(event) {
-					event.track.mode = "showing";
-				}
+				 function ontrackadded(event) {
+				 event.track.mode = "showing";
+				 }
 
-				this.player.textTracks().onaddtrack = ontrackadded;
-				*/
+				 this.player.textTracks().onaddtrack = ontrackadded;
+				 */
 
 				$(this.el).append(track);
 			}
+		},
+
+		getHashForCurrentIndex: function () {
+			return this.toc[this.currentIndex].hash;
 		}
-	};
-	
+	});
+
+	var VideoManager = {};
+	VideoManager.HashInURL = HashInURL;
+
 	return VideoManager;
-	
 });

@@ -279,7 +279,10 @@ define(["jquery", "handlebars", "text!viewer_template.html", "video-manager", "v
 
 		$(".resource-list").TOCTree();
 
-		VideoManager.initialize(metadata.toc, "#video video", videojs("main_video"), metadata.markers, manifest);
+		var settings = { toc: metadata.toc, el: "#video video", player: videojs("main_video"), markers: metadata.markers, options: manifest };
+		$("#video").VideoManager(settings);
+
+		//VideoManager.initialize(metadata.toc, "#video video", videojs("main_video"), metadata.markers, manifest);
 
 		initialize();
 
@@ -291,7 +294,7 @@ define(["jquery", "handlebars", "text!viewer_template.html", "video-manager", "v
 			videojs("main_video").poster(metadata.posterImage);
 		}
 
-		VideoManager.loadMostRecentVideo();
+		$("#video").VideoManager("loadMostRecentVideo");
 	}
 
 	function onHabitatTOCLoaded (data) {
@@ -303,7 +306,7 @@ define(["jquery", "handlebars", "text!viewer_template.html", "video-manager", "v
 
 		initialize();
 
-		VideoManager.loadMostRecentVideo();
+		$("#video").VideoManager("loadMostRecentVideo");
 	}
 
 	function onEPUBTOCLoaded (data) {
@@ -311,11 +314,14 @@ define(["jquery", "handlebars", "text!viewer_template.html", "video-manager", "v
 
 		$(".toc").TOCTree({ type: "epub", data: metadata, metadata: metadata, expander: "#collapse-button" });
 
-		VideoManager.initialize(metadata, "#video video", videojs("main_video"), [], manifest);
+		var settings = { toc: metadata, el: "#video video", player: videojs("main_video"), markers: [], options: manifest };
+		$("#video").VideoManager(settings);
+
+		//VideoManager.initialize(metadata, "#video video", videojs("main_video"), [], manifest);
 
 		initialize();
 
-		VideoManager.loadMostRecentVideo();
+		$("#video").VideoManager("loadMostRecentVideo");
 	}
 
 	function loadContent () {
@@ -451,7 +457,7 @@ define(["jquery", "handlebars", "text!viewer_template.html", "video-manager", "v
 	}
 
 	function onOpenComments () {
-		$("#comments-panel").toggle("slide", {direction: "right"});
+		$("#comments-panel").Comments("togglePanel");
 	}
 
 	var BuildPage = {
@@ -498,7 +504,7 @@ define(["jquery", "handlebars", "text!viewer_template.html", "video-manager", "v
 
 			$("#show-comments-button").click(onOpenComments);
 
-			$("#comments-panel").Comments();
+			$("#comments-panel").Comments( { manager: $("#video") });
 
 			// this should get rid of the extra vertical scrollbar on the InformIT site for IE users
 			if (window.parent) {

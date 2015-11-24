@@ -116,42 +116,54 @@
 </div>
 
 <div id="comments-panel">
-	<div id="comments-entry" class="panel panel-success">
-		<div class="panel-heading"><i class="fa fa-comments-o fa-2x pull-right"></i> <span>Comments or Questions?</span></div>
-		<div class="panel-body">
-			<div id="comments-entry">
-				<div class="form-inline">
-					<div class="container-fluid">
-						<div class="row">
-							<div class="form-group col-xs-6">
-								<input type="text" class="form-control" id="commentName" placeholder="Name">
-							</div>
-							<div class="form-group col-xs-6">
-								<input type="email" class="form-control" id="commentEmail" placeholder="Email">
-							</div>
-							<div class="col-xs-12">
-								<textarea class="form-control" rows="3" id="commentText" placeholder="Comment or question?"></textarea>
-								<button id="submit-comment" class="btn btn-success pull-right">Submit</button>
+	<div id="close-button">
+		<i class="fa fa-close"></i>
+	</div>
+	<section id="comments-content">
+		<div id="comments-scroller">
+		<div id="comments-entry" class="panel panel-success">
+			<div class="panel-heading"><i class="fa fa-comments-o fa-2x pull-right"></i> <span>Comments or Questions?</span></div>
+			<div class="panel-body">
+				<div id="comments-entry">
+					<div class="form-inline">
+						<div class="container-fluid">
+							<div class="row">
+								<div class="form-group col-xs-6">
+									<input type="text" class="form-control" id="commentName" placeholder="Name (optional)">
+								</div>
+								<div class="form-group col-xs-6">
+									<input type="email" class="form-control" id="commentEmail" placeholder="Email (optional)">
+								</div>
+								<div class="col-xs-12">
+									<textarea class="form-control" rows="3" id="commentText" placeholder="Comment or question?"></textarea>
+									<div class="checkbox">
+										<label>
+											<input id="commentAnchor" type="checkbox"> Link to current page?
+										</label>
+									</div>
+									<button id="submit-comment" class="btn btn-success pull-right disabled">Submit</button>
+								</div>
 							</div>
 						</div>
 					</div>
 				</div>
 			</div>
 		</div>
-	</div>
-	<div id="comments-pane">
-		<ul class="nav nav-tabs" role="tablist">
-			<li role="presentation" class="active">
-				<a role="tab">All <small>13</small></a>
-			</li>
-			<li role="presentation">
-				<a role="tab">This Chapter <small>5</small></a>
-			</li>
-		</ul>
+		<div id="comments-pane">
+			<ul class="nav nav-tabs" role="tablist">
+				<li role="presentation" class="active">
+					<a role="tab">All <small>13</small></a>
+				</li>
+				<li role="presentation">
+					<a role="tab">This Chapter <small>5</small></a>
+				</li>
+			</ul>
 
-		<div class="tab-content">
+			<div class="tab-content">
+			</div>
 		</div>
-	</div>
+		</div>
+	</section>
 </div>
 
 <div id="coach-marks">
