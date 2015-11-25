@@ -453,7 +453,7 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 
 			$(".loading-indicator").hide();
 
-			$("#comments-panel").Comments("showComments", iframe);
+			$("#comments-panel").Comments("showCommentIconsInIframe", iframe);
 		},
 
 		addIFrame: function (params) {

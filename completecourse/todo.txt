@@ -1,6 +1,3 @@
-// TODO: count of comments for page and whole title
-// TODO: make sure new posts automatically are added to the margins
-// TODO: comments not always loaded in sync with iframe
 // TODO: associating a comment with a video (or chapter/toc entry?)
 // TODO: when comments are visible, reduce margin-left of iframe-holder's child div to 0 and size comment panel to fit remaining area (with min-width)
 // TODO: video: in IE, it doesn't seem to restart with the time position you left off
@@ -114,3 +111,7 @@
 // DONE: added breakout_of_frame to avoid iframe scrolling issues on iPad (and possibly other issues)
 // TODONT: come up with a way to make images approximately the same scale [production ppi issue]
 // DONE: associating a comment with a text position [uses currentIndex]
+// DONE: count of comments for page and whole title
+// DONE: make page tab active
+// DONE: comments not always loaded in sync with iframe
+// DONE: make sure new posts automatically are added to the margins

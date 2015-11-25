@@ -9,12 +9,13 @@ define(["jquery.ui", "firebase"], function () {
 			this.element.find("#commentText").on("input", $.proxy(this.onChangeComment, this));
 			this.element.find("#submit-comment").click($.proxy(this.onClickSubmit, this));
 			this.element.find("#close-button").click($.proxy(this.onClickClose, this));
-
-			this.loadCommentsFromFirebase();
+			this.element.find("#tab-all").click($.proxy(this.onClickAllComments, this));
+			this.element.find("#tab-page").click($.proxy(this.onClickPageComments, this));
 
 			this.comments = [];
-
 			this.last_iframe = undefined;
+
+			this.loadCommentsFromFirebase();
 		},
 
 		clearComments: function () {
@@ -28,25 +29,14 @@ define(["jquery.ui", "firebase"], function () {
 			//this.firebaseRef.child("my_office_sway/comments").on("value", $.proxy(this.onLoadComments, this));
 			this.clearComments();
 			this.firebaseRef.child("my_office_sway/comments").orderByChild("timestamp").on("child_added", $.proxy(this.onLoadComment, this));
-			//this.firebaseRef.child("my_office_sway/comments").endAt().on("value", $.proxy(this.onLoadComments, this));
-
-			this.showComments();
 		},
 
 		onLoadComment: function (snapshot) {
 			var c = snapshot.val();
 			c.key = snapshot.key();
 			this.addComment(c);
-		},
 
-		onLoadComments: function (snapshot) {
-			this.clearComments();
-
-			var val = snapshot.val();
-			for (var each in val) {
-				var c = val[each];
-				this.addComment(c);
-			}
+			this.showCommentIconsInIframe();
 		},
 
 		addComment: function (params) {
@@ -73,6 +63,9 @@ define(["jquery.ui", "firebase"], function () {
 			this.element.find(".tab-content").prepend(d);
 
 			this.comments.push(params);
+
+			var s = "(" + this.comments.length + ")";
+			this.element.find("#tab-all small").text(s);
 		},
 
 		onClickSubmit: function () {
@@ -112,7 +105,7 @@ define(["jquery.ui", "firebase"], function () {
 					from: "top",
 					align: "right"
 				},
-				delay: 4000,
+				delay: 8000,
 				z_index: 5000,
 				animate: {
 					enter: 'animated fadeInDown',
@@ -153,22 +146,26 @@ define(["jquery.ui", "firebase"], function () {
 			this.element.toggle("slide", {direction: "right"});
 		},
 
-		showComments: function (iframe) {
+		showCommentIconsInIframe: function (iframe) {
+			var count = 0;
+
 			if (iframe == undefined)
-				iframe == this.last_iframe;
+				iframe = this.last_iframe;
 
 			if (iframe) {
 				iframe.remove(".comment-anchor");
 
 				for (var i = 0; i < this.comments.length; i++) {
 					var c = this.comments[i];
+					c.onPage = false;
 					if (c.anchor) {
 						var el = iframe.contents().find(c.anchor);
 						if (el.length) {
 							var d = $("<div>", { class: "comment-anchor", html: "&#xe0b9" });
 							d.attr("data-key", c.key);
 							el.parent().append(d);
-							console.log("Added");
+							c.onPage = true;
+							count++;
 						}
 					}
 				}
@@ -176,12 +173,20 @@ define(["jquery.ui", "firebase"], function () {
 
 				iframe.contents().find(".comment-anchor").off("click").click($.proxy(this.showCommentFromLink, this));
 			}
+
+			var s = "(" + count + ")";
+			this.element.find("#tab-page small").text(s);
+
+			this.refreshCommentList();
 		},
 
 		showCommentFromLink: function (event) {
 			var el = event.target;
 			var key = $(el).attr("data-key");
 			if (key) {
+				// show all comments
+				this.refreshCommentList(true);
+
 				var me = this;
 				setTimeout(function () {
 					me.scrollToComment(key);
@@ -218,6 +223,50 @@ define(["jquery.ui", "firebase"], function () {
 					}
 				}
 			);
+		},
+
+		refreshCommentList: function (showAll) {
+			if (showAll == undefined) {
+				var tab = this.element.find("#all-or-page-tabs li.active");
+				if (tab.length && tab.attr("id") == "tab-li-page") {
+					showAll = false;
+				} else {
+					showAll = true;
+				}
+			} else {
+				// make tab reflect choice
+				if (showAll) {
+					this.element.find("#tab-li-all").addClass("active");
+					this.element.find("#tab-li-page").removeClass("active");
+				} else {
+					this.element.find("#tab-li-all").removeClass("active");
+					this.element.find("#tab-li-page").addClass("active");
+				}
+			}
+
+			if (showAll) {
+				this.element.find(".tab-content .comment").show(0);
+			} else {
+				this.element.find(".tab-content .comment").hide(0);
+				for (var i = 0; i < this.comments.length; i++) {
+					var c = this.comments[i];
+					if (c.onPage) {
+						this.element.find("[data-key='" + c.key + "']").show(0);
+					}
+				}
+			}
+		},
+
+		onClickAllComments: function (event) {
+			event.preventDefault();
+
+			this.refreshCommentList(true);
+		},
+
+		onClickPageComments: function (event) {
+			event.preventDefault();
+
+			this.refreshCommentList(false);
 		}
 	});
 });
