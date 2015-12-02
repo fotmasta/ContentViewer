@@ -771,9 +771,17 @@ button#search-close {
       color: #999; }
       #comments-panel .comment .comment-name small {
         margin-left: 1em; }
+      #comments-panel .comment .comment-name i {
+        margin-left: 1em; }
     #comments-panel .comment .comment-text {
       padding-bottom: 15px;
       border-bottom: 1px solid #6EE0AF; }
+    #comments-panel .comment.has-anchor {
+      cursor: pointer; }
+      #comments-panel .comment.has-anchor:hover {
+        background-color: #DBDAEA; }
+      #comments-panel .comment.has-anchor:active {
+        background-color: #7a7691; }
 
 .codelink {
   display: none; }

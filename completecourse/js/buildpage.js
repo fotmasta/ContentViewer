@@ -123,6 +123,9 @@ define(["jquery", "handlebars", "text!viewer_template.html", "video-manager", "v
 		$(".toc").on("playvideo", onPlayContent);
 	}
 
+	function getEscapedPathFromTitle (title) {
+		return title.substr(0, 48).toLowerCase().replace(/ /g,"_");
+	}
 	function onPlayContent () {
 		var currentSize = ResponsiveBootstrapToolkit.current();
 
@@ -274,7 +277,19 @@ define(["jquery", "handlebars", "text!viewer_template.html", "video-manager", "v
 		return metadata;
 	}
 
+	// if the toc doesn't have IDs associated with each entry, add temporary ones
+	function addIDsToTOC (toc) {
+		for (var i = 0; i < toc.length; i++) {
+			var t = toc[i];
+			if (t.id == undefined) {
+				t.id = i;
+			}
+		}
+	}
+
 	function onLoadedTOC (metadata) {
+		addIDsToTOC(metadata.toc);
+
 		$(".toc").TOCTree({ type: "video", data: metadata.toc, metadata: metadata, expander: "#collapse-button" });
 
 		$(".resource-list").TOCTree();
@@ -311,6 +326,8 @@ define(["jquery", "handlebars", "text!viewer_template.html", "video-manager", "v
 
 	function onEPUBTOCLoaded (data) {
 		var metadata = convertEPUBTOCtoMetadata(data);
+
+		addIDsToTOC(metadata);
 
 		$(".toc").TOCTree({ type: "epub", data: metadata, metadata: metadata, expander: "#collapse-button" });
 
@@ -504,7 +521,7 @@ define(["jquery", "handlebars", "text!viewer_template.html", "video-manager", "v
 
 			$("#show-comments-button").click(onOpenComments);
 
-			$("#comments-panel").Comments( { manager: $("#video") });
+			$("#comments-panel").Comments( { manager: $("#video"), titlePath: getEscapedPathFromTitle(options.title) });
 
 			// this should get rid of the extra vertical scrollbar on the InformIT site for IE users
 			if (window.parent) {

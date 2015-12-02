@@ -15,28 +15,52 @@ define(["jquery.ui", "firebase"], function () {
 			this.comments = [];
 			this.last_iframe = undefined;
 
-			this.loadCommentsFromFirebase();
+			this.authorize();
+		},
+
+		authorize: function () {
+			var ref = new Firebase("https://ptg-comments.firebaseio.com");
+			ref.authAnonymously($.proxy(this.onAuthorized, this));
+		},
+
+		onAuthorized: function (error, authData) {
+			if (error) {
+				console.log("Login Failed!", error);
+			} else {
+				//console.log("Authenticated successfully with payload:", authData);
+				this.loadCommentsFromFirebase();
+			}
 		},
 
 		clearComments: function () {
 			this.element.find(".comment").remove();
 
 			this.comments = [];
+
+			this.element.find("#tab-all small").text("(0)");
+			this.element.find("#tab-page small").text("(0)");
 		},
 
 		loadCommentsFromFirebase: function () {
 			this.firebaseRef = new Firebase("https://ptg-comments.firebaseio.com/");
-			//this.firebaseRef.child("my_office_sway/comments").on("value", $.proxy(this.onLoadComments, this));
-			this.clearComments();
-			this.firebaseRef.child("my_office_sway/comments").orderByChild("timestamp").on("child_added", $.proxy(this.onLoadComment, this));
+			//this.clearComments();
+			// use "child_added" or "value"? ("child_added" wasn't triggered for changes; "value" is)
+			this.firebaseRef.child(this.options.titlePath + "/comments").orderByChild("timestamp").on("value", $.proxy(this.onLoadComments, this));
 		},
 
-		onLoadComment: function (snapshot) {
-			var c = snapshot.val();
-			c.key = snapshot.key();
-			this.addComment(c);
+		onLoadComments: function (snapshot) {
+			this.clearComments();
 
-			this.showCommentIconsInIframe();
+			var recs = snapshot.val();
+			for (var each in recs) {
+				var c = recs[each];
+				if (c.ok) {
+					c.key = each;
+					this.addComment(c);
+
+					this.showCommentIconsInIframe();
+				}
+			}
 		},
 
 		addComment: function (params) {
@@ -60,6 +84,12 @@ define(["jquery.ui", "firebase"], function () {
 			var date = $("<small>", { text: dateFormatted });
 			h.append(date);
 
+			if (params.anchor_id) {
+				h.append($("<i class='fa fa-anchor'></i>"));
+				d.addClass("has-anchor");
+				d.click($.proxy(this.onClickComment, this));
+			}
+
 			this.element.find(".tab-content").prepend(d);
 
 			this.comments.push(params);
@@ -68,8 +98,23 @@ define(["jquery.ui", "firebase"], function () {
 			this.element.find("#tab-all small").text(s);
 		},
 
+		onClickComment: function (event) {
+			var key = $(event.currentTarget).attr("data-key");
+			for (var i = 0; i < this.comments.length; i++) {
+				var c = this.comments[i];
+				if (c.key == key) {
+					var options = {};
+
+					var index = c.anchor_id;
+
+					this.options.manager.VideoManager("playFromTOC", index, options);
+					break;
+				}
+			}
+		},
+
 		onClickSubmit: function () {
-			var newCommentRef = this.firebaseRef.child("my_office_sway/comments").push();
+			var newCommentRef = this.firebaseRef.child(this.options.titlePath + "/comments").push();
 
 			var name = this.element.find("#commentName").val();
 			name = name ? name : "Anonymous";
@@ -82,8 +127,8 @@ define(["jquery.ui", "firebase"], function () {
 			var useAnchor = this.element.find("#commentAnchor").prop("checked");
 			if (useAnchor) {
 				// look up an anchor to use for this entry in the TOC
-				var hash = this.options.manager.VideoManager("getHashForCurrentIndex");
-				rec.anchor = hash;
+				var anchor_id = this.options.manager.VideoManager("getIDForCurrentIndex");
+				rec.anchor_id = anchor_id;
 			}
 
 			newCommentRef.set(rec);
@@ -136,6 +181,7 @@ define(["jquery.ui", "firebase"], function () {
 
 		openPanel: function () {
 			this.element.show("slide", {direction: "right"});
+			this.element.find(".comment.animated").removeClass("animated");
 		},
 
 		closePanel: function () {
@@ -144,6 +190,7 @@ define(["jquery.ui", "firebase"], function () {
 
 		togglePanel: function () {
 			this.element.toggle("slide", {direction: "right"});
+			this.element.find(".comment.animated").removeClass("animated");
 		},
 
 		showCommentIconsInIframe: function (iframe) {
@@ -158,8 +205,9 @@ define(["jquery.ui", "firebase"], function () {
 				for (var i = 0; i < this.comments.length; i++) {
 					var c = this.comments[i];
 					c.onPage = false;
-					if (c.anchor) {
-						var el = iframe.contents().find(c.anchor);
+					if (c.anchor_id) {
+						var hash = this.options.manager.VideoManager("getHashForID", c.anchor_id);
+						var el = iframe.contents().find(hash);
 						if (el.length) {
 							var d = $("<div>", { class: "comment-anchor", html: "&#xe0b9" });
 							d.attr("data-key", c.key);

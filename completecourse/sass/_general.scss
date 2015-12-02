@@ -1077,6 +1077,10 @@ button#search-close {
 			small {
 				margin-left: 1em;
 			}
+
+			i {
+				margin-left: 1em;
+			}
 		}
 
 		.comment-text {
@@ -1089,6 +1093,18 @@ button#search-close {
 		padding: 15px;
 		margin-top: 15px;
 		margin-bottom: 15px;
+
+		&.has-anchor {
+			cursor: pointer;
+
+			&:hover {
+				background-color: #DBDAEA;
+			}
+
+			&:active {
+				background-color: #7a7691;
+			}
+		}
 	}
 }
 

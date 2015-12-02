@@ -1243,8 +1243,18 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 			}
 		},
 
-		getHashForCurrentIndex: function () {
-			return this.toc[this.currentIndex].hash;
+		getIDForCurrentIndex: function () {
+			return this.toc[this.currentIndex].id;
+		},
+
+		getHashForID: function (id) {
+			for (var i = 0; i < this.toc.length; i++) {
+				var t = this.toc[i];
+				if (t.id == id) {
+					return t.hash;
+				}
+			}
+			return undefined;
 		}
 	});
 
