@@ -122,3 +122,4 @@
 // DONE: remove anchor hash (get it from videomanager on the fly)
 // DONE: id for each toc entry
 // DONE: require signon for comments (anonymous) and protect editing of "ok" field
+// DONE: enable comments only for titles with the correct setup parameters [manifest.js: allowComments: true]

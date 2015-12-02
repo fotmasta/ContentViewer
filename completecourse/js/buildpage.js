@@ -519,7 +519,11 @@ define(["jquery", "handlebars", "text!viewer_template.html", "video-manager", "v
 
 			$("#account-button").click(function () { window.open("//memberservices.informit.com/my_account/index.aspx"); });
 
-			$("#show-comments-button").click(onOpenComments);
+			if (options.allowComments !== true) {
+				$("#show-comments-button").hide(0);
+			} else {
+				$("#show-comments-button").click(onOpenComments);
+			}
 
 			$("#comments-panel").Comments( { manager: $("#video"), titlePath: getEscapedPathFromTitle(options.title) });
 
