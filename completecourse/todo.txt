@@ -6,8 +6,6 @@
 // TODO: make all images the same scale??
 // TODO: when scrolling through content, check off sections that might not have triggered the usual "completed" scrolling trigger (ie, check for sequential completions)
 // TODO: short sub-sections don't get marked complete
-// TODO: tighten up TOC look and feel (maybe: a's without tree-toggler don't have to be padded so far to the right)
-// TODO: the Unleashed CSS causes an ugly scrolling jump when a new iframe section is loaded via infinite scrolling
 
 ////////////////////////////////////////////////////////////////////////////
 
@@ -104,6 +102,7 @@
 // DONE: track download link clicks
 // DONE: new TOC styling: can hanging indents work?
 // INFO: to preview a web edition, use this URL: https://memberservices.informit.com/my_account/webedition/[isbn]/html/index.html
+// DONE: tighten up TOC look and feel (maybe: a's without tree-toggler don't have to be padded so far to the right)
 // DONE: in new TOC: completion buttons are overlapping (or being loaded too many times)
 // DONE: in both old and new TOC stylings: download button click area is way too big [default functionality of a label element; switched to a div]
 // DONE: video title header TOC entries without video should be obvious [made them toggle the section]
@@ -123,3 +122,4 @@
 // DONE: id for each toc entry
 // DONE: require signon for comments (anonymous) and protect editing of "ok" field
 // DONE: enable comments only for titles with the correct setup parameters [manifest.js: allowComments: true]
+// TODONT: the Unleashed CSS causes an ugly scrolling jump when a new iframe section is loaded via infinite scrolling

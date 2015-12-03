@@ -317,7 +317,10 @@ define(["jquery", "handlebars", "text!viewer_template.html", "video-manager", "v
 
 		$(".toc").TOCTree({ type: "habitat", skin: manifest.skin, data: data, metadata: metadata, expander: "#collapse-button" });
 
-		VideoManager.initialize(metadata, "#video video", videojs("main_video"), [], manifest);
+		var settings = { toc: metadata, el: "#video video", player: videojs("main_video"), markers: [], options: manifest };
+		$("#video").VideoManager(settings);
+
+		//VideoManager.initialize(metadata, "#video video", videojs("main_video"), [], manifest);
 
 		initialize();
 
