@@ -1,4 +1,5 @@
 // TODO: reply feature for comments (ie, nested comments)
+// TODO: "comment pending" placeholder
 // TODO: web interface for ok'ing comments
 // TODO: when comments are visible, reduce margin-left of iframe-holder's child div to 0 and size comment panel to fit remaining area (with min-width)
 // TODO: video: in IE, it doesn't seem to restart with the time position you left off

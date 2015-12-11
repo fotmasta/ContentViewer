@@ -1074,6 +1074,11 @@ button#search-close {
 		}
 	}
 
+	button#delete-comment {
+		margin-right: 15px;
+		display: none;
+	}
+
 	.comment {
 		.comment-name {
 			font-weight: bold;
@@ -1106,9 +1111,11 @@ button#search-close {
 				background-color: #DBDAEA;
 			}
 
+			/*
 			&:active {
 				background-color: #7a7691;
 			}
+			*/
 		}
 
 		span.category {
@@ -1125,6 +1132,19 @@ button#search-close {
 
 		span.reference {
 			margin-left: .5em;
+		}
+
+		.comments-entry {
+			margin-top: 25px;
+			border: 3px solid #30844F;
+
+			.anchor.checkbox {
+				display: none;
+			}
+
+			button#delete-comment {
+				display: block;
+			}
 		}
 	}
 }

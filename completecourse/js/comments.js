@@ -110,6 +110,10 @@ define(["jquery.ui", "firebase"], function () {
 				d.click($.proxy(this.onClickComment, this));
 			}
 
+			var btn = $("<button>", { class: "btn btn-primary pull-right reply", text: "Reply" });
+			btn.click($.proxy(this.onClickReply, this));
+			h.append(btn);
+
 			this.element.find(".tab-content").prepend(d);
 
 			this.comments.push(params);
@@ -140,7 +144,8 @@ define(["jquery.ui", "firebase"], function () {
 			name = name ? name : "Anonymous";
 			var email = this.element.find("#commentEmail").val();
 			var text = this.element.find("#commentText").val();
-			var category = this.element.find("#category input:radio:checked").val();
+			var categoryEl = this.element.find("#category input:radio:checked");
+			var category = categoryEl.length ? categoryEl.val() : null;
 			var timestamp = Date.now();
 
 			var rec = { "name": name, email: email, "text": text, "timestamp": timestamp, category: category, "ok": false };
@@ -180,12 +185,15 @@ define(["jquery.ui", "firebase"], function () {
 			});
 		},
 
-		onChangeComment: function () {
-			var text = this.element.find("#commentText").val();
+		onChangeComment: function (event) {
+			var el = $(event.target);
+			var form = el.parents(".comments-entry");
+
+			var text = form.find("#commentText").val();
 			if (text)
-				this.element.find("#submit-comment").removeClass("disabled");
+				form.find("#submit-comment").removeClass("disabled");
 			else
-				this.element.find("#submit-comment").addClass("disabled");
+				form.find("#submit-comment").addClass("disabled");
 		},
 
 		resetDataEntry: function () {
@@ -354,6 +362,54 @@ define(["jquery.ui", "firebase"], function () {
 			this.showCommentIconsInIframe();
 
 			this.refreshCommentList(false);
+		},
+
+		onClickReply: function (event) {
+			event.preventDefault();
+			event.stopPropagation();
+
+			// add a comment with this comment as the "parent" (but only nest 1 layer deep)
+			// add a comment form here
+			var form = $("#comments-entry").clone().addClass("animated flash")
+			form.attr("id", "");
+
+			form.find("#commentText").on("input", $.proxy(this.onChangeComment, this));
+			form.find("#submit-comment").click($.proxy(this.onClickReplySubmit, this));
+			form.find("#delete-comment").click($.proxy(this.onClickDeleteComment, this));
+
+			var el = $(event.target).parents(".comment");
+			el.append(form);
+		},
+
+		onClickReplySubmit: function (event) {
+			var el = $(event.target);
+			var parentComment = el.parents(".comment");
+			var parentKey = parentComment.attr("data-key");
+
+			var newCommentRef = this.firebaseRef.child(this.options.titlePath + "/comments").push();
+
+			var form = el.parents(".comments-entry");
+
+			var name = form.find("#commentName").val();
+			name = name ? name : "Anonymous";
+			var email = form.find("#commentEmail").val();
+			var text = form.find("#commentText").val();
+			var categoryEl = form.find("#category input:radio:checked");
+			var category = categoryEl.length ? categoryEl.val() : null;
+			var timestamp = Date.now();
+
+			var rec = { "name": name, email: email, "text": text, "timestamp": timestamp, category: category, "ok": false, "parent": parentKey };
+
+			newCommentRef.set(rec);
+
+			this.notifyNewComment();
+
+			form.remove();
+		},
+
+		onClickDeleteComment: function (event) {
+			var el = $(event.target).parents(".comments-entry");
+			el.remove();
 		}
 	});
 });

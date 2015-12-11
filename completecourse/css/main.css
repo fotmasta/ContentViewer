@@ -760,6 +760,9 @@ button#search-close {
     margin-right: 15px; }
   #comments-panel .container-fluid .form-control {
     width: 100%; }
+  #comments-panel button#delete-comment {
+    margin-right: 15px;
+    display: none; }
   #comments-panel .comment {
     background-color: #D2F1D3;
     border-radius: 15px;
@@ -777,11 +780,14 @@ button#search-close {
       padding-bottom: 15px;
       border-bottom: 1px solid #6EE0AF; }
     #comments-panel .comment.has-anchor {
-      cursor: pointer; }
+      cursor: pointer;
+      /*
+      &:active {
+      	background-color: #7a7691;
+      }
+      */ }
       #comments-panel .comment.has-anchor:hover {
         background-color: #DBDAEA; }
-      #comments-panel .comment.has-anchor:active {
-        background-color: #7a7691; }
     #comments-panel .comment span.category {
       margin-left: 1em; }
       #comments-panel .comment span.category.techsupport {
@@ -790,6 +796,13 @@ button#search-close {
         background-color: #35653c; }
     #comments-panel .comment span.reference {
       margin-left: .5em; }
+    #comments-panel .comment .comments-entry {
+      margin-top: 25px;
+      border: 3px solid #30844F; }
+      #comments-panel .comment .comments-entry .anchor.checkbox {
+        display: none; }
+      #comments-panel .comment .comments-entry button#delete-comment {
+        display: block; }
 
 .codelink {
   display: none; }
