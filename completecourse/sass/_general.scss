@@ -1059,8 +1059,13 @@ button#search-close {
 		margin-bottom: 15px;
 	}
 
+	#category {
+		label.control-label {
+			margin-right: 15px;
+		}
+	}
+
 	#submit-comment {
-		margin-top: 15px;
 	}
 
 	.container-fluid {
@@ -1104,6 +1109,22 @@ button#search-close {
 			&:active {
 				background-color: #7a7691;
 			}
+		}
+
+		span.category {
+			margin-left: 1em;
+
+			&.techsupport {
+				background-color: #9b9016;
+			}
+
+			&.authorfeedback {
+				background-color: #35653c;
+			}
+		}
+
+		span.reference {
+			margin-left: .5em;
 		}
 	}
 }

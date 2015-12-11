@@ -57,10 +57,10 @@ define(["jquery.ui", "firebase"], function () {
 				if (c.ok) {
 					c.key = each;
 					this.addComment(c);
-
-					this.showCommentIconsInIframe();
 				}
 			}
+
+			this.showCommentIconsInIframe();
 		},
 
 		addComment: function (params) {
@@ -71,9 +71,12 @@ define(["jquery.ui", "firebase"], function () {
 			d.append(p);
 
 			var n = params.name;
+			/*
 			if (params.email) {
 				n += " (" + params.email + ")";
 			}
+			*/
+
 			var h = $("<h5>", { class: "comment-name", text: n });
 			d.append(h);
 
@@ -84,8 +87,25 @@ define(["jquery.ui", "firebase"], function () {
 			var date = $("<small>", { text: dateFormatted });
 			h.append(date);
 
+			if (params.category) {
+				var cat = params.category;
+				switch (params.category) {
+					case "authorfeedback":
+						cat = "feedback"; break;
+					case "techsupport":
+						cat = "support"; break;
+				}
+				var c = $("<span>", { class: "badge category " + params.category, text: cat });
+				h.append(c);
+			}
+
 			if (params.anchor_id) {
-				h.append($("<i class='fa fa-anchor'></i>"));
+				var title = this.options.manager.VideoManager("getTOCTitleForID", params.anchor_id);
+
+				var t = $("<span>", { class: "reference", text: title });
+				var i = $("<i class='fa fa-anchor'></i>");
+				h.append(i).append(t);
+
 				d.addClass("has-anchor");
 				d.click($.proxy(this.onClickComment, this));
 			}
@@ -120,9 +140,10 @@ define(["jquery.ui", "firebase"], function () {
 			name = name ? name : "Anonymous";
 			var email = this.element.find("#commentEmail").val();
 			var text = this.element.find("#commentText").val();
+			var category = this.element.find("#category input:radio:checked").val();
 			var timestamp = Date.now();
 
-			var rec = { "name": name, email: email, "text": text, "timestamp": timestamp, "ok": false }
+			var rec = { "name": name, email: email, "text": text, "timestamp": timestamp, category: category, "ok": false };
 
 			var useAnchor = this.element.find("#commentAnchor").prop("checked");
 			if (useAnchor) {
@@ -172,6 +193,7 @@ define(["jquery.ui", "firebase"], function () {
 			this.element.find("#commentEmail").val("");
 			this.element.find("#commentText").val("");
 			this.element.find("#commentAnchor").prop("checked", false);
+			this.element.find("#category input:radio:checked").prop("checked", false);
 			this.element.find("#submit-comment").addClass("disabled");
 		},
 
@@ -199,6 +221,7 @@ define(["jquery.ui", "firebase"], function () {
 			if (iframe == undefined)
 				iframe = this.last_iframe;
 
+			// if it's an epub, find the comment on the page
 			if (iframe) {
 				iframe.remove(".comment-anchor");
 
@@ -220,6 +243,18 @@ define(["jquery.ui", "firebase"], function () {
 				this.last_iframe = iframe;
 
 				iframe.contents().find(".comment-anchor").off("click").click($.proxy(this.showCommentFromLink, this));
+			} else {
+				for (var i = 0; i < this.comments.length; i++) {
+					var c = this.comments[i];
+					c.onPage = false;
+					if (c.anchor_id) {
+						var id = this.options.manager.VideoManager("getIDForCurrentIndex");
+						if (id == c.anchor_id) {
+							c.onPage = true;
+							count++;
+						}
+					}
+				}
 			}
 
 			var s = "(" + count + ")";
@@ -308,11 +343,15 @@ define(["jquery.ui", "firebase"], function () {
 		onClickAllComments: function (event) {
 			event.preventDefault();
 
+			this.showCommentIconsInIframe();
+
 			this.refreshCommentList(true);
 		},
 
 		onClickPageComments: function (event) {
 			event.preventDefault();
+
+			this.showCommentIconsInIframe();
 
 			this.refreshCommentList(false);
 		}

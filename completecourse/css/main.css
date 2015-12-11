@@ -756,8 +756,8 @@ button#search-close {
     padding-right: 0; }
   #comments-panel .form-group {
     margin-bottom: 15px; }
-  #comments-panel #submit-comment {
-    margin-top: 15px; }
+  #comments-panel #category label.control-label {
+    margin-right: 15px; }
   #comments-panel .container-fluid .form-control {
     width: 100%; }
   #comments-panel .comment {
@@ -782,6 +782,14 @@ button#search-close {
         background-color: #DBDAEA; }
       #comments-panel .comment.has-anchor:active {
         background-color: #7a7691; }
+    #comments-panel .comment span.category {
+      margin-left: 1em; }
+      #comments-panel .comment span.category.techsupport {
+        background-color: #9b9016; }
+      #comments-panel .comment span.category.authorfeedback {
+        background-color: #35653c; }
+    #comments-panel .comment span.reference {
+      margin-left: .5em; }
 
 .codelink {
   display: none; }

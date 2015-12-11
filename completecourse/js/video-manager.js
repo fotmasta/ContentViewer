@@ -360,6 +360,8 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 
 			this.removeAllTriggers();
 			this.addTriggersForThisVideo();
+
+			this.onNewContentShowing();
 		},
 
 		// THEORY: links within the epub need to be overridden so the iframe src gets updated and the location bar stays current
@@ -453,6 +455,10 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 
 			$(".loading-indicator").hide();
 
+			this.onNewContentShowing(iframe);
+		},
+
+		onNewContentShowing: function (iframe) {
 			$("#comments-panel").Comments("showCommentIconsInIframe", iframe);
 		},
 
@@ -1125,10 +1131,6 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 
 				if (isNew) {
 					entry.parents("li").find("> ul").show(300);
-					/*
-					 entry.parents("li").find("> ul .dropper.opened").show(0);
-					 entry.parents("li").find("> ul .dropper.closed").hide(0);
-					 */
 				}
 
 				var scroller = $("#contents-pane .scroller");
@@ -1245,6 +1247,16 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 
 		getIDForCurrentIndex: function () {
 			return this.toc[this.currentIndex].id;
+		},
+
+		getTOCTitleForID: function (id) {
+			for (var i = 0; i < this.toc.length; i++) {
+				var t = this.toc[i];
+				if (t.id == id) {
+					return t.desc;
+				}
+			}
+			return undefined;
 		},
 
 		getHashForID: function (id) {

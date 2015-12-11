@@ -1,3 +1,4 @@
+// TODO: reply feature for comments (ie, nested comments)
 // TODO: web interface for ok'ing comments
 // TODO: when comments are visible, reduce margin-left of iframe-holder's child div to 0 and size comment panel to fit remaining area (with min-width)
 // TODO: video: in IE, it doesn't seem to restart with the time position you left off
@@ -122,4 +123,8 @@
 // DONE: id for each toc entry
 // DONE: require signon for comments (anonymous) and protect editing of "ok" field
 // DONE: enable comments only for titles with the correct setup parameters [manifest.js: allowComments: true]
-// TODONT: the Unleashed CSS causes an ugly scrolling jump when a new iframe section is loaded via infinite scrolling
+// TODONT: the Unleashed CSS causes an ugly scrolling jump when a new iframe section is loaded via infinite scrolling [no infinite scrolling]
+// DONE: comments for "This Section" don't seem to be correctly accounted for
+// DONE: drop-down for category of comment (optional): Tech Support, Author Feedback, General
+// DONE: show category and reference TOC name in comment
+// DONE: test commenting refresh in ePub titles (on tab switching, content switching, new comments loading)
