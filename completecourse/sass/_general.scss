@@ -1146,6 +1146,14 @@ button#search-close {
 				display: block;
 			}
 		}
+
+		.comment-name + .reply {
+			margin-top: 3em;
+		}
+
+		&.reply {
+			background-color: white;
+		}
 	}
 }
 

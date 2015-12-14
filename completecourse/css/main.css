@@ -803,6 +803,10 @@ button#search-close {
         display: none; }
       #comments-panel .comment .comments-entry button#delete-comment {
         display: block; }
+    #comments-panel .comment .comment-name + .reply {
+      margin-top: 3em; }
+    #comments-panel .comment.reply {
+      background-color: white; }
 
 .codelink {
   display: none; }

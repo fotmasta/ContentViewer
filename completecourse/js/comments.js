@@ -1,4 +1,20 @@
 define(["jquery.ui", "firebase"], function () {
+
+	function findParentComment (el) {
+		var this_el = el;
+
+		var parentComment;
+
+		while (this_el.length) {
+			this_el = this_el.parents(".comment");
+			if (this_el.length) {
+				parentComment = this_el;
+			}
+		}
+
+		return parentComment;
+	}
+
 	$.widget("que.Comments", {
 
 		options: {},
@@ -52,9 +68,20 @@ define(["jquery.ui", "firebase"], function () {
 			this.clearComments();
 
 			var recs = snapshot.val();
+
+			// add non-child comments first
 			for (var each in recs) {
 				var c = recs[each];
-				if (c.ok) {
+				if (!c.parent) {
+					c.key = each;
+					this.addComment(c);
+				}
+			}
+
+			// now load child comments (so they can be appended to their parents)
+			for (var each in recs) {
+				var c = recs[each];
+				if (c.parent) {
 					c.key = each;
 					this.addComment(c);
 				}
@@ -67,15 +94,12 @@ define(["jquery.ui", "firebase"], function () {
 			var d = $("<div>", { class: "comment" });
 			d.attr("data-key", params.key);
 
-			var p = $("<p>", { class: "comment-text", text: params.text });
-			d.append(p);
-
-			var n = params.name;
-			/*
-			if (params.email) {
-				n += " (" + params.email + ")";
+			if (params.ok) {
+				var p = $("<p>", {class: "comment-text", text: params.text});
+				d.append(p);
 			}
-			*/
+
+			var n = params.ok ? params.name : "Comment pending";
 
 			var h = $("<h5>", { class: "comment-name", text: n });
 			d.append(h);
@@ -110,11 +134,22 @@ define(["jquery.ui", "firebase"], function () {
 				d.click($.proxy(this.onClickComment, this));
 			}
 
-			var btn = $("<button>", { class: "btn btn-primary pull-right reply", text: "Reply" });
-			btn.click($.proxy(this.onClickReply, this));
-			h.append(btn);
+			if (params.ok) {
+				var btn = $("<button>", {class: "btn btn-primary pull-right reply", text: "Reply"});
+				btn.click($.proxy(this.onClickReply, this));
+				h.append(btn);
+			}
 
-			this.element.find(".tab-content").prepend(d);
+			if (params.parent) {
+				// add it to the parent
+				d.addClass("reply");
+				var parentComment = this.element.find(".comment[data-key='" + params.parent + "']");
+				if (parentComment.length) {
+					parentComment.append(d);
+				}
+			} else {
+				this.element.find(".tab-content").prepend(d);
+			}
 
 			this.comments.push(params);
 
@@ -377,13 +412,16 @@ define(["jquery.ui", "firebase"], function () {
 			form.find("#submit-comment").click($.proxy(this.onClickReplySubmit, this));
 			form.find("#delete-comment").click($.proxy(this.onClickDeleteComment, this));
 
-			var el = $(event.target).parents(".comment");
+			//var el = $(event.target).parents(".comment");
+			var el = findParentComment($(event.target));
 			el.append(form);
 		},
 
 		onClickReplySubmit: function (event) {
 			var el = $(event.target);
-			var parentComment = el.parents(".comment");
+
+			var parentComment = findParentComment(el);
+
 			var parentKey = parentComment.attr("data-key");
 
 			var newCommentRef = this.firebaseRef.child(this.options.titlePath + "/comments").push();
