@@ -58,7 +58,7 @@ define(["jquery.ui", "firebase"], function () {
 		},
 
 		loadCommentsFromFirebase: function () {
-			this.firebaseRef = new Firebase("https://ptg-comments.firebaseio.com/");
+			this.firebaseRef = new Firebase("https://ptg-comments.firebaseio.com/titles/");
 			//this.clearComments();
 			// use "child_added" or "value"? ("child_added" wasn't triggered for changes; "value" is)
 			this.firebaseRef.child(this.options.titlePath + "/comments").orderByChild("timestamp").on("value", $.proxy(this.onLoadComments, this));
