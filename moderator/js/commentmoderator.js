@@ -62,13 +62,26 @@ define(["jquery.ui", "firebase", "bootstrap-confirmation"], function () {
 			var h = $("<tr><th>title</th><th>date</th><th>category</th><th>reply</th><th>name</th><th>email</th><th>text</th><th>Ok?</th><th>Delete</th></tr>");
 			el.append(h);
 
-			var data = snapshot.val();
+			var data = this.sortData(snapshot.val());
 
 			var lastTitle;
 
 			for (var each in data) {
 				var titleName = each;
 				var title = data[each];
+
+				if (titleName != lastTitle) {
+					var row = $("<tr>");
+					el.append(row);
+
+					var td = $("<td>", {text: titleName});
+					td.attr("colspan", 9);
+					row.append(td);
+					row.addClass("success");
+
+					lastTitle = titleName;
+				}
+
 				for (var c in title.comments) {
 					var rec = title.comments[c];
 
@@ -98,15 +111,15 @@ define(["jquery.ui", "firebase", "bootstrap-confirmation"], function () {
 						.append($("<td>", {text: rec.text}))
 						.append($("<td>", { class: "text-center ok-row" }).append(checkbox))
 						.append($("<td>", { class: "text-center" }).append(deleteButton));
-
-					if (title != lastTitle) {
-						row.addClass("success");
-						lastTitle = title;
-					}
 				}
 			}
 
 			$('[data-toggle="confirmation"]').confirmation( { placement: "left", onConfirm: $.proxy(this.onClickDelete, this) } );
+		},
+
+		// sort by title, unmoderated, timestamp
+		sortData: function (data) {
+			return data;
 		},
 
 		onClickOK: function (event) {
