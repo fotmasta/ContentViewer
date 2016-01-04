@@ -15,6 +15,10 @@ define(["jquery.ui", "firebase"], function () {
 		return parentComment;
 	}
 
+	function makeFirebaseFriendly (path) {
+		return path.replace(".", "");
+	}
+
 	$.widget("que.Comments", {
 
 		options: {},
@@ -61,7 +65,8 @@ define(["jquery.ui", "firebase"], function () {
 			this.firebaseRef = new Firebase("https://ptg-comments.firebaseio.com/titles/");
 			//this.clearComments();
 			// use "child_added" or "value"? ("child_added" wasn't triggered for changes; "value" is)
-			this.firebaseRef.child(this.options.titlePath + "/comments").orderByChild("timestamp").on("value", $.proxy(this.onLoadComments, this));
+			var path = makeFirebaseFriendly(this.options.titlePath);
+			this.firebaseRef.child(path + "/comments").orderByChild("timestamp").on("value", $.proxy(this.onLoadComments, this));
 		},
 
 		onLoadComments: function (snapshot) {
@@ -173,7 +178,8 @@ define(["jquery.ui", "firebase"], function () {
 		},
 
 		onClickSubmit: function () {
-			var newCommentRef = this.firebaseRef.child(this.options.titlePath + "/comments").push();
+			var path = makeFirebaseFriendly(this.options.titlePath);
+			var newCommentRef = this.firebaseRef.child(path + "/comments").push();
 
 			var name = this.element.find("#commentName").val();
 			name = name ? name : "Anonymous";
@@ -424,7 +430,8 @@ define(["jquery.ui", "firebase"], function () {
 
 			var parentKey = parentComment.attr("data-key");
 
-			var newCommentRef = this.firebaseRef.child(this.options.titlePath + "/comments").push();
+			var path = makeFirebaseFriendly(this.options.titlePath);
+			var newCommentRef = this.firebaseRef.child(path + "/comments").push();
 
 			var form = el.parents(".comments-entry");
 

@@ -1,0 +1,43 @@
+li.question {
+	padding: 2em 0;
+}
+
+ol.answers-holder {
+	list-style-type: lower-alpha;
+
+	li {
+		p.response {
+			display: inline-block;
+			padding: 5px 10px;
+			cursor: pointer;
+
+			&:hover:not(.selected) {
+				background-color: #bcbfff;
+				border-radius: 15px;
+			}
+
+			&.selected {
+				background-color: #76f498;
+				border-radius: 15px;
+			}
+
+			&.right {
+				&:before {
+					content: "Right";
+					display: block;
+					position: absolute;
+					left: 0px;
+				}
+			}
+
+			&.wrong {
+				&:before {
+					content: "Wrong";
+					display: block;
+					position: absolute;
+					left: 0px;
+				}
+			}
+		}
+	}
+}
