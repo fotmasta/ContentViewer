@@ -1,43 +1,108 @@
-li.question {
-	padding: 2em 0;
-}
-
-ol.answers-holder {
-	list-style-type: lower-alpha;
+ol.quiz-holder {
+	margin-left: 120px;
 
 	li {
-		p.response {
-			display: inline-block;
-			padding: 5px 10px;
-			cursor: pointer;
+		font-size: 1.5em;
+	}
 
-			&:hover:not(.selected) {
-				background-color: #bcbfff;
-				border-radius: 15px;
-			}
+	.checker {
+		margin-top: .5em;
 
-			&.selected {
-				background-color: #76f498;
-				border-radius: 15px;
-			}
+		&.inactive {
+			visibility: hidden;
+		}
+	}
+}
 
-			&.right {
-				&:before {
-					content: "Right";
-					display: block;
-					position: absolute;
-					left: 0px;
+li.question {
+	padding: .5em 0 .5em 0;
+
+	ol.answers-holder {
+		list-style-type: lower-alpha;
+		position: relative;
+
+		li {
+			font-size: .75em;
+			position: relative;
+
+			p.response {
+				display: inline-block;
+				padding: 5px 10px;
+				cursor: pointer;
+				vertical-align: middle;
+
+				&:hover:not(.selected) {
+					background-color: #bcbfff;
+					border-radius: 15px;
+				}
+
+				&.selected {
+					background-color: #76f498;
+					border-radius: 15px;
+				}
+
+				code {
+					white-space: pre;
 				}
 			}
 
-			&.wrong {
-				&:before {
-					content: "Wrong";
-					display: block;
-					position: absolute;
-					left: 0px;
-				}
+			i.icon {
+				position: absolute;
+				left: -65px;
+				top: 50%;
+				transform: translateY(-50%);
 			}
+		}
+	}
+}
+
+.summary {
+	z-index: 100;
+	background-color: #7374A9;
+	position: absolute;
+	left: 10px;
+	padding: 15px 0 15px 0;
+	border-radius: 15px;
+	box-shadow: -2px 4px 12px #333;
+
+	h3 {
+		margin-top: 0;
+		text-align: center;
+		color: white;
+		font-size: 125%;
+		font-weight: 400;
+	}
+
+	&.affix {
+		top: 0;
+		position: fixed;
+	}
+
+	table.results {
+		width: 75px;
+		background-color: #f0f0ff;
+	}
+
+	table.results {
+		td, th {
+			//border: 1px solid black;
+			padding: 3px;
+		}
+
+		th {
+			background-color: black;
+			color: white;
+			text-align: center;
+		}
+
+		td:nth-child(2) {
+			text-align: right;
+			min-width: 2em;
+			border-left: 1px solid #999;
+		}
+
+		tr.total {
+			background-color: #d3d3d3;
 		}
 	}
 }
