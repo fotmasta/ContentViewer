@@ -84,7 +84,7 @@ define(["jquery.ui", "bootstrap", "jquery.json"], function () {
 			btn.click($.proxy(this.onClickCheck, this));
 			btn.appendTo(checker);
 
-			var hint = $("<p>", { class: "hint", html: "<i class='fa fa-bookmark text-danger'></i> See: " });
+			var hint = $("<p>", { class: "hint", html: "<i class='fa fa-bookmark text-danger'></i> Hint: " });
 			var link = $("<a>", { href: q_params.hint, text: q_params.hint });
 			hint.append(link);
 			checker.append(hint);
@@ -118,6 +118,8 @@ define(["jquery.ui", "bootstrap", "jquery.json"], function () {
 
 			q.attr("data-correct", null);
 
+			this.updateScore();
+			
 			this.adjustSummarySize();
 
 			this.saveResponses();
