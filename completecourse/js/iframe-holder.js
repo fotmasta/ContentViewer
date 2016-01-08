@@ -187,22 +187,22 @@ define(["bootstrap-dialog", "imagesloaded", "jquery.ui"], function (BootstrapDia
 		},
 
 		addStylesheet: function () {
-			//var path = getAbsolutePath();
-
 			var path;
 
 			if (window.location.hostname == "localhost") {
-				path = getAbsolutePath() + "/../completecourse";
+				path = getAbsolutePath() + "/../completecourse/";
 			} else {
-				path = "https://s3.amazonaws.com/storefronts/streaming-video/completecourse";
+				path = getInformITBaseURL();
 			}
 
 			// add our own stylesheet for additional styles
 			var $head = this.iframe.contents().find("head");
 			$head.append($("<link/>",
-				{ rel: "stylesheet", href: path + "/css/main.css", type: "text/css" }));
+				{ rel: "stylesheet", href: path + "css/main.css", type: "text/css" }));
 
-			var skin = "skin-" + this.options.manager.options.skin;
+			var skin = "";
+			if (this.options.manager.options && this.options.manager.options.skin)
+				skin = "skin-" + this.options.manager.options.skin;
 
 			var $body = this.iframe.contents().find("body").addClass("habitat-body " + skin);
 		},

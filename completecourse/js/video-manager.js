@@ -114,6 +114,29 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 		return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
 	}
 
+	function throttle(fn, threshhold, scope) {
+		threshhold || (threshhold = 250);
+		var last,
+			deferTimer;
+		return function () {
+			var context = scope || this;
+
+			var now = +new Date,
+				args = arguments;
+			if (last && now < last + threshhold) {
+				// hold on to it
+				clearTimeout(deferTimer);
+				deferTimer = setTimeout(function () {
+					last = now;
+					fn.apply(context, args);
+				}, threshhold);
+			} else {
+				last = now;
+				fn.apply(context, args);
+			}
+		};
+	}
+
 	$.widget("que.VideoManager", {
 		_create: function () {
 			this.initialize(this.options.toc, this.options.el, this.options.player, this.options.markers, this.options.options);
@@ -161,7 +184,8 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 
 			$(".toc").on("playvideo", onPlayContent).on("closesearch", $.proxy(this.onCloseSearch, this));
 
-			$("#video").scroll($.proxy(this.onScrollContent, this));
+			// don't call this function with EVERY scroll
+			$("#video").scroll(throttle($.proxy(this.onScrollContent), 5000, this));
 
 			$(".toc").on("downloadvideo", $.proxy(this.onDownloadVideo, this));
 
@@ -1113,6 +1137,8 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 		},
 
 		syncTOCToContent: function (index) {
+			console.log("sync");
+
 			if (index == undefined)
 				index = this.findCurrentItem();
 

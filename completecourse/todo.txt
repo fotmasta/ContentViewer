@@ -1,3 +1,4 @@
+// TODO: syncTOCToContent takes a LONG time on some titles (like the Adobe Illustrator CIB 9780134382548)
 // TODO: remediation links to TOC entries in Web Edition
 // TODO: make sure quiz responses get saved in a unique location for Web Editions (within the Database item, perhaps?)
 // TODO: when comments are visible, reduce margin-left of iframe-holder's child div to 0 and size comment panel to fit remaining area (with min-width)
