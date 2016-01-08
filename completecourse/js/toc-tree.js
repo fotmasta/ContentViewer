@@ -162,6 +162,10 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 		return label;
 	}
 
+	function sortByRef (a, b) {
+		return parseInt(a.ref) - parseInt(b.ref);
+	}
+
 	$.widget("que.TOCTree", {
 
 		options: {},
@@ -439,6 +443,10 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 
 			$(".search-result-list").empty();
 
+			if (this.options.skin && this.options.skin.trim() == "Microsoft") {
+				results = results.sort(sortByRef);
+			}
+
 			for (var i = 0; i < results.length; i++) {
 				var index = results[i].ref;
 				var hit = this.options.metadata[index];
@@ -447,9 +455,15 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 					var label = MakeAShortLabelForSearchResults(node);
 					var section_label = " <p class='section-label'>" + label + "</p>";
 					var hit_label = "<p class='hit-label'>" + hit.desc + "</p>";
-					var hitResult = $("<div>", {class: "hit", html: section_label + hit_label}).data("index", index);
+					var hitResult = $("<div>", {class: "hit", tabindex: 0, html: section_label + hit_label}).data("index", index);
 					var me = this;
 					hitResult.click(function (event) {
+						var index = $(this).data("index");
+						me.launchVideo(index, { highlight: term }, event);
+						$(".hit.selected").removeClass("selected");
+						$(this).addClass("selected");
+					});
+					hitResult.keypress(function (event) {
 						var index = $(this).data("index");
 						me.launchVideo(index, { highlight: term }, event);
 						$(".hit.selected").removeClass("selected");

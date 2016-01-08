@@ -202,7 +202,9 @@ define(["bootstrap-dialog", "imagesloaded", "jquery.ui"], function (BootstrapDia
 			$head.append($("<link/>",
 				{ rel: "stylesheet", href: path + "/css/main.css", type: "text/css" }));
 
-			var $body = this.iframe.contents().find("body").addClass("habitat-body");
+			var skin = "skin-" + this.options.manager.options.skin;
+
+			var $body = this.iframe.contents().find("body").addClass("habitat-body " + skin);
 		},
 
 		highlight: function (terms) {
@@ -233,7 +235,7 @@ define(["bootstrap-dialog", "imagesloaded", "jquery.ui"], function (BootstrapDia
 
 			if (obj) {
 				// add a next button
-				var a = $('<button id="next-button" class="button button-a"><h4>Next Up </h4>' + obj.title + '</button>').data("goto-index", obj.index);
+				var a = $('<button id="next-button" class="button button-a"><h4>Next </h4>' + obj.title + '</button>').data("goto-index", obj.index);
 				a.click($.proxy(this.onClickJumpButton, this));
 
 				this.iframe.contents().find("body").append(a);

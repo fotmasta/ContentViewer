@@ -119,7 +119,7 @@ define(["jquery.ui", "bootstrap", "jquery.json"], function () {
 			q.attr("data-correct", null);
 
 			this.updateScore();
-			
+
 			this.adjustSummarySize();
 
 			this.saveResponses();

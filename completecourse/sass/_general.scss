@@ -1,6 +1,11 @@
 @import url(https://fonts.googleapis.com/css?family=Source+Sans+Pro);
 @import url(https://fonts.googleapis.com/icon?family=Material+Icons);
 
+@font-face{font-family:'wf_segoe-ui_normal';src:url('http://i.s-microsoft.com/fonts/segoe-ui/west-european/normal/latest.eot');src:url('http://i.s-microsoft.
+com/fonts/segoe-ui/west-european/normal/latest.eot?#iefix') format('embedded-opentype'),url('http://i.s-microsoft.com/fonts/segoe-ui/west-
+european/normal/latest.woff') format('woff'),url('http://i.s-microsoft.com/fonts/segoe-ui/west-european/normal/latest.ttf') format('truetype'),url('http://i.s-
+microsoft.com/fonts/segoe-ui/west-european/normal/latest.svg#web') format('svg');font-weight:normal;font-style:normal}
+
 $video-background-color: white;
 $blue-color: #719db7;
 $quiz-color: #569E39;
@@ -12,6 +17,57 @@ html {
 
 body {
 	font-family: "Source Sans Pro", "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+body.skin-Microsoft {
+	font-family: 'wf_segoe-ui_normal', 'Segoe UI', Tahoma, Arial, sans-serif;
+
+	button.btn {
+		border-radius: 0;
+
+		-webkit-box-shadow: none;
+		box-shadow: none;
+		background-image: none;
+	}
+
+	.input-group-addon {
+		border-radius: 0;
+	}
+
+	input {
+		border-radius: 0;
+	}
+
+	.progress {
+		border-radius: 0;
+		-webkit-box-shadow: none;
+		box-shadow: none;
+
+		.progress-bar-warning {
+			background-image: none;
+			-webkit-box-shadow: none;
+			box-shadow: none;
+		}
+	}
+
+	.search-results {
+		background-color: white;
+
+		.row {
+			background-color: #CD4800;
+		}
+
+		.search-result-list .selected {
+			background-color: #3B6DCB;
+			p {
+				color: white;
+			}
+		}
+	}
+
+	.btn-info {
+		background-color: #4F9CF6;
+	}
 }
 
 .col-xs-0 {
@@ -117,11 +173,6 @@ body {
 }
 
 .iframe-holder {
-	/*
-	height: auto;
-	overflow: hidden;
-	*/
-
 	& > div {
 		max-width: 1024px;
 		margin: 0 auto;
@@ -130,6 +181,12 @@ body {
 
 	iframe {
 		width: 100%;
+	}
+}
+
+body.skin-Microsoft .iframe-holder {
+	& > div {
+		max-width: 65rem;
 	}
 }
 
@@ -506,7 +563,7 @@ ul.toc-holder {
 #show-menu-button {
 	padding: 6px 12px;
 
-	background-color: #2aabd2;
+	background-color: #337ab7;
 }
 
 #resource-toggler {
@@ -653,16 +710,30 @@ span.completed {
 	background: #e5f2f7;
 	text-decoration: none;
 	text-transform: none;
-	padding: 20px;
+	padding: 20px 3em 20px 20px;
 	border-radius: 3px;
 	border-bottom: 3px solid #007db6;
 	background-position: right 13.3333px top 50%;
 	background-size: auto 1.5em;
 	background-repeat: no-repeat;
 	background-image: url(images/icon-arrow-black.svg);
+	font-size: 14px;
+
+	&.header-prev-button {
+		background-position: left 13.3333px top 50%;
+		background-image: url(images/icon-arrow-black-back.svg);
+		padding-left: 4em;
+	}
 
 	&:hover {
 		background: #A2D1E7;
+	}
+
+	h4 {
+		margin-top: initial;
+		margin-bottom: initial;
+		font-weight: bold;
+		font-family: inherit;
 	}
 }
 
@@ -728,11 +799,19 @@ span.completed {
 		}
 	}
 
-	div.image img {
-		max-width: 50%;
-		max-height: 50%;
+	// Microsoft doesn't want images scaled down to fit
+	&:not(.skin-Microsoft) {
+		div.image img {
+			max-width: 50%;
+			max-height: 50%;
+		}
 	}
+}
 
+.habitat-body.skin-Microsoft {
+	.button-a {
+		width: auto;
+	}
 }
 
 .image_popup {

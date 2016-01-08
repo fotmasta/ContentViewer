@@ -113,6 +113,8 @@ define(["jquery", "handlebars", "text!viewer_template.html", "video-manager", "v
 		// NOTE: started using opacity too since the tab panels were overriding "invisible"
 		$("#main").removeClass("invisible").css("opacity", 1);
 
+		$("body").addClass("skin-" + manifest.skin);
+
 		/*
 		 if (!coachMarksShown) {
 		 $("#coach-marks").CoachMarks().CoachMarks("instance").open();
@@ -290,7 +292,7 @@ define(["jquery", "handlebars", "text!viewer_template.html", "video-manager", "v
 	function onLoadedTOC (metadata) {
 		addIDsToTOC(metadata.toc);
 
-		$(".toc").TOCTree({ type: "video", data: metadata.toc, metadata: metadata, expander: "#collapse-button" });
+		$(".toc").TOCTree({ type: "video", skin: manifest.skin, data: metadata.toc, metadata: metadata, expander: "#collapse-button" });
 
 		$(".resource-list").TOCTree();
 
@@ -332,7 +334,7 @@ define(["jquery", "handlebars", "text!viewer_template.html", "video-manager", "v
 
 		addIDsToTOC(metadata);
 
-		$(".toc").TOCTree({ type: "epub", data: metadata, metadata: metadata, expander: "#collapse-button" });
+		$(".toc").TOCTree({ type: "epub", skin: manifest.skin, data: metadata, metadata: metadata, expander: "#collapse-button" });
 
 		var settings = { toc: metadata, el: "#video video", player: videojs("main_video"), markers: [], options: manifest };
 		$("#video").VideoManager(settings);

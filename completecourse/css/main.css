@@ -1,10 +1,46 @@
 @import url(https://fonts.googleapis.com/css?family=Source+Sans+Pro);
 @import url(https://fonts.googleapis.com/icon?family=Material+Icons);
+@font-face {
+  font-family: 'wf_segoe-ui_normal';
+  src: url("http://i.s-microsoft.com/fonts/segoe-ui/west-european/normal/latest.eot");
+  src: url("http://i.s-microsoft.\a com/fonts/segoe-ui/west-european/normal/latest.eot?#iefix") format("embedded-opentype"), url("http://i.s-microsoft.com/fonts/segoe-ui/west-\a european/normal/latest.woff") format("woff"), url("http://i.s-microsoft.com/fonts/segoe-ui/west-european/normal/latest.ttf") format("truetype"), url("http://i.s-\amicrosoft.com/fonts/segoe-ui/west-european/normal/latest.svg#web") format("svg");
+  font-weight: normal;
+  font-style: normal; }
 html {
   overflow: hidden; }
 
 body {
   font-family: "Source Sans Pro", "Helvetica Neue", Helvetica, Arial, sans-serif; }
+
+body.skin-Microsoft {
+  font-family: 'wf_segoe-ui_normal', 'Segoe UI', Tahoma, Arial, sans-serif; }
+  body.skin-Microsoft button.btn {
+    border-radius: 0;
+    -webkit-box-shadow: none;
+    box-shadow: none;
+    background-image: none; }
+  body.skin-Microsoft .input-group-addon {
+    border-radius: 0; }
+  body.skin-Microsoft input {
+    border-radius: 0; }
+  body.skin-Microsoft .progress {
+    border-radius: 0;
+    -webkit-box-shadow: none;
+    box-shadow: none; }
+    body.skin-Microsoft .progress .progress-bar-warning {
+      background-image: none;
+      -webkit-box-shadow: none;
+      box-shadow: none; }
+  body.skin-Microsoft .search-results {
+    background-color: white; }
+    body.skin-Microsoft .search-results .row {
+      background-color: #CD4800; }
+    body.skin-Microsoft .search-results .search-result-list .selected {
+      background-color: #3B6DCB; }
+      body.skin-Microsoft .search-results .search-result-list .selected p {
+        color: white; }
+  body.skin-Microsoft .btn-info {
+    background-color: #4F9CF6; }
 
 .col-xs-0 {
   float: left;
@@ -65,17 +101,15 @@ body {
   */
   position: relative; }
 
-.iframe-holder {
-  /*
-  height: auto;
-  overflow: hidden;
-  */ }
-  .iframe-holder > div {
-    max-width: 1024px;
-    margin: 0 auto;
-    background-color: white; }
-  .iframe-holder iframe {
-    width: 100%; }
+.iframe-holder > div {
+  max-width: 1024px;
+  margin: 0 auto;
+  background-color: white; }
+.iframe-holder iframe {
+  width: 100%; }
+
+body.skin-Microsoft .iframe-holder > div {
+  max-width: 65rem; }
 
 #video {
   padding: 0;
@@ -326,7 +360,7 @@ ul.toc-holder {
 
 #show-menu-button {
   padding: 6px 12px;
-  background-color: #2aabd2; }
+  background-color: #337ab7; }
 
 #resource-toggler {
   margin: 8px 8px 0 0; }
@@ -433,15 +467,25 @@ span.completed {
   background: #e5f2f7;
   text-decoration: none;
   text-transform: none;
-  padding: 20px;
+  padding: 20px 3em 20px 20px;
   border-radius: 3px;
   border-bottom: 3px solid #007db6;
   background-position: right 13.3333px top 50%;
   background-size: auto 1.5em;
   background-repeat: no-repeat;
-  background-image: url(images/icon-arrow-black.svg); }
+  background-image: url(images/icon-arrow-black.svg);
+  font-size: 14px; }
+  .button-a.header-prev-button {
+    background-position: left 13.3333px top 50%;
+    background-image: url(images/icon-arrow-black-back.svg);
+    padding-left: 4em; }
   .button-a:hover {
     background: #A2D1E7; }
+  .button-a h4 {
+    margin-top: initial;
+    margin-bottom: initial;
+    font-weight: bold;
+    font-family: inherit; }
 
 .habitat-body {
   font-family: 'Source Sans Pro', sans-serif; }
@@ -478,9 +522,12 @@ span.completed {
   .habitat-body .sidebar-g .title, .habitat-body .sidebar-r .title {
     font-size: 150%;
     margin-bottom: 1em; }
-  .habitat-body div.image img {
+  .habitat-body:not(.skin-Microsoft) div.image img {
     max-width: 50%;
     max-height: 50%; }
+
+.habitat-body.skin-Microsoft .button-a {
+  width: auto; }
 
 .image_popup {
   display: flex;
