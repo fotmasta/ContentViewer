@@ -11,7 +11,7 @@ $blue-color: #719db7;
 $quiz-color: #569E39;
 $button-blue: #337ab7;
 
-html {
+html.ui {
 	overflow: hidden;
 }
 
@@ -173,14 +173,20 @@ body.skin-Microsoft {
 }
 
 .iframe-holder {
-	& > div {
+	height: 100%;
+
+	& > div.the-iframe-holder {
 		max-width: 1024px;
 		margin: 0 auto;
 		background-color: white;
+		height: 100%;
+		-webkit-overflow-scrolling: touch;
+		overflow-y: scroll;
 	}
 
 	iframe {
 		width: 100%;
+		height: 100%;
 	}
 }
 
@@ -197,7 +203,7 @@ body.skin-Microsoft .iframe-holder {
 	
 	background-color: #E5F0F1; //$video-background-color;
 
-	overflow: auto;
+	overflow: hidden;
 	-webkit-overflow-scrolling: touch;
 
 	.overlay {

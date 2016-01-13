@@ -30,6 +30,14 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 	}
 
 	function URLWithoutHash (url) {
+		if (url === undefined) return url;
+
+		// eliminate relative path notations
+		url = url.replace(/^\.\.\//, "");
+
+		// change Habitat's .xhtml to .html
+		url = url.replace(/\.xhtml/, ".html");
+
 		if (url) {
 			if (url.lastIndexOf) {
 
@@ -56,20 +64,14 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 		var visible = [];
 		var $iframe = $(iframe);
 
+		var h = $(window).height();
+
 		for (var i = 0; i < elements.length; i++) {
 			var elem = elements[i];
-			var $window = $(window);
-			var viewport_top = 0;//$window.scrollTop() + $("#video").scrollTop();
-			var viewport_height = $window.height();
-			var viewport_bottom = viewport_top + viewport_height;
-			var $elem = $(elem);
-			var top = $elem.offset().top + $iframe.offset().top;
-			var height = $elem.height();
-			var bottom = top + height;
-
-			if ((top >= viewport_top && top < viewport_bottom) ||
-				(bottom > viewport_top && bottom <= viewport_bottom) ||
-				(height > viewport_height && top <= viewport_top && bottom >= viewport_bottom)) {
+			var rect = elem.getBoundingClientRect();
+			if ( (rect.top >= 0 && rect.top <= h) ||
+				(rect.bottom >= 0 && rect.bottom <= h) ||
+				(rect.height >= h && rect.top <= h && rect.bottom >= h)) {
 				visible.push(elem);
 			}
 		}
@@ -137,6 +139,12 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 		};
 	}
 
+	function decodeEntities (encodedString) {
+		var textArea = document.createElement('textarea');
+		textArea.innerHTML = encodedString;
+		return textArea.value;
+	}
+
 	$.widget("que.VideoManager", {
 		_create: function () {
 			this.initialize(this.options.toc, this.options.el, this.options.player, this.options.markers, this.options.options);
@@ -153,7 +161,7 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 			if (options.title)
 				document.title = options.title;
 
-			Database.initialize(toc);
+			Database.initialize(toc, options.title);
 			$(".toc").TOCTree("setStatus", Database.getItems());
 
 			this.updateProgress();
@@ -183,9 +191,6 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 			this.player.on("loadedmetadata", $.proxy(this.onLoadedMetadata, this));
 
 			$(".toc").on("playvideo", onPlayContent).on("closesearch", $.proxy(this.onCloseSearch, this));
-
-			// don't call this function with EVERY scroll
-			$("#video").scroll(throttle($.proxy(this.onScrollContent), 5000, this));
 
 			$(".toc").on("downloadvideo", $.proxy(this.onDownloadVideo, this));
 
@@ -283,7 +288,7 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 			// check for link from query parameter
 			var link = getParameterByName(loc, "link");
 			if (link) {
-				this.playFromTOC(link, {pause: true, history: false});
+				this.playFromTOC(link, {pause: true, history: false, time: this.getCurrentVideoTime()});
 				return true;
 			}
 			return false;
@@ -461,12 +466,12 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 			}
 
 			if (immediate) {
-				$("#video").scrollTop(dest);
+				iframe.contents().find("body").scrollTop(dest);
 			} else {
 				// this should stop it from overriding the scroll-to-hash that comes next with an actual hash
 				if (dest != 0)
 					this.busyScrolling = true;
-					$("#video").stop().animate({scrollTop: dest}, {
+					iframe.contents().find("body").stop().animate({scrollTop: dest}, {
 						duration: 1000,
 						complete: $.proxy(this.onDoneScrolling, this)
 					});
@@ -1058,7 +1063,8 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 						// THEORY: look for matching header text in this src file only
 						// WARNING: Habitat compatibility
 						var thisSrc = URLPageOnly(URLWithoutHash(me.toc[j].src));
-						if (me.toc[j].desc == t && curSrc == thisSrc) {
+						var desc = decodeEntities(me.toc[j].desc);
+						if (desc == t && curSrc == thisSrc) {
 							foundindex = j;
 							break;
 						}
@@ -1130,15 +1136,13 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 					history.pushState(null, null, "?link=" + newIndex);
 				}
 
-				if (this.options.infinite_scrolling != false) {
+				if (this.options.infinite_scrolling === true) {
 					this.checkForAutoAdvance();
 				}
 			}
 		},
 
 		syncTOCToContent: function (index) {
-			console.log("sync");
-
 			if (index == undefined)
 				index = this.findCurrentItem();
 

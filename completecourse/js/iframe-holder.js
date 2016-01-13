@@ -41,7 +41,7 @@ define(["bootstrap-dialog", "imagesloaded", "jquery.ui"], function (BootstrapDia
 		options: {},
 
 		_create: function () {
-			this.element.attr("data-index", this.options.index);
+			this.element.addClass("the-iframe-holder").attr("data-index", this.options.index);
 
 			var src = URLWithoutHash(this.options.src);
 
@@ -63,19 +63,7 @@ define(["bootstrap-dialog", "imagesloaded", "jquery.ui"], function (BootstrapDia
 
 			this.iframe.hide(0);
 
-			this.iframe.attr("src", src).css("height", "auto");
-		},
-
-		sizeToFitToBottom: function () {
-			var bottomb = this.iframe.contents().find(".button-a#next-button");
-			var h;
-			if (bottomb.length) {
-				h = Math.round(bottomb.offset().top + bottomb.outerHeight());
-			} else {
-				h = this.iframe.contents().find("body").outerHeight();
-			}
-
-			this.iframe.height(h);
+			this.iframe.attr("src", src);
 		},
 
 		onLoaded: function ()  {
@@ -88,6 +76,8 @@ define(["bootstrap-dialog", "imagesloaded", "jquery.ui"], function (BootstrapDia
 
 			this.overrideLinks();
 
+			this.iframe.contents().scroll($.proxy(this.onScrollIframe, this));
+
 			var me = this;
 
 			switch (this.options.type) {
@@ -95,7 +85,7 @@ define(["bootstrap-dialog", "imagesloaded", "jquery.ui"], function (BootstrapDia
 					this.element.show(0);
 
 					var wh = $(window).outerHeight();
-					this.iframe.css("min-height", wh);
+					//this.iframe.css("min-height", wh);
 
 					this.iframe.removeClass("fadeIn animated").hide(0);
 					this.iframe.addClass("fadeIn animated").show(0);
@@ -120,22 +110,7 @@ define(["bootstrap-dialog", "imagesloaded", "jquery.ui"], function (BootstrapDia
 				default:    // epub, habitat
 					imagesLoaded(this.iframe.contents().find("body"), $.proxy(this.onIframeContentsLoaded, this));
 
-					$(this.iframe[0].contentWindow).off("resize");
-
-					// THEORY: account for the iframe resizing
-					$(this.iframe[0].contentWindow).on("resize", $.proxy(this.sizeToFitToBottom, this));
-
-					// THEORY: account for the iframe's Inkling widgets resizing themselves
-					this.iframe[0].contentWindow.addEventListener("message", $.proxy(this.receiveMessage, this));
-
 					break;
-			}
-		},
-
-		receiveMessage: function (event) {
-			// Inkling widget resize event
-			if (event.data && event.data.type && event.data.type == "size") {
-				this.sizeToFitToBottom();
 			}
 		},
 
@@ -151,17 +126,6 @@ define(["bootstrap-dialog", "imagesloaded", "jquery.ui"], function (BootstrapDia
 				if (xs) {
 					me.iframe.contents().find(".habitat-body").addClass("xs");
 				}
-
-				//var h = me.iframe.contents()[0].body.scrollHeight;
-
-				// turn off scrolling on the iframe's content
-				// NOTE: I was tempted to comment this out for ePub content from CodeMantra to allow the scroll thumb to appear (but the disappearing thumb could be a Mac/Chrome thing)
-				me.iframe.contents().find("html").css("overflow", "hidden");
-
-				//me.iframe.height(h);
-
-				//me.iframe.scrollTop(1).scrollTop(0);
-				me.sizeToFitToBottom();
 
 				me.highlight(me.options.highlight);
 
@@ -351,6 +315,11 @@ define(["bootstrap-dialog", "imagesloaded", "jquery.ui"], function (BootstrapDia
 					});
 				});
 			});
+		},
+
+		onScrollIframe: function (event) {
+			if (this.options.manager)
+				this.options.manager.onScrollContent();
 		}
 	});
 });

@@ -1,4 +1,4 @@
-// TODO: syncTOCToContent takes a LONG time on some titles (like the Adobe Illustrator CIB 9780134382548)
+// TODO: quizzerator: save quiz correct answers (ie, complete)
 // TODO: remediation links to TOC entries in Web Edition
 // TODO: make sure quiz responses get saved in a unique location for Web Editions (within the Database item, perhaps?)
 // TODO: when comments are visible, reduce margin-left of iframe-holder's child div to 0 and size comment panel to fit remaining area (with min-width)
@@ -139,3 +139,10 @@
 // DONE: "check all" button? (make it appear after 1/2 second)
 // DONE: remediation / hint when incorrect response is checked
 // DONE: save responses
+// DONE: syncTOCToContent needs to be reworked for new scrolling
+// DONE: syncTOCToContent takes a LONG time on some titles (like the Adobe Illustrator CIB 9780134382548)
+// DONE: scrolling to links doesn't work now
+// DONE: test all versions with new iframe scrolling logic
+// DONE: links within Illustrator CIB do not work (link paths had relative path shortcuts and .xhtml)
+// DONE: eliminate sizeToFitToBottom()
+// DONE: sections with ampersands (&) in them do not get marked complete

@@ -1,4 +1,6 @@
-define(["jquery.ui", "bootstrap", "jquery.json"], function () {
+// TODO: video height needs to be window height; html needs to be window height (or 100%) and overflow: auto
+
+define(["../../../js/database", "jquery.ui", "bootstrap", "jquery.json"], function () {
 
 	$.widget("que.quizzerator", {
 		options: {},
@@ -6,23 +8,27 @@ define(["jquery.ui", "bootstrap", "jquery.json"], function () {
 		_create: function () {
 			$.getJSON("quiz1.json", $.proxy(this.onLoadedData, this));
 
-			var summary = $("<div>", { class: "summary" });
-			var container = $("<div>", { class: "holder" });
+			var summary = $("<div>", {class: "summary"});
+			var container = $("<div>", {class: "holder"});
 			summary.append(container);
 			container.append($("<h3>Score:</h3>"));
 			var t = $("<table><tr><td>Correct</td><td id='correct-count'></td></tr><tr><td>Incorrect</td><td id='incorrect-count'></td></tr><tr class='total'><td>Remaining</td><td id='remaining-count'></td></tr></table>");
 			t.addClass("results");
 			container.append(t);
-			var btn = $("<button>", { id: "check-all", class: "btn btn-success btn-sm center-block shrunk", text: "Check All" });
+			var btn = $("<button>", {
+				id: "check-all",
+				class: "btn btn-success btn-sm center-block shrunk",
+				text: "Check All"
+			});
 			btn.click($.proxy(this.onClickCheckAll, this));
 			container.append(btn);
 
 			this.element.append(summary);
 
-			var ol = $("<ol>", { class: "quiz-holder" });
+			var ol = $("<ol>", {class: "quiz-holder"});
 			this.element.append(ol);
 
-			summary.affix({ offset: { top: summary.offset().top } });
+			summary.affix({offset: {top: summary.offset().top}});
 		},
 
 		onLoadedData: function (data) {
@@ -41,12 +47,12 @@ define(["jquery.ui", "bootstrap", "jquery.json"], function () {
 		},
 
 		addQuestion: function (q_params) {
-			var q = $("<li>", { class: "question" });
+			var q = $("<li>", {class: "question"});
 
-			var p_question = $("<p>", { text: q_params.q });
+			var p_question = $("<p>", {text: q_params.q});
 			q.append(p_question);
 
-			var answers = $("<ol>", { class: "answers-holder" });
+			var answers = $("<ol>", {class: "answers-holder"});
 			q.append(answers);
 
 			for (var each in q_params.answers) {
@@ -60,16 +66,16 @@ define(["jquery.ui", "bootstrap", "jquery.json"], function () {
 
 				var li = $("<li>");
 
-				var icons = $("<div>", { class: "icons" });
+				var icons = $("<div>", {class: "icons"});
 				li.append(icons);
 
-				var icon_correct = $("<i>", { class: "icon correct fa fa-2x fa-thumbs-o-up hidden" });
+				var icon_correct = $("<i>", {class: "icon correct fa fa-2x fa-thumbs-o-up hidden"});
 				icons.append(icon_correct);
 
-				var icon_incorrect = $("<i>", { class: "icon incorrect fa fa-2x fa-thumbs-o-down hidden" });
+				var icon_incorrect = $("<i>", {class: "icon incorrect fa fa-2x fa-thumbs-o-down hidden"});
 				icons.append(icon_incorrect);
 
-				var p = $("<p>", { class: "response", html: answer });
+				var p = $("<p>", {class: "response", html: answer});
 				if (isCorrect) p.attr("data-correct", true);
 
 				p.click($.proxy(this.onClickAnswer, this));
@@ -79,13 +85,13 @@ define(["jquery.ui", "bootstrap", "jquery.json"], function () {
 
 			}
 
-			var checker = $("<div>", { class: "checker inactive" }).appendTo(q);
-			var btn = $("<button>", { class: "btn btn-primary", text: "Check Answer" });
+			var checker = $("<div>", {class: "checker inactive"}).appendTo(q);
+			var btn = $("<button>", {class: "btn btn-primary", text: "Check Answer"});
 			btn.click($.proxy(this.onClickCheck, this));
 			btn.appendTo(checker);
 
-			var hint = $("<p>", { class: "hint", html: "<i class='fa fa-bookmark text-danger'></i> Hint: " });
-			var link = $("<a>", { href: q_params.hint, text: q_params.hint });
+			var hint = $("<p>", {class: "hint", html: "<i class='fa fa-bookmark text-danger'></i> Hint: "});
+			var link = $("<a>", {href: q_params.hint, text: q_params.hint});
 			hint.append(link);
 			checker.append(hint);
 
@@ -111,7 +117,7 @@ define(["jquery.ui", "bootstrap", "jquery.json"], function () {
 				response.addClass("selected");
 				q.find(".checker").removeClass("inactive animated fadeOut").addClass("animated fadeInLeft").find("button").removeClass("btn-danger").addClass("btn-primary").text("Check Answer");
 			} else {
-				q.find(".checker").addClass("animated fadeOut").animate( { _nothing: 0 }, 1000, $.proxy(me.resetButton, me, q));
+				q.find(".checker").addClass("animated fadeOut").animate({_nothing: 0}, 1000, $.proxy(me.resetButton, me, q));
 			}
 
 			q.find(".icon").addClass("hidden");
@@ -123,6 +129,8 @@ define(["jquery.ui", "bootstrap", "jquery.json"], function () {
 			this.adjustSummarySize();
 
 			this.saveResponses();
+
+			this.dispatchResizeNotice();
 		},
 
 		resetButton: function (question) {
@@ -181,6 +189,8 @@ define(["jquery.ui", "bootstrap", "jquery.json"], function () {
 			}
 
 			this.updateScore();
+
+			this.dispatchResizeNotice();
 		},
 
 		onClickCheckAll: function (event) {
@@ -237,12 +247,18 @@ define(["jquery.ui", "bootstrap", "jquery.json"], function () {
 				responses.push(index);
 			}
 
-			var obj = { responses: responses };
+			var obj = {responses: responses};
 			var to_json = $.toJSON(obj);
 
 			var key = this.data.id;
 
 			localStorage.setItem(key, to_json)
+		},
+
+		dispatchResizeNotice: function () {
+			// tell the iframe-holder we need to resize
+			var event = new Event('resize');
+			window.dispatchEvent(event);
 		}
 	});
 

@@ -1,15 +1,26 @@
 define(["jquery.json"], function () {
 
+	function makeKey (s) {
+		s = s.toLowerCase();
+		s = s.replace(/\s/g, "_");
+
+		return s;
+	}
+
 	var Database = {
 
 		items: [],
 		currentIndex: undefined,
 
-		initialize: function (toc) {
-			// NOTE: store our app data in a key named for the folder this content came from (ie, test_my_google_apps)
+		initialize: function (toc, title) {
+			if (title === undefined) {
+				// NOTE: store our app data in a key named for the folder this content came from (ie, test_my_google_apps)
 
-			var paths = window.location.pathname.split("/");
-			this.folder = paths[paths.length - 2];
+				var paths = window.location.pathname.split("/");
+				title = paths[paths.length - 2];
+			}
+
+			this.folder = makeKey(title);
 
 			this.items = new Array(toc.length);
 			for (var i = 0; i < this.items.length; i++) {
@@ -39,6 +50,10 @@ define(["jquery.json"], function () {
 		},
 
 		setItemProperty: function (index, property, value) {
+			if (index >= this.items.length) {
+				this.items[index] = {};
+			}
+
 			this.items[index][property] = value;
 
 			this.saveToLocalStorage();
@@ -63,6 +78,10 @@ define(["jquery.json"], function () {
 		},
 
 		saveCurrentTime: function (time) {
+			if (this.currentIndex >= this.items.length) {
+				this.items[index] = {};
+			}
+
 			this.items[this.currentIndex].time = time;
 
 			this.saveToLocalStorage();

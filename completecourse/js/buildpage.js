@@ -488,6 +488,8 @@ define(["jquery", "handlebars", "text!viewer_template.html", "video-manager", "v
 			var context = { title: options.title };
 			var html = template(context);
 
+			$("html").addClass("ui");
+
 			$("body").append($(html));
 
 			addLinkToCSS(baseURL + "css/bootstrap.min.css");

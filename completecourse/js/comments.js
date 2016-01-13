@@ -271,7 +271,7 @@ define(["jquery.ui", "firebase"], function () {
 				iframe = this.last_iframe;
 
 			// if it's an epub, find the comment on the page
-			if (iframe) {
+			if (iframe && iframe.remove) {
 				iframe.remove(".comment-anchor");
 
 				for (var i = 0; i < this.comments.length; i++) {
