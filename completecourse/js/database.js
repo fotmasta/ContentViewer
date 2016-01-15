@@ -38,11 +38,12 @@ define(["jquery.json"], function () {
 
 				this.items = db.items;
 				this.currentIndex = db.index;
+				this.titleProperty = db.titleProperty;
 			}
 		},
 
 		saveToLocalStorage: function () {
-			var db = { items: this.items, index: this.currentIndex };
+			var db = { items: this.items, index: this.currentIndex, titleProperty: this.titleProperty };
 
 			var to_json = $.toJSON(db);
 
@@ -105,7 +106,26 @@ define(["jquery.json"], function () {
 					completed++;
 			}
 			return (completed / this.items.length);
+		},
+
+		getTitleProperty: function (key) {
+			if (this.titleProperty === undefined) {
+				this.titleProperty = {};
+			}
+
+			return this.titleProperty[key];
+		},
+
+		setTitleProperty: function (key, val) {
+			if (this.titleProperty === undefined) {
+				this.titleProperty = {};
+			}
+
+			this.titleProperty[key] = val;
+
+			this.saveToLocalStorage();
 		}
+
 	};
 
 	return Database;

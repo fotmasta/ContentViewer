@@ -1,4 +1,4 @@
-define(["bootstrap-dialog", "imagesloaded", "jquery.ui"], function (BootstrapDialog, imagesLoaded) {
+define(["bootstrap-dialog", "imagesloaded", "database", "jquery.ui"], function (BootstrapDialog, imagesLoaded, Database) {
 
 	function URLWithoutPage (url) {
 		var n = url.lastIndexOf("/");
@@ -31,10 +31,40 @@ define(["bootstrap-dialog", "imagesloaded", "jquery.ui"], function (BootstrapDia
 		}
 	}
 
+	function getCodePath () {
+		var path;
+
+		if (window.location.hostname == "localhost") {
+			path = getAbsolutePath() + "/../completecourse/";
+		} else {
+			if (window.getInformITBaseURL != undefined)
+				path = getInformITBaseURL();
+			else
+				path = "https://s3.amazonaws.com/storefronts/streaming-video/completecourse/";
+		}
+
+		return path;
+	}
+
 	function getAbsolutePath () {
 		var loc = window.location;
 		var pathName = loc.pathname.substring(0, loc.pathname.lastIndexOf('/'));
 		return loc.origin + pathName;
+	}
+
+	function ParseIfWidget (src) {
+		var regex = /^\[.*\]/;
+		if (regex.test(src)) {
+			var params = /^\[(.*),(.*)\]/;
+			var match = src.match(params);
+			if (match.length) {
+				// the data for this widget comes from the project's path
+				var adjustedPath = getCodePath() + match[1].trim() + "?" + getAbsolutePath() + "/" + match[2].trim();
+				return adjustedPath;
+			}
+			return src;
+		} else
+			return src;
 	}
 
 	$.widget("que.iFrameHolder", {
@@ -45,6 +75,9 @@ define(["bootstrap-dialog", "imagesloaded", "jquery.ui"], function (BootstrapDia
 
 			var src = URLWithoutHash(this.options.src);
 
+			// if this is a widget, get it from the code path
+			src = ParseIfWidget(src);
+
 			this.iframe = $("<iframe>", { src: src, frameborder: 0, "allowfullscreen": true });
 
 			this.element.css("display", "none");
@@ -52,14 +85,15 @@ define(["bootstrap-dialog", "imagesloaded", "jquery.ui"], function (BootstrapDia
 			this.iframe.load($.proxy(this.onLoaded, this));
 
 			this.element.append(this.iframe);
-
-			//this.addStylesheet();
 		},
 
 		loadNewContent: function (options) {
 			this.options = options;
 
 			var src = URLWithoutHash(this.options.src);
+
+			// if this is a widget, get it from the code path
+			src = ParseIfWidget(src);
 
 			this.iframe.hide(0);
 
@@ -75,6 +109,8 @@ define(["bootstrap-dialog", "imagesloaded", "jquery.ui"], function (BootstrapDia
 			}
 
 			this.overrideLinks();
+
+			this.iframe[0].contentWindow.addEventListener("message", $.proxy(this.onIframeMessage, this));
 
 			this.iframe.contents().scroll($.proxy(this.onScrollIframe, this));
 
@@ -151,13 +187,7 @@ define(["bootstrap-dialog", "imagesloaded", "jquery.ui"], function (BootstrapDia
 		},
 
 		addStylesheet: function () {
-			var path;
-
-			if (window.location.hostname == "localhost") {
-				path = getAbsolutePath() + "/../completecourse/";
-			} else {
-				path = getInformITBaseURL();
-			}
+			var path = getCodePath();
 
 			// add our own stylesheet for additional styles
 			var $head = this.iframe.contents().find("head");
@@ -320,6 +350,38 @@ define(["bootstrap-dialog", "imagesloaded", "jquery.ui"], function (BootstrapDia
 		onScrollIframe: function (event) {
 			if (this.options.manager)
 				this.options.manager.onScrollContent();
+		},
+
+		returnHumanReadableTOCNames: function (sourceWindow, list) {
+			var newList = this.options.manager.getTOCNames(list);
+
+			sourceWindow.postMessage({ type: "convertedTOC", list: newList }, "*");
+		},
+
+		onIframeMessage: function (event) {
+			if (event.source != window) {
+				switch (event.data.type) {
+					case "getProperty":
+						var db = this.options.manager.getDatabase();
+
+						var data = db.getTitleProperty(event.data.key);
+
+						event.source.postMessage({ type: "getProperty", key: event.data.key, value: data }, "*");
+						break;
+					case "setProperty":
+						var db = this.options.manager.getDatabase();
+
+						var data = db.setTitleProperty(event.data.key, event.data.value);
+
+						break;
+					case "overrideLinks":
+						this.overrideLinks();
+						break;
+					case "getTOCNames":
+						this.returnHumanReadableTOCNames(event.source, event.data.list);
+						break;
+				}
+			}
 		}
 	});
 });

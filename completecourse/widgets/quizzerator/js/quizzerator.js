@@ -1,12 +1,25 @@
 // TODO: video height needs to be window height; html needs to be window height (or 100%) and overflow: auto
 
-define(["../../../js/database", "jquery.ui", "bootstrap", "jquery.json"], function () {
+define(["jquery.ui", "bootstrap", "jquery.json"], function (VideoManager) {
 
 	$.widget("que.quizzerator", {
 		options: {},
 
 		_create: function () {
-			$.getJSON("quiz1.json", $.proxy(this.onLoadedData, this));
+			var quizFile = window.location.search.substr(1);
+
+			this.id = "quiz_id";
+
+			// use filename for quiz id
+			var regex = /([^\/]+)(\.json)$/;
+			match = quizFile.match(regex);
+			if (match.length) {
+				this.id = match[1];
+			} else {
+				this.id = quizFile;
+			}
+
+			$.getJSON(quizFile, $.proxy(this.onLoadedData, this));
 
 			var summary = $("<div>", {class: "summary"});
 			var container = $("<div>", {class: "holder"});
@@ -29,15 +42,30 @@ define(["../../../js/database", "jquery.ui", "bootstrap", "jquery.json"], functi
 			this.element.append(ol);
 
 			summary.affix({offset: {top: summary.offset().top}});
+
+			window.addEventListener("message", $.proxy(this.onWindowMessage, this));
 		},
 
 		onLoadedData: function (data) {
 			this.data = data;
 
+			// id can also come from json data
+			if (this.data.id) {
+				this.id = this.data.id;
+			}
+
+			if (this.data.title) {
+				this.element.find("h3.quiz-title").text(this.data.title);
+			}
+
 			for (var each in data.questions) {
 				var q = data.questions[each];
 				this.addQuestion(q);
 			}
+
+			this.notifyParentFrame({ type: "overrideLinks" });
+
+			this.convertHintLinksToHumanReadable();
 
 			this.loadResponses();
 
@@ -90,10 +118,12 @@ define(["../../../js/database", "jquery.ui", "bootstrap", "jquery.json"], functi
 			btn.click($.proxy(this.onClickCheck, this));
 			btn.appendTo(checker);
 
-			var hint = $("<p>", {class: "hint", html: "<i class='fa fa-bookmark text-danger'></i> Hint: "});
-			var link = $("<a>", {href: q_params.hint, text: q_params.hint});
-			hint.append(link);
-			checker.append(hint);
+			if (q_params.hint) {
+				var hint = $("<p>", {class: "hint", html: "<i class='fa fa-bookmark text-danger'></i> Hint: "});
+				var link = $("<a>", {href: q_params.hint, text: q_params.hint});
+				hint.append(link);
+				checker.append(hint);
+			}
 
 			this.element.find(".quiz-holder").append(q);
 		},
@@ -104,7 +134,7 @@ define(["../../../js/database", "jquery.ui", "bootstrap", "jquery.json"], functi
 			this.clickResponse(el);
 		},
 
-		clickResponse: function (response) {
+		clickResponse: function (response, alsoCheck) {
 			var q = $(response).parents(".question");
 
 			var alreadySelected = response.hasClass("selected");
@@ -124,13 +154,15 @@ define(["../../../js/database", "jquery.ui", "bootstrap", "jquery.json"], functi
 
 			q.attr("data-correct", null);
 
+			if (alsoCheck) {
+				this.checkQuestion(q, false);
+			}
+
 			this.updateScore();
 
 			this.adjustSummarySize();
 
 			this.saveResponses();
-
-			this.dispatchResizeNotice();
 		},
 
 		resetButton: function (question) {
@@ -165,7 +197,7 @@ define(["../../../js/database", "jquery.ui", "bootstrap", "jquery.json"], functi
 			this.checkQuestion(q);
 		},
 
-		checkQuestion: function (q) {
+		checkQuestion: function (q, animate) {
 			q.find(".icon").addClass("hidden");
 
 			var correctAnswer = q.find(".response[data-correct=true]");
@@ -173,14 +205,27 @@ define(["../../../js/database", "jquery.ui", "bootstrap", "jquery.json"], functi
 
 			if (correctAnswer.is(chosenAnswer)) {
 				chosenAnswer.parent("li").find(".correct").removeClass("hidden");
-				chosenAnswer.parent("li").find(".icons").removeClass("hidden animated").hide(0).addClass("animated rollIn").show(0);
-				q.find(".checker button").text("That's Correct!").removeClass("btn-primary btn-danger").addClass("btn-success");
+				if (animate != false) {
+					chosenAnswer.parent("li").find(".icons").removeClass("hidden animated").hide(0).addClass("animated rollIn").show(0);
+					q.find(".checker button").text("That's Correct!").removeClass("btn-primary btn-danger").addClass("btn-success animated fadeInLeft");
+				} else {
+					chosenAnswer.parent("li").find(".icons").removeClass("hidden animated").show(0);
+					q.find(".checker button").text("That's Correct!").removeClass("btn-primary btn-danger").addClass("btn-success");
+					q.find(".checker").removeClass("animated");
+				}
 
 				q.attr("data-correct", true);
 			} else {
 				chosenAnswer.parent("li").find(".incorrect").removeClass("hidden");
-				chosenAnswer.parent("li").find(".icons").removeClass("hidden animated").hide(0).addClass("animated rollIn").show(0);
-				q.find(".checker button").text("That's Not Correct! Try Again?").removeClass("btn-primary").addClass("btn-danger");
+				if (animate != false) {
+					chosenAnswer.parent("li").find(".icons").removeClass("hidden animated").hide(0).addClass("animated rollIn").show(0);
+					q.find(".checker button").text("That's Not Correct! Try Again?").removeClass("btn-primary").addClass("btn-danger animated fadeInLeft");
+				} else {
+					chosenAnswer.parent("li").find(".icons").removeClass("hidden animated").show(0);
+					q.find(".checker button").text("That's Not Correct! Try Again?").removeClass("btn-primary").addClass("btn-danger");
+					q.find(".checker").removeClass("animated");
+				}
+
 				q.find(".checker").removeClass("inactive");
 
 				q.attr("data-correct", false);
@@ -189,8 +234,6 @@ define(["../../../js/database", "jquery.ui", "bootstrap", "jquery.json"], functi
 			}
 
 			this.updateScore();
-
-			this.dispatchResizeNotice();
 		},
 
 		onClickCheckAll: function (event) {
@@ -214,11 +257,12 @@ define(["../../../js/database", "jquery.ui", "bootstrap", "jquery.json"], functi
 		},
 
 		loadResponses: function () {
-			var key = this.data.id;
+			this.notifyParentFrame({ type: "getProperty", key: this.id });
+		},
 
-			var item = localStorage.getItem(key);
-			if (item) {
-				var obj = $.evalJSON(item);
+		loadResponsesCallback: function (quizData) {
+			if (quizData) {
+				var obj = $.evalJSON(quizData);
 
 				for (var i = 0; i < obj.responses.length; i++) {
 					var resp = obj.responses[i];
@@ -227,12 +271,11 @@ define(["../../../js/database", "jquery.ui", "bootstrap", "jquery.json"], functi
 						if (q.length) {
 							var r = q.find(".response").eq(resp);
 							if (r.length)
-								this.clickResponse(r);
+								this.clickResponse(r, true);
 						}
 					}
 				}
 			}
-
 		},
 
 		saveResponses: function () {
@@ -250,15 +293,55 @@ define(["../../../js/database", "jquery.ui", "bootstrap", "jquery.json"], functi
 			var obj = {responses: responses};
 			var to_json = $.toJSON(obj);
 
-			var key = this.data.id;
-
-			localStorage.setItem(key, to_json)
+			this.notifyParentFrame({ type: "setProperty", key: this.id, value: to_json });
 		},
 
-		dispatchResizeNotice: function () {
-			// tell the iframe-holder we need to resize
-			var event = new Event('resize');
-			window.dispatchEvent(event);
+		onWindowMessage: function (event) {
+			if (event.source != window) {
+				switch (event.data.type) {
+					case "getProperty":
+						if (event.data.key == this.id) {
+							this.loadResponsesCallback(event.data.value);
+						}
+						break;
+					case "convertedTOC":
+						this.convertHintLinksCallback(event.data.list);
+						break;
+				}
+			}
+		},
+
+		notifyParentFrame: function (msg) {
+			window.postMessage(msg, "*");
+		},
+
+		convertHintLinksToHumanReadable: function () {
+			var hints = [];
+
+			var questions = this.element.find(".question");
+			for (var i = 0; i < questions.length; i++) {
+				var q = questions.eq(i);
+				var hint = q.find(".hint a");
+				if (hint.length) {
+					var href = hint.attr("href");
+					if (href) {
+						hints.push({index: i, href: href});
+					}
+				}
+			}
+
+			this.notifyParentFrame({ type: "getTOCNames", list: hints });
+		},
+
+		convertHintLinksCallback: function (list) {
+			var questions = this.element.find(".question");
+
+			for (var i = 0; i < list.length; i++) {
+				var entry = list[i];
+
+				var q = questions.eq(entry.index);
+				q.find(".hint a").text(entry.title);
+			}
 		}
 	});
 

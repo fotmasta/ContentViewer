@@ -11,11 +11,11 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 		if (hours < 10) { hours   = "0" + hours; }
 		if (minutes < 10) { minutes = "0" + minutes; }
 		if (seconds < 10) { seconds = "0" + seconds; }
-		
+
 		var time = (hours == "00" ? "" : hours + ":")
 			+ (minutes == "00" && hours == "00" ? "" : minutes)
 			+ ":" + seconds;
-		
+
 		return time;
 	};
 
@@ -400,10 +400,17 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 			if (this_href) {
 				// try to find where this internal link is in the toc and go there
 				for (var i = 0; i < this.toc.length; i++) {
+					// check epub content
 					var other_href = URLWithoutHash(this.toc[i].src);
-					if (other_href.indexOf(this_href) != -1) {
+					if (other_href && other_href.indexOf(this_href) != -1) {
 						var hash = VideoManager.HashInURL(href);
 						this.playFromTOC(i, {hash: hash});
+						break;
+					}
+					// check video content
+					other_href = URLWithoutHash(this.toc[i].video);
+					if (other_href && other_href.indexOf(this_href) != -1) {
+						this.playFromTOC(i, {});
 						break;
 					}
 				}
@@ -420,21 +427,48 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 			if (this_href) {
 				// try to find where this internal link is in the toc and go there
 				for (var i = 0; i < this.toc.length; i++) {
+					// check epub content
 					var other_href = URLWithoutHash(this.toc[i].src);
-					if (other_href.indexOf(this_href) != -1) {
+					if (other_href && other_href.indexOf(this_href) != -1) {
+						return true;
+					}
+					// check video content
+					other_href = URLWithoutHash(this.toc[i].video);
+					if (other_href && other_href.indexOf(this_href) != -1) {
 						return true;
 					}
 				}
-			} else {
-				// is it in the DOM?
-				debugger;
-
-				var iframe = $("iframe").eq(0);
-
-				this.scrollToHash(iframe, {hash: href}, false);
 			}
 
 			return false;
+		},
+
+		getTOCNames: function (list) {
+			for (var j = 0; j < list.length; j++) {
+				var this_href = list[j].href;
+
+				var title = undefined;
+				for (var i = 0; i < this.toc.length; i++) {
+					// check epub content
+					var other_href = URLWithoutHash(this.toc[i].src);
+					if (other_href && other_href.indexOf(this_href) != -1) {
+						title = this.toc[i].desc;
+						break;
+					}
+					// check video content
+					other_href = URLWithoutHash(this.toc[i].video);
+					if (other_href && other_href.indexOf(this_href) != -1) {
+						title = this.toc[i].desc;
+						break;
+					}
+				}
+
+				if (title != undefined) {
+					list[j].title = title;
+				}
+			}
+
+			return list;
 		},
 
 		onDoneScrolling: function () {
@@ -1297,7 +1331,12 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 				}
 			}
 			return undefined;
+		},
+
+		getDatabase: function () {
+			return Database;
 		}
+
 	});
 
 	var VideoManager = {};
