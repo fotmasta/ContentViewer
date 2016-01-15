@@ -1,19 +1,23 @@
 // TODO: video height needs to be window height; html needs to be window height (or 100%) and overflow: auto
 
-define(["jquery.ui", "bootstrap", "jquery.json"], function (VideoManager) {
+define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database) {
 
 	$.widget("que.quizzerator", {
 		options: {},
 
 		_create: function () {
-			var quizFile = window.location.search.substr(1);
+			//var quizFile = window.location.search.substr(1);
+
+			this.db = database;
 
 			this.id = "quiz_id";
+
+			var quizFile = this.options.data;
 
 			// use filename for quiz id
 			var regex = /([^\/]+)(\.json)$/;
 			match = quizFile.match(regex);
-			if (match.length) {
+			if (match && match.length) {
 				this.id = match[1];
 			} else {
 				this.id = quizFile;
@@ -63,7 +67,7 @@ define(["jquery.ui", "bootstrap", "jquery.json"], function (VideoManager) {
 				this.addQuestion(q);
 			}
 
-			this.notifyParentFrame({ type: "overrideLinks" });
+			this.options.iframe.overrideLinks();
 
 			this.convertHintLinksToHumanReadable();
 
@@ -257,10 +261,8 @@ define(["jquery.ui", "bootstrap", "jquery.json"], function (VideoManager) {
 		},
 
 		loadResponses: function () {
-			this.notifyParentFrame({ type: "getProperty", key: this.id });
-		},
+			var quizData = this.db.getTitleProperty(this.id);
 
-		loadResponsesCallback: function (quizData) {
 			if (quizData) {
 				var obj = $.evalJSON(quizData);
 
@@ -293,26 +295,7 @@ define(["jquery.ui", "bootstrap", "jquery.json"], function (VideoManager) {
 			var obj = {responses: responses};
 			var to_json = $.toJSON(obj);
 
-			this.notifyParentFrame({ type: "setProperty", key: this.id, value: to_json });
-		},
-
-		onWindowMessage: function (event) {
-			if (event.source != window) {
-				switch (event.data.type) {
-					case "getProperty":
-						if (event.data.key == this.id) {
-							this.loadResponsesCallback(event.data.value);
-						}
-						break;
-					case "convertedTOC":
-						this.convertHintLinksCallback(event.data.list);
-						break;
-				}
-			}
-		},
-
-		notifyParentFrame: function (msg) {
-			window.postMessage(msg, "*");
+			this.db.setTitleProperty(this.id, to_json);
 		},
 
 		convertHintLinksToHumanReadable: function () {
@@ -330,11 +313,7 @@ define(["jquery.ui", "bootstrap", "jquery.json"], function (VideoManager) {
 				}
 			}
 
-			this.notifyParentFrame({ type: "getTOCNames", list: hints });
-		},
-
-		convertHintLinksCallback: function (list) {
-			var questions = this.element.find(".question");
+			var list = this.options.iframe.returnHumanReadableTOCNames(hints);
 
 			for (var i = 0; i < list.length; i++) {
 				var entry = list[i];

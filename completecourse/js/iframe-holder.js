@@ -60,7 +60,8 @@ define(["bootstrap-dialog", "imagesloaded", "database", "jquery.ui"], function (
 			if (match.length) {
 				// the data for this widget comes from the project's path
 				var adjustedPath = getCodePath() + match[1].trim() + "?" + getAbsolutePath() + "/" + match[2].trim();
-				return adjustedPath;
+				//return adjustedPath;
+				return "";
 			}
 			return src;
 		} else
@@ -103,14 +104,17 @@ define(["bootstrap-dialog", "imagesloaded", "database", "jquery.ui"], function (
 		onLoaded: function ()  {
 			this.addStylesheet();
 
+			if (this.iframe.attr("src") == "") {
+				console.log("widget?");
+				this.injectWidget();
+			}
+
 			if (!this.options.infinite_scrolling) {
 				this.addPreviousButton();
 				this.addNextButton();
 			}
 
 			this.overrideLinks();
-
-			this.iframe[0].contentWindow.addEventListener("message", $.proxy(this.onIframeMessage, this));
 
 			this.iframe.contents().scroll($.proxy(this.onScrollIframe, this));
 
@@ -352,36 +356,25 @@ define(["bootstrap-dialog", "imagesloaded", "database", "jquery.ui"], function (
 				this.options.manager.onScrollContent();
 		},
 
-		returnHumanReadableTOCNames: function (sourceWindow, list) {
-			var newList = this.options.manager.getTOCNames(list);
-
-			sourceWindow.postMessage({ type: "convertedTOC", list: newList }, "*");
+		returnHumanReadableTOCNames: function (list) {
+			return this.options.manager.getTOCNames(list);
 		},
 
-		onIframeMessage: function (event) {
-			if (event.source != window) {
-				switch (event.data.type) {
-					case "getProperty":
-						var db = this.options.manager.getDatabase();
+		injectWidget: function () {
+			var base = window.getInformITBaseURL();
+			$.get(base + "widgets/quizzerator/index.html", $.proxy(this.onWidgetLoaded, this));
+		},
 
-						var data = db.getTitleProperty(event.data.key);
+		onWidgetLoaded: function (data) {
+			var iframe = this.iframe[0];
+			iframe.contentWindow.document.open();
+			iframe.contentWindow.document.write(data);
 
-						event.source.postMessage({ type: "getProperty", key: event.data.key, value: data }, "*");
-						break;
-					case "setProperty":
-						var db = this.options.manager.getDatabase();
+			var me = this;
 
-						var data = db.setTitleProperty(event.data.key, event.data.value);
-
-						break;
-					case "overrideLinks":
-						this.overrideLinks();
-						break;
-					case "getTOCNames":
-						this.returnHumanReadableTOCNames(event.source, event.data.list);
-						break;
-				}
-			}
+			require(["../widgets/quizzerator/js/quizzerator"], function (quizzerator) {
+				me.iframe.contents().find("#quiz1").quizzerator({data: "media/quizzes/quiz1.json", iframe: me});
+			});
 		}
 	});
 });

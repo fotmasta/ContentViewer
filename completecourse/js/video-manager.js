@@ -517,6 +517,7 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 			this.waitingForIFrameToLoad = false;
 
 			$(".loading-indicator").hide();
+			console.log("hide");
 
 			this.onNewContentShowing(iframe);
 		},
@@ -526,6 +527,8 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 		},
 
 		addIFrame: function (params) {
+			$(".loading-indicator").show();
+
 			if (this.iframe == undefined) {
 				var iframe = $("<div>").iFrameHolder({
 					manager: this,
@@ -558,8 +561,6 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 				this.waitingForIFrameToLoad = true;
 				this.iframe.iFrameHolder("loadNewContent", options);
 			}
-
-			$(".loading-indicator").show();
 		},
 
 		playExtraFromTOC: function (index, options) {

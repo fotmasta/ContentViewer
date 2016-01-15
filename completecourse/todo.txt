@@ -1,3 +1,5 @@
+// TODO: fix styling and initial load of quizzerator
+// TODO: use TOC entry for quiz title
 // TODO: closed captioning transcript (in sidebar?)
 // TODO: private browsing on iPad doesn't work because localStorage is required (might be able to catch exceptions and ignore)
 // TODO: when comments are visible, reduce margin-left of iframe-holder's child div to 0 and size comment panel to fit remaining area (with min-width)
@@ -146,8 +148,9 @@
 // DONE: eliminate sizeToFitToBottom()
 // DONE: sections with ampersands (&) in them do not get marked complete
 // DONE: quizzerator: save quiz correct answers (ie, complete)
-// DONE: make sure quiz responses get saved in a unique location for Web Editions (within the Database item, perhaps?)
+// DONE: make sure quiz responses get saved in a unique location for Web Editions (within the Database item, perhaps?) [nope, used postMessage to communicate between windows because they were on separate domains and not allowed to share code]
 // DONE: switching between quiz and video isn't catching the change in src
 // DONE: use filename of quiz for its id [can also be in the json data]
 // DONE: quiz titles?
 // DONE: remediation links to TOC entries in Web Edition [use text of src or video of desired TOC entry]
+// DONE: load quizzerator into iframe via javascript
