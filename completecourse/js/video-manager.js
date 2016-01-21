@@ -332,7 +332,11 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 			}
 
 			if (options && (options.history == undefined || options.history == true)) {
-				history.pushState(null, null, "?link=" + index);
+				var staging = "";
+				if (window.location.search.indexOf("staging") != -1) {
+					staging = "&staging";
+				}
+				history.pushState(null, null, "?link=" + index + staging);
 			}
 
 			this.syncTOCToContent(index);
@@ -517,7 +521,6 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 			this.waitingForIFrameToLoad = false;
 
 			$(".loading-indicator").hide();
-			console.log("hide");
 
 			this.onNewContentShowing(iframe);
 		},

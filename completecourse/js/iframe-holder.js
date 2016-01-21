@@ -52,20 +52,27 @@ define(["bootstrap-dialog", "imagesloaded", "database", "jquery.ui"], function (
 		return loc.origin + pathName;
 	}
 
-	function ParseIfWidget (src) {
+	function ParseWidget (src) {
 		var regex = /^\[.*\]/;
 		if (regex.test(src)) {
 			var params = /^\[(.*),(.*)\]/;
 			var match = src.match(params);
 			if (match.length) {
-				// the data for this widget comes from the project's path
-				var adjustedPath = getCodePath() + match[1].trim() + "?" + getAbsolutePath() + "/" + match[2].trim();
-				//return adjustedPath;
-				return "";
+				var widget = {src: match[1].trim(), params: match[2].trim()};
+				return widget;
 			}
-			return src;
-		} else
-			return src;
+		}
+		return {};
+	}
+
+	function IsWidget (src) {
+		var regex = /^\[.*\]/;
+		if (regex.test(src)) {
+			var params = /^\[(.*),(.*)\]/;
+			var match = src.match(params);
+			if (match.length) return true;
+		}
+		return false;
 	}
 
 	$.widget("que.iFrameHolder", {
@@ -76,10 +83,13 @@ define(["bootstrap-dialog", "imagesloaded", "database", "jquery.ui"], function (
 
 			var src = URLWithoutHash(this.options.src);
 
-			// if this is a widget, get it from the code path
-			src = ParseIfWidget(src);
-
-			this.iframe = $("<iframe>", { src: src, frameborder: 0, "allowfullscreen": true });
+			if (IsWidget(src)) {
+				var widget = ParseWidget(src);
+				this.iframe = $("<iframe>", { src: "", frameborder: 0, "allowfullscreen": true });
+				this.injectWidget(widget.src, widget.params);
+			} else {
+				this.iframe = $("<iframe>", { src: src, frameborder: 0, "allowfullscreen": true });
+			}
 
 			this.element.css("display", "none");
 
@@ -93,21 +103,19 @@ define(["bootstrap-dialog", "imagesloaded", "database", "jquery.ui"], function (
 
 			var src = URLWithoutHash(this.options.src);
 
-			// if this is a widget, get it from the code path
-			src = ParseIfWidget(src);
+			if (IsWidget(src)) {
+				// clear out the old content
+				this.iframe.attr("src", "index.html").attr("src", "");
 
-			this.iframe.hide(0);
-
-			this.iframe.attr("src", src);
+				var widget = ParseWidget(src);
+				this.injectWidget(widget.src, widget.params);
+			} else {
+				this.iframe.attr("src", src);
+			}
 		},
 
 		onLoaded: function ()  {
 			this.addStylesheet();
-
-			if (this.iframe.attr("src") == "") {
-				console.log("widget?");
-				this.injectWidget();
-			}
 
 			if (!this.options.infinite_scrolling) {
 				this.addPreviousButton();
@@ -360,21 +368,36 @@ define(["bootstrap-dialog", "imagesloaded", "database", "jquery.ui"], function (
 			return this.options.manager.getTOCNames(list);
 		},
 
-		injectWidget: function () {
+		injectWidget: function (src, params) {
 			var base = window.getInformITBaseURL();
-			$.get(base + "widgets/quizzerator/index.html", $.proxy(this.onWidgetLoaded, this));
+			$.get(base + src, $.proxy(this.onWidgetLoaded, this, { src: src, params: params } ));
+
 		},
 
-		onWidgetLoaded: function (data) {
+		onWidgetLoaded: function (obj, data) {
 			var iframe = this.iframe[0];
-			iframe.contentWindow.document.open();
-			iframe.contentWindow.document.write(data);
-
 			var me = this;
 
-			require(["../widgets/quizzerator/js/quizzerator"], function (quizzerator) {
-				me.iframe.contents().find("#quiz1").quizzerator({data: "media/quizzes/quiz1.json", iframe: me});
-			});
+			var desc;
+			if (this.options.manager && this.options.index != undefined)
+				desc = this.options.manager.getTOCTitleForID(this.options.index);
+
+			if (iframe.contentWindow) {
+				iframe.contentWindow.document.open();
+				iframe.contentWindow.document.write(data);
+				iframe.contentWindow.document.close();
+
+				// CONVENTION: parse widget name from data-js in widget's index.html; the widget returns its name
+				var regex = /data-js="(.*)"/ig;
+				var matches = regex.exec(data);
+				if (matches.length) {
+					var js = matches[1];
+
+					require([js], function (widget_name) {
+						me.iframe.contents().find("#the_widget")[widget_name]({data: obj.params, iframe: me, jquery: $, desc: desc});
+					});
+				}
+			}
 		}
 	});
 });

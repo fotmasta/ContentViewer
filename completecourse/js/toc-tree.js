@@ -592,6 +592,10 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 		},
 
 		markCompleted: function (index) {
+			if (index > this.options.data.length - 1) {
+				this.options.data[index] = {};
+			}
+
 			this.options.data[index].completed = true;
 
 			var el = this.holder.find("[data-index=" + index + "]");
@@ -669,10 +673,12 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 		setStatus: function (items) {
 			for (var i = 0; i < items.length; i++) {
 				var item = items[i];
-				if (item.completed)
-					this.markCompleted(i);
-				else if (item.started)
-					this.markStarted(i);
+				if (item) {
+					if (item.completed)
+						this.markCompleted(i);
+					else if (item.started)
+						this.markStarted(i);
+				}
 			}
 		},
 

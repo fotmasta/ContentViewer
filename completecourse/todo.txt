@@ -1,4 +1,3 @@
-// TODO: fix styling and initial load of quizzerator
 // TODO: use TOC entry for quiz title
 // TODO: closed captioning transcript (in sidebar?)
 // TODO: private browsing on iPad doesn't work because localStorage is required (might be able to catch exceptions and ignore)
@@ -154,3 +153,7 @@
 // DONE: quiz titles?
 // DONE: remediation links to TOC entries in Web Edition [use text of src or video of desired TOC entry]
 // DONE: load quizzerator into iframe via javascript
+// DONE: fix styling and initial load of quizzerator (code now loads into iframe-holder's code space not its own, which affects jquery's $; and css paths are hard-coded to server)
+// NOTE: you can't mess with code from iframes loaded from other domains; jquery loaded in other frames does not share the code space, not even scrolling code as for affix
+// DONE: comments trying to use VideoManager before it's ready (instantiate Comments after video-manager)
+// DONE: affix isn't working when loading content into frame; timing? (see NOTE above)

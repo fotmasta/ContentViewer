@@ -105,6 +105,8 @@ define(["jquery", "handlebars", "text!viewer_template.html", "video-manager", "v
 	var contentsPaneDesiredVisible = undefined;
 	var lastSize = undefined;
 
+	var optionsTitle;
+
 	function initialize () {
 		onResize();
 
@@ -114,6 +116,8 @@ define(["jquery", "handlebars", "text!viewer_template.html", "video-manager", "v
 		$("#main").removeClass("invisible").css("opacity", 1);
 
 		$("body").addClass("skin-" + manifest.skin);
+
+		$("#comments-panel").Comments( { manager: $("#video"), titlePath: getEscapedPathFromTitle(optionsTitle) });
 
 		/*
 		 if (!coachMarksShown) {
@@ -128,6 +132,7 @@ define(["jquery", "handlebars", "text!viewer_template.html", "video-manager", "v
 	function getEscapedPathFromTitle (title) {
 		return title.substr(0, 48).toLowerCase().replace(/ /g,"_");
 	}
+
 	function onPlayContent () {
 		var currentSize = ResponsiveBootstrapToolkit.current();
 
@@ -532,7 +537,9 @@ define(["jquery", "handlebars", "text!viewer_template.html", "video-manager", "v
 				$("#show-comments-button").click(onOpenComments);
 			}
 
-			$("#comments-panel").Comments( { manager: $("#video"), titlePath: getEscapedPathFromTitle(options.title) });
+			optionsTitle = options.title;
+
+			//$("#comments-panel").Comments( { manager: $("#video"), titlePath: getEscapedPathFromTitle(options.title) });
 
 			// this should get rid of the extra vertical scrollbar on the InformIT site for IE users
 			if (window.parent) {

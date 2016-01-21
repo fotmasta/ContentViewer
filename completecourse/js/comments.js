@@ -1,4 +1,4 @@
-define(["jquery.ui", "firebase"], function () {
+define(["jquery.ui", "firebase", "video-manager"], function () {
 
 	function findParentComment (el) {
 		var this_el = el;

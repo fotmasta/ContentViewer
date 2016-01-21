@@ -1,13 +1,113 @@
-// TODO: video height needs to be window height; html needs to be window height (or 100%) and overflow: auto
+var baseURL;
+
+if (window.getInformITBaseURL)
+	baseURL = window.getInformITBaseURL();
+else if (window.parent.getInformITBaseURL)
+	baseURL = window.parent.getInformITBaseURL();
+else {
+	if (window.location.hostname == "localhost") {
+		baseURL = "../completecourse/";
+	} else {
+		baseURL = "https://s3.amazonaws.com/storefronts/streaming-video/completecourse/";
+	}
+}
+
+//baseURL = "../../../completecourse/";
+
+requirejs.config({
+	baseUrl: baseURL + "js/",
+	paths: {
+		"jquery": "jquery-2.1.3.min",
+		"jquery.ui": "jquery-ui.min",
+		"jquery.json": "jquery.json.min",
+		"jquery.onscreen": "jquery.onscreen",
+		"jquery.highlight": "jquery.highlight",
+		"bootstrap": "bootstrap",
+		"bootstrap-notify": "bootstrap-notify.min",
+		"bootstrap-dialog": "bootstrap-dialog.min",
+		"imagesloaded": "imagesloaded.pkgd.min",
+		"popcorn": "popcorn-complete.min",
+		"bootstrap-toolkit": "bootstrap-toolkit.min",
+		"videojs": "video",
+		"videojs-markers": "videojs-markers",
+		"handlebars": "handlebars-v3.0.3",
+		"lunr": "lunr.min",
+		"firebase": "https://cdn.firebase.com/js/client/2.3.2/firebase"
+	},
+	shim: {
+		"jquery": {
+			export: "$"
+		},
+		"jquery.ui": {
+			export: "$"
+		},
+		"jquery.json": {
+			export: "$",
+			deps: ['jquery']
+		},
+		"jquery.onscreen": {
+			export: "$",
+			deps: ['jquery']
+		},
+		"jquery.highlight": {
+			export: "$",
+			deps: ['jquery']
+		},
+		"bootstrap": {
+			export: "$",
+			deps: ['jquery']
+		},
+		"bootstrap-notify": {
+			export: "$",
+			deps: ['bootstrap']
+		},
+		"bootstrap-dialog": {
+			deps: ['bootstrap']
+		},
+		"popcorn": {
+			export: "Popcorn"
+		},
+		"popcorn.timebase": {
+			export: "Popcorn",
+			deps: ['popcorn']
+		},
+		"bootstrap-toolkit": {
+			export: "$",
+			deps: ["jquery"]
+		},
+		"videojs": {
+			export: "videojs",
+			deps: ["jquery"]
+		},
+		"videojs-markers": {
+			deps: ["videojs", "jquery"]
+		},
+		"imagesloaded": {
+			export: "$",
+			deps: ["jquery"]
+		},
+		"handlebars": {
+			exports: "Handlebars"
+		},
+		"firebase": {
+			export: "Firebase"
+		}
+	},
+	// this fixed the "appending .js" problem I was getting on informit.com
+	config: {
+		text: {
+			useXhr: function (url, protocol, hostname, port) {
+				return true;
+			}
+		}
+	}
+});
 
 define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database) {
-
 	$.widget("que.quizzerator", {
 		options: {},
 
 		_create: function () {
-			//var quizFile = window.location.search.substr(1);
-
 			this.db = database;
 
 			this.id = "quiz_id";
@@ -44,13 +144,19 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 
 			var ol = $("<ol>", {class: "quiz-holder"});
 			this.element.append(ol);
+		},
 
-			summary.affix({offset: {top: summary.offset().top}});
-
-			window.addEventListener("message", $.proxy(this.onWindowMessage, this));
+		// work-around for cross-domain iframe
+		kludgeAffix: function () {
+			var doc = this.element.find(".summary")[0].ownerDocument;
+			var win = doc.defaultView;
+			var sum = this.options.jquery("iframe").contents().find(".summary");
+			sum.affix({ offset: { top: 140 }, target: win});
 		},
 
 		onLoadedData: function (data) {
+			this.kludgeAffix();
+
 			this.data = data;
 
 			// id can also come from json data
@@ -58,7 +164,9 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 				this.id = this.data.id;
 			}
 
-			if (this.data.title) {
+			if (this.options.desc) {
+				this.element.find("h3.quiz-title").text(this.options.desc);
+			} else if (this.data.title) {
 				this.element.find("h3.quiz-title").text(this.data.title);
 			}
 
@@ -179,20 +287,19 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 
 			var me = this;
 
-			if (answered.length) {
-				this.element.find("#check-all").removeClass("shrunk");
-				setTimeout(function () {
-					me.element.find("#check-all").addClass("unhidden");
-				}, 500);
-			} else {
-				this.element.find("#check-all").addClass("shrunk");
-				setTimeout(function () {
-					me.element.find("#check-all").removeClass("unhidden");
-				}, 500);
+			var doHeightAdjustment = function () {
+				me.element.find("#check-all").addClass("unhidden");
+				var h = me.element.find(".holder").outerHeight();
+				me.element.find(".summary").height(h);
 			}
 
-			var h = this.element.find(".holder").outerHeight();
-			this.element.find(".summary").height(h);
+			if (answered.length) {
+				this.element.find("#check-all").removeClass("shrunk");
+				setTimeout(doHeightAdjustment, 500);
+			} else {
+				this.element.find("#check-all").addClass("shrunk");
+				setTimeout(doHeightAdjustment, 500);
+			}
 		},
 
 		onClickCheck: function (event) {
@@ -252,12 +359,12 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 			var correct = this.element.find(".question[data-correct=true]").length;
 			var incorrect = this.element.find(".question[data-correct=false]").length;
 
-			$(".summary").find("#correct-count").text(correct);
-			$(".summary").find("#incorrect-count").text(incorrect);
+			this.element.find(".summary").find("#correct-count").text(correct);
+			this.element.find("#incorrect-count").text(incorrect);
 
 			var remaining = this.element.find(".question").length - (correct + incorrect);
 
-			$(".summary").find("#remaining-count").text(remaining);
+			this.element.find("#remaining-count").text(remaining);
 		},
 
 		loadResponses: function () {
@@ -324,4 +431,5 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 		}
 	});
 
+	return "quizzerator";
 });

@@ -102,7 +102,7 @@ define(["jquery.json"], function () {
 		getPercentageComplete: function () {
 			var completed = 0;
 			for (var i = 0; i < this.items.length; i++) {
-				if (this.items[i].completed)
+				if (this.items[i] && this.items[i].completed)
 					completed++;
 			}
 			return (completed / this.items.length);
