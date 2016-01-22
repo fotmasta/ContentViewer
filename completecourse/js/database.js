@@ -47,7 +47,11 @@ define(["jquery.json"], function () {
 
 			var to_json = $.toJSON(db);
 
-			localStorage.setItem(this.folder, to_json);
+			try {
+				localStorage.setItem(this.folder, to_json);
+			} catch (e) {
+				// private browsing
+			}
 		},
 
 		setItemProperty: function (index, property, value) {

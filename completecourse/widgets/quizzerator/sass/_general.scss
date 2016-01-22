@@ -26,6 +26,18 @@ ol.quiz-holder {
 li.question {
 	padding: .5em 0 .5em 0;
 
+	&[data-correct=false] {
+		p.response.selected {
+			background-color: #d9534f !important;
+		}
+	}
+
+	&[data-correct=true] {
+		p.response.selected {
+			background-color: #5cb85c !important;
+		}
+	}
+
 	ol.answers-holder {
 		list-style-type: lower-alpha;
 		position: relative;
@@ -47,7 +59,7 @@ li.question {
 				}
 
 				&.selected {
-					background-color: #76f498;
+					background-color: #ffff82;
 					border-radius: 15px;
 				}
 

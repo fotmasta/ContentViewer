@@ -85,10 +85,10 @@ define(["bootstrap-dialog", "imagesloaded", "database", "jquery.ui"], function (
 
 			if (IsWidget(src)) {
 				var widget = ParseWidget(src);
-				this.iframe = $("<iframe>", { src: "", frameborder: 0, "allowfullscreen": true });
+				this.iframe = $("<iframe>", { class: "content", src: "", frameborder: 0, "allowfullscreen": true });
 				this.injectWidget(widget.src, widget.params);
 			} else {
-				this.iframe = $("<iframe>", { src: src, frameborder: 0, "allowfullscreen": true });
+				this.iframe = $("<iframe>", { class: "content", src: src, frameborder: 0, "allowfullscreen": true });
 			}
 
 			this.element.css("display", "none");
@@ -124,7 +124,10 @@ define(["bootstrap-dialog", "imagesloaded", "database", "jquery.ui"], function (
 
 			this.overrideLinks();
 
+			// desktop:
 			this.iframe.contents().scroll($.proxy(this.onScrollIframe, this));
+			// iOS:
+			$(".the-iframe-holder").scroll($.proxy(this.onScrollIframe, this));
 
 			var me = this;
 
@@ -390,7 +393,7 @@ define(["bootstrap-dialog", "imagesloaded", "database", "jquery.ui"], function (
 				// CONVENTION: parse widget name from data-js in widget's index.html; the widget returns its name
 				var regex = /data-js="(.*)"/ig;
 				var matches = regex.exec(data);
-				if (matches.length) {
+				if (matches && matches.length) {
 					var js = matches[1];
 
 					require([js], function (widget_name) {

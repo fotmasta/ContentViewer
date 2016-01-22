@@ -503,13 +503,23 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 				dest = top - 30;
 			}
 
+			// kludge for iOS scrolling (I don't like this one bit)
+			var scrollingDOM;
+			if ($(".the-iframe-holder").height() == $("iframe").height()) {
+				// desktop
+				scrollingDOM = iframe.contents().find("body");
+			} else {
+				// iOS
+				scrollingDOM = $(".the-iframe-holder");
+			}
+
 			if (immediate) {
-				iframe.contents().find("body").scrollTop(dest);
+				scrollingDOM.scrollTop(dest);
 			} else {
 				// this should stop it from overriding the scroll-to-hash that comes next with an actual hash
 				if (dest != 0)
 					this.busyScrolling = true;
-					iframe.contents().find("body").stop().animate({scrollTop: dest}, {
+					scrollingDOM.stop().animate({scrollTop: dest}, {
 						duration: 1000,
 						complete: $.proxy(this.onDoneScrolling, this)
 					});
@@ -1084,7 +1094,7 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 
 			var me = this;
 
-			var iframes = $("iframe:onScreen");
+			var iframes = $("iframe.content:onScreen");
 
 			var curSrc = URLPageOnly(URLWithoutHash(this.toc[this.getCurrentIndex()].src));
 
@@ -1093,8 +1103,8 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 				var headers = iframe.contents().find("h1, h2, h3, h4");
 				var headersOnScreen = iFrameElementsOnScreen(headers, iframe);
 				for (var i = headersOnScreen.length - 1; i >= 0; i--) {
-					var item = headersOnScreen[i];
-					var h = $(item);
+					var screen_item = headersOnScreen[i];
+					var h = $(screen_item);
 					//var t = h.text().replace(/(\r\n|\n|\r)/gm,"").replace(/\s+/g, " ");
 					var t = h.text();
 					for (var j = 0; j < me.toc.length; j++) {

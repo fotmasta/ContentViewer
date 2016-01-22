@@ -1,4 +1,6 @@
-// TODO: use TOC entry for quiz title
+// TODO: iOS pages don't scroll at first load (resetting iframe overflow corrects it; refresh?)
+// TODO: iOS jumps back to top of page when loading
+// TOOD: on iOS, setSearchIndex on toc-tree is being called before it's initialized
 // TODO: closed captioning transcript (in sidebar?)
 // TODO: private browsing on iPad doesn't work because localStorage is required (might be able to catch exceptions and ignore)
 // TODO: when comments are visible, reduce margin-left of iframe-holder's child div to 0 and size comment panel to fit remaining area (with min-width)
@@ -157,3 +159,5 @@
 // NOTE: you can't mess with code from iframes loaded from other domains; jquery loaded in other frames does not share the code space, not even scrolling code as for affix
 // DONE: comments trying to use VideoManager before it's ready (instantiate Comments after video-manager)
 // DONE: affix isn't working when loading content into frame; timing? (see NOTE above)
+// DONE: use TOC entry for quiz title
+// DONE: intra-page scrolling doesn't work on iPad; desktop (body) vs iOS (the-iframe-holder) scrolling
