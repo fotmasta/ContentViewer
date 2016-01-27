@@ -64,7 +64,8 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 		var visible = [];
 		var $iframe = $(iframe);
 
-		var h = $(window).height();
+		// NOTE: iOS fix has to account for scrolling because getBoundingClientRect doesn't
+		var h = $(window).height() + $(".the-iframe-holder").scrollTop();
 
 		for (var i = 0; i < elements.length; i++) {
 			var elem = elements[i];
@@ -480,6 +481,18 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 		},
 
 		scrollToHash: function (iframe, options, immediate) {
+			// iOS kludge:
+			// TODO: try this, delay, then transform none
+			// TODO: why does it scroll and then reset?!
+			/*
+			$(".the-iframe-holder")[0].style.cssText += ';-webkit-transform:rotateZ(0deg)';
+			$(".the-iframe-holder")[0].offsetHeight;
+			$(".the-iframe-holder")[0].style.cssText += ';-webkit-transform:none';
+			*/
+
+			//$(".the-iframe-holder").css("-webkit-overflow-scrolling", "auto");
+			//$(".the-iframe-holder").css("-webkit-overflow-scrolling", "touch");
+
 			var index, hash;
 
 			if (options.hash == undefined) {

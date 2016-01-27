@@ -1,6 +1,3 @@
-// TODO: iOS pages don't scroll at first load (resetting iframe overflow corrects it; refresh?)
-// TODO: iOS jumps back to top of page when loading
-// TOOD: on iOS, setSearchIndex on toc-tree is being called before it's initialized
 // TODO: closed captioning transcript (in sidebar?)
 // TODO: private browsing on iPad doesn't work because localStorage is required (might be able to catch exceptions and ignore)
 // TODO: when comments are visible, reduce margin-left of iframe-holder's child div to 0 and size comment panel to fit remaining area (with min-width)
@@ -161,3 +158,7 @@
 // DONE: affix isn't working when loading content into frame; timing? (see NOTE above)
 // DONE: use TOC entry for quiz title
 // DONE: intra-page scrolling doesn't work on iPad; desktop (body) vs iOS (the-iframe-holder) scrolling
+// NOTE: stashed an attempt to load html content into a DIV instead of an iframe but the Inkling CSS overrides proved overwhelming
+// DONE: iOS jumps back to top of page when loading (related to the non-scrolling-at-first problem) [it was animate.css; disabled it for the iframe appearance on iOS]
+// DONE: on iOS, setSearchIndex on toc-tree is being called before it's initialized [added timeout retry]
+// TODONT: iOS pages don't scroll at first load (resetting iframe overflow corrects it; a pain in the ass to correct, ignoring since it corrects itself on successive clicks)

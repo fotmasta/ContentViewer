@@ -184,8 +184,12 @@ define(["bootstrap-dialog", "imagesloaded", "database", "jquery.ui"], function (
 
 				this.element.show(0);
 
-				me.iframe.removeClass("fadeIn animated").hide(0);
-				me.iframe.addClass("fadeIn animated").show(0);
+				// NOTE: I think this was disrupting the render and touch-scrolling of the iframe on iOS (probably because of 3D rendering "optimizations")
+				var is_iOS = /iPad|iPhone|iPod/.test(navigator.platform);
+				if  (!is_iOS) {
+					me.iframe.removeClass("fadeIn animated").hide(0);
+					me.iframe.addClass("fadeIn animated").show(0);
+				}
 
 				// NOTE: if we're auto-advancing, don't scroll to any hashtags
 
@@ -390,9 +394,22 @@ define(["bootstrap-dialog", "imagesloaded", "database", "jquery.ui"], function (
 				iframe.contentWindow.document.write(data);
 				iframe.contentWindow.document.close();
 
-				// CONVENTION: parse widget name from data-js in widget's index.html; the widget returns its name
-				var regex = /data-js="(.*)"/ig;
-				var matches = regex.exec(data);
+				// CONVENTION: parse widget name from data-js in widget's index.html; the widget returns its name; get css and js files to load from the widget's index.html
+				var regex, matches;
+
+				regex = /data-css="(.*?)"/ig;
+				matches = regex.exec(data);
+				if (matches && matches.length) {
+					var cssURL = matches[1];
+
+					var $head = this.iframe.contents().find("head");
+					var path = getCodePath();
+					$head.append($("<link/>",
+						{ rel: "stylesheet", href: path + cssURL, type: "text/css" }));
+				}
+
+				regex = /data-js="(.*?)"/ig;
+				matches = regex.exec(data);
 				if (matches && matches.length) {
 					var js = matches[1];
 

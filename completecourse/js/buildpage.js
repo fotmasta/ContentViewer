@@ -548,7 +548,14 @@ define(["jquery", "handlebars", "text!viewer_template.html", "video-manager", "v
 		},
 
 		setSearchIndex: function (data) {
-			$(".toc").TOCTree("setSearchIndex", data);
+			// TODO: make sure toc has been initialized; if not, set a callback
+			var isInitialized = $(".toc").data("que-TOCTree");
+			if (isInitialized) {
+				$(".toc").TOCTree("setSearchIndex", data);
+			} else {
+				console.log("re-trying setSearchIndex");
+				setTimeout($.proxy(this.setSearchIndex, this, data), 500);
+			}
 		}
 	};
 
