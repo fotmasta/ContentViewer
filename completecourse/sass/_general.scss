@@ -170,6 +170,56 @@ body.skin-Microsoft {
 	-webkit-transform: translateY(-50%);
 	*/
 	position: relative;
+
+	&.has-transcript.transcript-visible .video-player {
+		height: 75%;
+	}
+
+	&:not(.has-transcript) .vjs-transcript-button {
+		display: none;
+	}
+
+	.video-player {
+		height: 100%;
+	}
+
+	.video-transcript {
+		height: 25%;
+		padding: 10px 25px;
+		border-top: 2px solid #5D5B61;
+		overflow: scroll;
+		z-index: 5;
+
+		p {
+			display: inline;
+
+			&:after {
+				content: " ";
+				display: inline;
+			}
+
+			&:hover {
+				background-color: #b1c1ff;
+				cursor: pointer;
+			}
+		}
+
+		p.current {
+			background-color: #fffdab;
+		}
+
+		br {
+			content: " ";
+
+			&:after {
+				content: " ";
+			}
+		}
+	}
+}
+
+.video-holder:not(.has-transcript) .video-transcript {
+	display: none;
 }
 
 .iframe-holder {
@@ -214,7 +264,7 @@ body.skin-Microsoft .iframe-holder {
 		left: 0;
 		width: 100%;
 		height: 100%;
-		
+
 		.overlay-block {
 			position: absolute;
 			top: 0;
@@ -239,6 +289,10 @@ body.skin-Microsoft .iframe-holder {
 		width: 100%;
 		background-color: $video-background-color;
 	}
+}
+
+.video-holder.has-transcript .overlay {
+	height: 75% !important;
 }
 
 .code-listing {
@@ -678,6 +732,8 @@ span.completed {
 }
 
 .vjs-back-button {
+	cursor: pointer;
+
 	&:hover:not(:active) {
 		color: white;
 	}
@@ -685,6 +741,20 @@ span.completed {
 	&:before {
 		font-family: FontAwesome !important;
 		content: "\f0e2";
+	}
+}
+
+.vjs-transcript-button {
+	cursor: pointer;
+	float: right !important;
+
+	&:hover:not(:active) {
+		color: white;
+	}
+
+	&:before {
+		font-family: FontAwesome !important;
+		content: "\f02d";
 	}
 }
 

@@ -100,6 +100,35 @@ body.skin-Microsoft {
   -webkit-transform: translateY(-50%);
   */
   position: relative; }
+  .video-holder.has-transcript.transcript-visible .video-player {
+    height: 75%; }
+  .video-holder:not(.has-transcript) .vjs-transcript-button {
+    display: none; }
+  .video-holder .video-player {
+    height: 100%; }
+  .video-holder .video-transcript {
+    height: 25%;
+    padding: 10px 25px;
+    border-top: 2px solid #5D5B61;
+    overflow: scroll;
+    z-index: 5; }
+    .video-holder .video-transcript p {
+      display: inline; }
+      .video-holder .video-transcript p:after {
+        content: " ";
+        display: inline; }
+      .video-holder .video-transcript p:hover {
+        background-color: #b1c1ff;
+        cursor: pointer; }
+    .video-holder .video-transcript p.current {
+      background-color: #fffdab; }
+    .video-holder .video-transcript br {
+      content: " "; }
+      .video-holder .video-transcript br:after {
+        content: " "; }
+
+.video-holder:not(.has-transcript) .video-transcript {
+  display: none; }
 
 .iframe-holder {
   height: 100%;
@@ -149,6 +178,9 @@ body.skin-Microsoft .iframe-holder > div {
   #video video {
     width: 100%;
     background-color: white; }
+
+.video-holder.has-transcript .overlay {
+  height: 75% !important; }
 
 .code-listing {
   position: relative; }
@@ -447,11 +479,22 @@ span.completed {
 #collapsible-menu.in .input-group {
   padding-bottom: 8px; }
 
-.vjs-back-button:hover:not(:active) {
-  color: white; }
-.vjs-back-button:before {
-  font-family: FontAwesome !important;
-  content: "\f0e2"; }
+.vjs-back-button {
+  cursor: pointer; }
+  .vjs-back-button:hover:not(:active) {
+    color: white; }
+  .vjs-back-button:before {
+    font-family: FontAwesome !important;
+    content: "\f0e2"; }
+
+.vjs-transcript-button {
+  cursor: pointer;
+  float: right !important; }
+  .vjs-transcript-button:hover:not(:active) {
+    color: white; }
+  .vjs-transcript-button:before {
+    font-family: FontAwesome !important;
+    content: "\f02d"; }
 
 #main_video .vjs-tip {
   font-size: 14px;

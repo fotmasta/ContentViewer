@@ -1,4 +1,4 @@
-define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-markers", "jquery.onscreen", "iframe-holder", "jquery.ui"], function (BootstrapDialog, Database) {
+define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-markers", "jquery.onscreen", "jquery.scrollTo", "iframe-holder", "jquery.ui"], function (BootstrapDialog, Database) {
 
 	// NOTE: I don't understand why I couldn't use this.waitingForAutoAdvance; somehow the instance of VideoManager passed into iframe-holder wasn't the same (!)
 
@@ -183,12 +183,17 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 			});
 			this.player.controlBar.addChild(backButton);
 
+			var transcriptButton = new videojs.Button(this.player);
+			transcriptButton.addClass("vjs-transcript-button");
+			transcriptButton.on("click", $.proxy(this.onToggleTranscript, this));
+			this.player.controlBar.addChild(transcriptButton);
+
 			//  NOTE: Not sure why this stopped working and I had to switch to the straight HTML5 event
 //			this.player.on("play", $.proxy(this.onVideoStarted, this));
 			$("video")[0].addEventListener("play", $.proxy(this.onVideoStarted, this));
 
 			this.player.on("ended", $.proxy(this.onVideoEnded, this));
-			this.player.on("timeupdate", $.proxy(this.saveCurrentVideoTime, this));
+			this.player.on("timeupdate", $.proxy(this.onVideoTimeUpdate, this));
 			this.player.on("loadedmetadata", $.proxy(this.onLoadedMetadata, this));
 
 			$(".toc").on("playvideo", onPlayContent).on("closesearch", $.proxy(this.onCloseSearch, this));
@@ -274,6 +279,29 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 
 		saveCurrentVideoIndex: function () {
 			Database.saveCurrentIndex(this.currentIndex);
+		},
+
+		onVideoTimeUpdate: function (event) {
+			// highlight and scroll to current transcript position
+			var t = this.player.currentTime();
+
+			if (this.hasTranscript) {
+				var me = this;
+				var p = this.element.find(".video-transcript p");
+				p.removeClass("current");
+				p.each(function (index, item) {
+					var el = $(item);
+					var begin = el.attr("data-begin");
+					var end = el.attr("data-end");
+					if (t > begin && t < end) {
+						el.addClass("current");
+						me.element.find(".video-transcript").scrollTo(el, 500, { interrupt: true });
+						return false;
+					}
+				});
+			}
+
+			this.saveCurrentVideoTime();
 		},
 
 		saveCurrentVideoTime: function () {
@@ -1334,6 +1362,57 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 
 				$(this.el).append(track);
 			}
+
+			var transcript = this.toc[this.currentIndex].transcript;
+			if (transcript) {
+				function timeStringToSeconds (s) {
+					var h = parseInt(s.substr(0, 2));
+					var m = parseInt(s.substr(3, 2));
+					var sec = parseInt(s.substr(6, 2));
+					var ms = parseInt(s.substr(9, 1));
+					return (h * 60 * 60) + (m * 60) + sec + (ms / 10);
+				}
+
+				var me = this;
+
+				$.get(transcript, function (data) {
+					var t = $(data);
+					var allText = t.find("div p");
+					$(".video-transcript").html(allText);
+
+					allText.click($.proxy(me.onClickTranscript, me));
+
+					allText.each(function (index, item) {
+						var el = $(item);
+						var begin = timeStringToSeconds(el.attr("begin"));
+						var end = timeStringToSeconds(el.attr("end"));
+						el.attr( { "data-begin": begin, "data-end": end } );
+					});
+				});
+
+				this.element.find(".video-holder").addClass("has-transcript");
+
+				this.hasTranscript = true;
+			} else {
+				this.element.find(".video-holder").removeClass("has-transcript");
+
+				this.hasTranscript = false;
+			}
+		},
+
+		onClickTranscript: function (event) {
+			var t = $(event.currentTarget).attr("data-begin");
+			this.player.currentTime(t);
+		},
+
+		onToggleTranscript: function (event) {
+			var holder = this.element.find(".video-holder");
+			if (holder.hasClass("transcript-visible")) {
+				holder.removeClass("transcript-visible");
+			} else {
+				holder.addClass("transcript-visible");
+			}
+			this.element.find(".vjs-transcript-button").blur();
 		},
 
 		getIDForCurrentIndex: function () {

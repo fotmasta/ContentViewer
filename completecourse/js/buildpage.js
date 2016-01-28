@@ -18,6 +18,7 @@ requirejs.config({
 		"jquery.json": "jquery.json.min",
 		"jquery.onscreen": "jquery.onscreen",
 		"jquery.highlight": "jquery.highlight",
+		"jquery.scrollTo": "jquery.scrollTo.min",
 		"bootstrap": "bootstrap",
 		"bootstrap-notify": "bootstrap-notify.min",
 		"bootstrap-dialog": "bootstrap-dialog.min",
@@ -46,6 +47,10 @@ requirejs.config({
 			deps: ['jquery']
 		},
 		"jquery.highlight": {
+			export: "$",
+			deps: ['jquery']
+		},
+		"jquery.scrollTo": {
 			export: "$",
 			deps: ['jquery']
 		},
