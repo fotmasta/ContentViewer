@@ -449,7 +449,14 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 
 			for (var i = 0; i < results.length; i++) {
 				var index = results[i].ref;
-				var hit = this.options.metadata[index];
+				var hit;
+				if (this.options.metadata.length) {
+					// ePub/Habitat
+					hit = this.options.metadata[index];
+				} else {
+					// video
+					hit = this.options.metadata.toc[index];
+				}
 				if (hit) {
 					var node = findNodeForIndex(this.nodes, index);
 					var label = MakeAShortLabelForSearchResults(node);

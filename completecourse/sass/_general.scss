@@ -248,6 +248,10 @@ body.skin-Microsoft .iframe-holder {
 	}
 }
 
+video {
+	&::cue {
+	}
+}
 #video {
 	padding: 0;
 	
