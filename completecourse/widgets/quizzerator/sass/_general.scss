@@ -1,3 +1,6 @@
+$correct-color: #5cb85c;
+$incorrect-color: #d9534f;
+
 .quizzerator {
 	margin-left: 140px;
 }
@@ -28,13 +31,13 @@ li.question {
 
 	&[data-correct=false] {
 		p.response.selected {
-			background-color: #d9534f !important;
+			background-color: $incorrect-color !important;
 		}
 	}
 
 	&[data-correct=true] {
 		p.response.selected {
-			background-color: #5cb85c !important;
+			background-color: $correct-color !important;
 		}
 	}
 
@@ -77,6 +80,14 @@ li.question {
 
 			i.icon {
 				transform: translateY(-50%);
+
+				&.correct {
+					color: $correct-color;
+				}
+
+				&.incorrect {
+					color: $incorrect-color;
+				}
 			}
 		}
 	}
@@ -106,7 +117,7 @@ li.question {
 	}
 
 	table.results {
-		width: 75px;
+		width: 100px;
 		background-color: #f0f0ff;
 	}
 
@@ -123,8 +134,12 @@ li.question {
 
 		td:nth-child(2) {
 			text-align: right;
-			min-width: 2em;
+			min-width: 3em;
 			border-left: 1px solid #999;
+		}
+
+		tr.answered {
+			background-color: white;
 		}
 
 		tr.total {

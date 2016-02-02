@@ -112,6 +112,8 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 
 			this.id = "quiz_id";
 
+			this.options.settings = { reviewableAfterEach: true };
+
 			var quizFile = this.options.data;
 
 			// use filename for quiz id
@@ -123,13 +125,14 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 				this.id = quizFile;
 			}
 
-			$.getJSON(quizFile, $.proxy(this.onLoadedData, this));
+			// get tsv of settings, questions, and responses
+			$.get(quizFile, $.proxy(this.onLoadedData, this));
 
 			var summary = $("<div>", {class: "summary"});
 			var container = $("<div>", {class: "holder"});
 			summary.append(container);
 			container.append($("<h3>Score:</h3>"));
-			var t = $("<table><tr><td>Correct</td><td id='correct-count'></td></tr><tr><td>Incorrect</td><td id='incorrect-count'></td></tr><tr class='total'><td>Remaining</td><td id='remaining-count'></td></tr></table>");
+			var t = $("<table><tr class='answered'><td>Answered</td><td id='answered-count'></td></tr><tr><td>Correct</td><td id='correct-count'></td></tr><tr><td>Incorrect</td><td id='incorrect-count'></td></tr><tr class='total'><td>Score</td><td id='score-result'></td></tr></table>");
 			t.addClass("results");
 			container.append(t);
 			var btn = $("<button>", {
@@ -159,20 +162,33 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 
 			this.data = data;
 
-			// id can also come from json data
-			if (this.data.id) {
-				this.id = this.data.id;
-			}
-
 			if (this.options.desc) {
 				this.element.find("h3.quiz-title").text(this.options.desc);
 			} else if (this.data.title) {
 				this.element.find("h3.quiz-title").text(this.data.title);
 			}
 
-			for (var each in data.questions) {
-				var q = data.questions[each];
+			var lines = data.split("\r\n");
+
+			this.processSettings(lines);
+
+			for (var i = 3; i < lines.length; i++) {
+				var q = {};
+
+				var line = lines[i];
+				var fields = line.split("\t");
+
+				q.q = fields[0];
+				q.hint = fields[1];
+				q.answers = [];
+				for (var j = 2; j < fields.length; j++) {
+					var answer = fields[j];
+					if (answer !== "")
+						q.answers.push(answer);
+				}
+
 				this.addQuestion(q);
+
 			}
 
 			this.options.iframe.overrideLinks();
@@ -184,6 +200,28 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 			this.updateScore();
 
 			this.adjustSummarySize();
+		},
+
+		processSettings: function (lines) {
+			var i = 1;
+			var done = false;
+
+			while (i < lines.length && !done) {
+				var fields = lines[i].split("\t");
+
+				var setting = fields[0].toLowerCase();
+
+				switch (setting) {
+					case "reviewable after each question":
+						this.options.settings.reviewableAfterEach = fields[1].toLowerCase() == "yes";
+						break;
+					case "question":
+						done = true;
+						break;
+				}
+
+				i++;
+			}
 		},
 
 		addQuestion: function (q_params) {
@@ -209,10 +247,10 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 				var icons = $("<div>", {class: "icons"});
 				li.append(icons);
 
-				var icon_correct = $("<i>", {class: "icon correct fa fa-2x fa-thumbs-o-up hidden"});
+				var icon_correct = $("<i>", {class: "icon correct fa fa-2x fa-check hidden"});
 				icons.append(icon_correct);
 
-				var icon_incorrect = $("<i>", {class: "icon incorrect fa fa-2x fa-thumbs-o-down hidden"});
+				var icon_incorrect = $("<i>", {class: "icon incorrect fa fa-2x fa-times hidden"});
 				icons.append(icon_incorrect);
 
 				var p = $("<p>", {class: "response", html: answer});
@@ -257,9 +295,11 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 
 			if (!alreadySelected) {
 				response.addClass("selected");
-				q.find(".checker").removeClass("inactive animated fadeOut").addClass("animated fadeInLeft").find("button").removeClass("btn-danger").addClass("btn-primary").text("Check Answer");
+				if (this.options.settings.reviewableAfterEach)
+					q.find(".checker").removeClass("inactive animated fadeOut").addClass("animated fadeInLeft").find("button").removeClass("btn-danger").addClass("btn-primary").text("Check Answer");
 			} else {
-				q.find(".checker").addClass("animated fadeOut").animate({_nothing: 0}, 1000, $.proxy(me.resetButton, me, q));
+				if (this.options.settings.reviewableAfterEach)
+					q.find(".checker").addClass("animated fadeOut").animate({_nothing: 0}, 1000, $.proxy(me.resetButton, me, q));
 			}
 
 			q.find(".icon").addClass("hidden");
@@ -293,12 +333,23 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 				me.element.find(".summary").height(h);
 			}
 
-			if (answered.length) {
-				this.element.find("#check-all").removeClass("shrunk");
-				setTimeout(doHeightAdjustment, 500);
+			if (this.options.settings.reviewableAfterEach) {
+				if (answered.length) {
+					this.element.find("#check-all").removeClass("shrunk");
+					setTimeout(doHeightAdjustment, 500);
+				} else {
+					this.element.find("#check-all").addClass("shrunk");
+					setTimeout(doHeightAdjustment, 500);
+				}
 			} else {
-				this.element.find("#check-all").addClass("shrunk");
-				setTimeout(doHeightAdjustment, 500);
+				var questions = this.element.find(".question");
+				if (answered.length == questions.length) {
+					this.element.find("#check-all").removeClass("shrunk");
+					setTimeout(doHeightAdjustment, 500);
+				} else {
+					this.element.find("#check-all").addClass("shrunk");
+					setTimeout(doHeightAdjustment, 500);
+				}
 			}
 		},
 
@@ -362,9 +413,15 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 			this.element.find(".summary").find("#correct-count").text(correct);
 			this.element.find("#incorrect-count").text(incorrect);
 
-			var remaining = this.element.find(".question").length - (correct + incorrect);
+			var total = this.element.find(".question").length;
 
-			this.element.find("#remaining-count").text(remaining);
+			var answered = this.element.find(".selected");
+
+			this.element.find("#answered-count").text(answered.length + " / " + total);
+
+			var score = Math.round((correct / total) * 100);
+
+			this.element.find("#score-result").text(score + "%");
 		},
 
 		loadResponses: function () {

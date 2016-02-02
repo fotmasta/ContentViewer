@@ -172,3 +172,6 @@
 // DONE: transcript search field (or just use the main search box) [main search]
 // DONE: search closed captioning, to supplement TOC search (prebuild search index during conversion) [replaces TOC search]
 // DONE: video transcript search results should populate TOC search result window
+// DONE: load quizzerator from tsv rather than json
+// DONE: use checks and x's instead of thumbs
+// DONE: have setting for review after each (yes/no)
