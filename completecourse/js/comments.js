@@ -1,4 +1,4 @@
-define(["jquery.ui", "firebase", "video-manager"], function () {
+define(["database", "jquery.ui", "video-manager", "firebase"], function (Database) {
 
 	function findParentComment (el) {
 		var this_el = el;
@@ -35,21 +35,7 @@ define(["jquery.ui", "firebase", "video-manager"], function () {
 			this.comments = [];
 			this.last_iframe = undefined;
 
-			this.authorize();
-		},
-
-		authorize: function () {
-			var ref = new Firebase("https://ptg-comments.firebaseio.com");
-			ref.authAnonymously($.proxy(this.onAuthorized, this));
-		},
-
-		onAuthorized: function (error, authData) {
-			if (error) {
-				console.log("Login Failed!", error);
-			} else {
-				//console.log("Authenticated successfully with payload:", authData);
-				this.loadCommentsFromFirebase();
-			}
+			Database.onAuthorized($.proxy(this.loadCommentsFromFirebase, this));
 		},
 
 		clearComments: function () {
@@ -63,7 +49,7 @@ define(["jquery.ui", "firebase", "video-manager"], function () {
 
 		loadCommentsFromFirebase: function () {
 			this.firebaseRef = new Firebase("https://ptg-comments.firebaseio.com/titles/");
-			//this.clearComments();
+
 			// use "child_added" or "value"? ("child_added" wasn't triggered for changes; "value" is)
 			var path = makeFirebaseFriendly(this.options.titlePath);
 			this.firebaseRef.child(path + "/comments").orderByChild("timestamp").on("value", $.proxy(this.onLoadComments, this));

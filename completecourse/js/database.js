@@ -1,4 +1,4 @@
-define(["jquery.json"], function () {
+define(["jquery.json", "firebase"], function () {
 
 	function makeKey (s) {
 		s = s.toLowerCase();
@@ -11,8 +11,14 @@ define(["jquery.json"], function () {
 
 		items: [],
 		currentIndex: undefined,
+		callbacks: [],
+		remoteAuthorized: false,
+		last_save: undefined,
+		attemptedRemoteLoad: false,
 
-		initialize: function (toc, title) {
+		initialize: function (toc, title, updateCallback) {
+			this.authorize();
+
 			if (title === undefined) {
 				// NOTE: store our app data in a key named for the folder this content came from (ie, test_my_google_apps)
 
@@ -28,10 +34,14 @@ define(["jquery.json"], function () {
 				this.items[i] = item;
 			}
 
+			this.updateCallback = updateCallback;
+
 			this.loadFromLocalStorage();
 		},
 
 		loadFromLocalStorage: function () {
+			console.log("load from local storage");
+
 			var item = localStorage.getItem(this.folder);
 			if (item) {
 				var db = $.evalJSON(item);
@@ -51,6 +61,11 @@ define(["jquery.json"], function () {
 				localStorage.setItem(this.folder, to_json);
 			} catch (e) {
 				// private browsing
+			}
+
+			if (to_json != this.last_save) {
+				this.saveToRemoteStorage(this.folder, to_json);
+				this.last_save = to_json;
 			}
 		},
 
@@ -128,8 +143,83 @@ define(["jquery.json"], function () {
 			this.titleProperty[key] = val;
 
 			this.saveToLocalStorage();
-		}
+		},
 
+		authorize: function () {
+			var ref = new Firebase("https://ptg-comments.firebaseio.com");
+			ref.authAnonymously($.proxy(this.onAuthorizedCallback, this));
+		},
+
+		onAuthorizedCallback: function (error, authData) {
+			if (error) {
+				console.log("Login Failed!", error);
+			} else {
+				console.log("remote authorized");
+
+				this.remoteAuthorized = true;
+
+				this.loadFromRemoteStorage();
+
+				for (var i = 0; i < this.callbacks.length; i++) {
+					this.callbacks[i]();
+				}
+			}
+		},
+
+		onAuthorized: function (callback) {
+			if (this.remoteAuthorized) {
+				callback();
+			} else {
+				this.callbacks.push(callback);
+			}
+		},
+
+		setCustomerID: function (id) {
+			console.log("using customer id " + id);
+			this.userStorageRef = new Firebase("https://ptg-comments.firebaseio.com/users/" + id);
+		},
+
+		saveToRemoteStorage: function (folder, data) {
+			// THEORY: don't save to remote until we've tried loading from the remote
+			if (this.attemptedRemoteLoad) {
+				console.log("trying to save to remote");
+
+				if (this.userStorageRef) {
+					this.userStorageRef.child(folder).set(data);
+					console.log("saved");
+				}
+			}
+		},
+
+		loadFromRemoteStorage: function () {
+			console.log("loading from remote");
+
+			if (this.userStorageRef) {
+				this.attemptedRemoteLoad = true;
+
+				var me = this;
+
+				this.userStorageRef.child(this.folder).once("value", function (snapshot) {
+					var item = snapshot.val();
+
+					if (item) {
+						var db = $.evalJSON(item);
+
+						me.items = db.items;
+						me.currentIndex = db.index;
+						me.titleProperty = db.titleProperty;
+
+						console.log("loaded");
+
+						if (me.updateCallback) {
+							me.updateCallback();
+						}
+					} else {
+						console.log("nothing on remote");
+					}
+				});
+			}
+		}
 	};
 
 	return Database;

@@ -162,7 +162,7 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 			if (options.title)
 				document.title = options.title;
 
-			Database.initialize(toc, options.title);
+			Database.initialize(toc, options.title, $.proxy(this.onDatabaseUpdate, this));
 			$(".toc").TOCTree("setStatus", Database.getItems());
 
 			this.updateProgress();
@@ -218,6 +218,8 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 					}
 				}
 			});
+
+			this.getCustomerIdentifier();
 
 			this.currentIndex = undefined;
 
@@ -1441,6 +1443,25 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 
 		getDatabase: function () {
 			return Database;
+		},
+
+		getCustomerIdentifier: function () {
+			if (window.opener) {
+				var customerID = $(window.opener.document).find("meta[name='WT.dcsvid']").attr("content");
+				if (customerID != null) {
+					Database.setCustomerID(customerID);
+				}
+			} else {
+				console.log("no opener");
+				if (window.location.hostname == "localhost") {
+					console.log("faking it");
+					Database.setCustomerID("5566ba59-a786-400e-a3e0-866b6d1244f7");
+				}
+			}
+		},
+
+		onDatabaseUpdate: function () {
+			$(".toc").TOCTree("setStatus", Database.getItems());
 		}
 
 	});

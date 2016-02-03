@@ -560,7 +560,7 @@ span.completed {
   .habitat-body .code-snippet, .habitat-body .code-listing {
     margin-bottom: 1.5em; }
   .habitat-body .objectiveset {
-    float: right; }
+    /*float: right;*/ }
   .habitat-body span.highlight {
     background-color: yellow; }
   .habitat-body .comment-anchor {
