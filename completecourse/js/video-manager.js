@@ -550,7 +550,7 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 			var scrollingDOM;
 			if ($(".the-iframe-holder").height() == $("iframe").height()) {
 				// desktop
-				scrollingDOM = iframe.contents().find("body");
+				scrollingDOM = iframe.contents().find("html,body");
 			} else {
 				// iOS
 				scrollingDOM = $(".the-iframe-holder");

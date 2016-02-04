@@ -7,6 +7,35 @@ define(["jquery.json", "firebase"], function () {
 		return s;
 	}
 
+	function shrink (itemsArray) {
+		var s = [];
+		for (var i = 0; i < itemsArray.length; i++) {
+			var it = itemsArray[i];
+			if (it) {
+				s[i * 2] = it.started ? "s" : " ";
+				s[i * 2 + 1] = it.completed ? "c" : " ";
+			} else {
+				s[i*2] = "  ";
+			}
+		}
+		var st = s.join("");
+
+		return st;
+	}
+
+	function unshrink (st) {
+		var itemsArray = [];
+		var n = st.length / 2;
+		for (var i = 0; i < n; i++) {
+			var obj = {
+				started: st[i*2] == "s",
+				completed: st[i*2+1] == "c"
+			};
+			itemsArray[i] = obj;
+		}
+		return itemsArray;
+	}
+
 	var Database = {
 
 		items: [],
@@ -46,14 +75,20 @@ define(["jquery.json", "firebase"], function () {
 			if (item) {
 				var db = $.evalJSON(item);
 
-				this.items = db.items;
+				if (typeof db.items == "string") {
+					this.items = unshrink(db.items);
+				} else {
+					this.items = db.items;
+				}
 				this.currentIndex = db.index;
 				this.titleProperty = db.titleProperty;
 			}
 		},
 
 		saveToLocalStorage: function () {
-			var db = { items: this.items, index: this.currentIndex, titleProperty: this.titleProperty };
+			var compressedItems = shrink(this.items);
+
+			var db = { items: compressedItems, index: this.currentIndex, titleProperty: this.titleProperty };
 
 			var to_json = $.toJSON(db);
 
@@ -70,7 +105,7 @@ define(["jquery.json", "firebase"], function () {
 		},
 
 		setItemProperty: function (index, property, value) {
-			if (index >= this.items.length) {
+			if (index >= this.items.length || this.items[index] == undefined) {
 				this.items[index] = {};
 			}
 
@@ -205,7 +240,11 @@ define(["jquery.json", "firebase"], function () {
 					if (item) {
 						var db = $.evalJSON(item);
 
-						me.items = db.items;
+						if (typeof db.items == "string") {
+							me.items = unshrink(db.items);
+						} else {
+							me.items = db.items;
+						}
 						me.currentIndex = db.index;
 						me.titleProperty = db.titleProperty;
 
