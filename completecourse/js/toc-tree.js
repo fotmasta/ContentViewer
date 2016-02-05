@@ -72,10 +72,18 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 
 			var shortLabel = undefined;
 
-			if (options.skin && options.skin.trim() == "CIB") {
-				var match = labelText.match(/^Chapter (\d+):/);
-				if (match) {
-					shortLabel = match[1];
+			if (options.skin) {
+				if (options.skin.trim() == "CIB") {
+					var match = labelText.match(/^Chapter (\d+):/);
+					if (match) {
+						shortLabel = match[1];
+					}
+				} else if (options.skin.trim() == "ABG") {
+					var match = labelText.match(/^Part\s*(\w+):\s*(.*)/);
+					if (match) {
+						shortLabel = match[1];
+						label = match[2];
+					}
 				}
 			}
 
@@ -213,15 +221,22 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 
 				var new_depth = depth.slice();
 
-				if (this.options.skin && this.options.skin.trim() == "CIB") {
-					if (d.node.short) {
-						new_depth.push(d.node.short);
-					} else {
-						if (depth.length == 0) {
-							new_depth.push(romanize(otherIndex));
-							otherIndex++;
+				if (this.options.skin) {
+					if (this.options.skin.trim() == "CIB") {
+						if (d.node.short) {
+							new_depth.push(d.node.short);
 						} else {
-							new_depth.push(i + 1);
+							if (depth.length == 0) {
+								new_depth.push(romanize(otherIndex));
+								otherIndex++;
+							} else {
+								new_depth.push(i + 1);
+							}
+						}
+					} else if (this.options.skin.trim() == "ABG") {
+						// remove extraneous Appendix from ABG titles (can't seem to do it in Habitat)
+						if (d.node.desc == "Appendix") {
+							d = null;
 						}
 					}
 				} else {
@@ -296,8 +311,21 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 					short.html(d.node.short);
 				} else {
 					if (this.options.type == "habitat") {
-						short_label = depth[depth.length - 1];
-						short.html(short_label);
+						if (this.options.skin && this.options.skin.trim() == "ABG") {
+							var match = entry_text.match(/^(\d+): (.*)/);
+							if (match) {
+								sp.html(match[2]);
+								short_label = match[1];
+								short.html(short_label);
+							}
+
+							if (short_label == "") {
+								short.addClass("invisible");
+							}
+						} else {
+							short_label = depth[depth.length - 1];
+							short.html(short_label);
+						}
 					} else if (this.options.type == "epub") {
 						short_label = depth[depth.length - 1];
 						short.html(short_label).addClass("invisible");
