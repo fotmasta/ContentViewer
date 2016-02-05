@@ -104,7 +104,7 @@ requirejs.config({
 	}
 });
 
-define(["jquery", "handlebars", "text!viewer_template.html", "video-manager", "video-overlay", "toc-tree", "videojs", "popcorn", "popcorn.timebase", "bootstrap-toolkit", "comments"], function ($, Handlebars, viewerTemplate, VideoManager) {
+define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popcorn", "popcorn.timebase", "bootstrap-toolkit", "comments"], function ($, VideoManager) {
 	var manifest;
 
 	var contentsPaneDesiredVisible = undefined;
@@ -494,13 +494,16 @@ define(["jquery", "handlebars", "text!viewer_template.html", "video-manager", "v
 
 	var BuildPage = {
 		build: function (options) {
-			var template = Handlebars.compile(viewerTemplate);
-			var context = { title: options.title };
-			var html = template(context);
+			var url = baseURL + "js/viewer_template.html";
+			$("body").load(url, $.proxy(this.doBuild, this, options));
+		},
+
+		doBuild: function (options) {
+			$(".navbar-brand").text(options.title);
 
 			$("html").addClass("ui");
 
-			$("body").append($(html));
+			//$("body").append($(html));
 
 			addLinkToCSS(baseURL + "css/bootstrap.min.css");
 			addLinkToCSS(baseURL + "css/bootstrap-theme.min.css");
