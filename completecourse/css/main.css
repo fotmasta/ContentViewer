@@ -812,6 +812,29 @@ button#search-close {
   40% {
     -webkit-transform: scale(1);
     transform: scale(1); } }
+.slide-panel .close-button {
+  position: absolute;
+  left: -32px;
+  top: 30px;
+  border: 2px solid #288C32;
+  border-radius: 5px 0 0 5px;
+  border-right: none;
+  background-color: white;
+  width: 30px;
+  height: 40px;
+  line-height: 40px;
+  text-align: center;
+  vertical-align: middle;
+  color: #288C32;
+  box-sizing: content-box; }
+  .slide-panel .close-button:hover {
+    color: #39c647;
+    cursor: pointer; }
+  .slide-panel .close-button:active {
+    color: black; }
+  .slide-panel .close-button .fa {
+    line-height: inherit; }
+
 #comments-panel {
   display: none;
   position: fixed;
@@ -827,28 +850,6 @@ button#search-close {
   #comments-panel #comments-content {
     height: 100%;
     overflow: auto; }
-  #comments-panel #close-button {
-    position: absolute;
-    left: -32px;
-    top: 30px;
-    border: 2px solid #288C32;
-    border-radius: 5px 0 0 5px;
-    border-right: none;
-    background-color: white;
-    width: 30px;
-    height: 40px;
-    line-height: 40px;
-    text-align: center;
-    vertical-align: middle;
-    color: #288C32;
-    box-sizing: content-box; }
-    #comments-panel #close-button:hover {
-      color: #39c647;
-      cursor: pointer; }
-    #comments-panel #close-button:active {
-      color: black; }
-    #comments-panel #close-button .fa {
-      line-height: inherit; }
   #comments-panel .panel-heading span {
     font-size: 18px; }
   #comments-panel .panel-body {
@@ -907,6 +908,24 @@ button#search-close {
       margin-top: 3em; }
     #comments-panel .comment.reply {
       background-color: white; }
+
+#account-panel {
+  display: none;
+  position: fixed;
+  top: 51px;
+  bottom: 0;
+  right: 0;
+  width: 33vw;
+  background-color: white;
+  border-left: 3px solid #3072AB;
+  padding: 10px;
+  overflow: visible;
+  box-shadow: -5px 0 20px black; }
+  #account-panel .close-button {
+    border-color: #3072AB;
+    color: #3072AB; }
+  #account-panel .panel-heading span {
+    font-size: 18px; }
 
 .codelink {
   display: none; }

@@ -1,3 +1,4 @@
+// TODO: test fallback when Firebase errors out due to max concurrent users
 // TODO: think about security considerations for user data (logged in? using id? more?)
 // TODO: test transcript/captioning [check]/quizzes on iOS
 // TODO: use latest videojs?
@@ -188,3 +189,7 @@
 // DONE: use a different method for loading the viewer_template so we don't get this error: XMLHttpRequest cannot load https://s3.amazonaws.com/storefronts/streaming-video/completecourse/js/viewer_template.html. No 'Access-Control-Allow-Origin' header is present on the requested resource. Origin 'https://memberservices.informit.com' is therefore not allowed access.
 // NOTE: switched from require|text to $.load for loading the viewer_template.html; hopefully this will prevent some of the cross-origin refresh problems.
 // DONE: make all images the same scale?? [can't be done my end]
+// DONE: save timestamp with status and only overwrite if older
+// DONE: account "stats" page (consecutive days read, # of titles, completion %)
+// DONE: only one panel (account or comments) open at a time
+// DONE: activate comments everywhere (for logged-in users)

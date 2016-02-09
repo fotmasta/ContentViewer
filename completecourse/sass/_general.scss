@@ -1159,25 +1159,8 @@ button#search-close {
 	  }
 }
 
-#comments-panel {
-	display: none;
-	position: fixed;
-	top: 51px;
-	bottom: 0;
-	right: 0;
-	width: 33vw;
-	background-color: white;
-	border-left: 3px solid #288C32;
-	padding: 10px;
-	overflow: visible;
-	box-shadow: -5px 0 20px black;
-
-	#comments-content {
-		height: 100%;
-		overflow: auto;
-	}
-
-	#close-button {
+.slide-panel {
+	.close-button {
 		position: absolute;
 		left: -32px;
 		top: 30px;
@@ -1205,6 +1188,25 @@ button#search-close {
 		.fa {
 			line-height: inherit;
 		}
+	}
+}
+
+#comments-panel {
+	display: none;
+	position: fixed;
+	top: 51px;
+	bottom: 0;
+	right: 0;
+	width: 33vw;
+	background-color: white;
+	border-left: 3px solid #288C32;
+	padding: 10px;
+	overflow: visible;
+	box-shadow: -5px 0 20px black;
+
+	#comments-content {
+		height: 100%;
+		overflow: auto;
 	}
 
 	.panel-heading {
@@ -1317,6 +1319,34 @@ button#search-close {
 		&.reply {
 			background-color: white;
 		}
+	}
+}
+
+#account-panel {
+	display: none;
+	position: fixed;
+	top: 51px;
+	bottom: 0;
+	right: 0;
+	width: 33vw;
+	background-color: white;
+	border-left: 3px solid #3072AB;
+	padding: 10px;
+	overflow: visible;
+	box-shadow: -5px 0 20px black;
+
+	.close-button {
+		border-color: #3072AB;
+		color: #3072AB;
+	}
+
+	.panel-heading {
+		span {
+			font-size: 18px;
+		}
+	}
+
+	.panel-body {
 	}
 }
 

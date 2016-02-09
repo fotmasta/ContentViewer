@@ -1452,12 +1452,24 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 					Database.setCustomerID(customerID);
 				}
 			} else {
-				console.log("no opener");
 				if (window.location.hostname == "localhost") {
-					console.log("faking it");
 					Database.setCustomerID("5566ba59-a786-400e-a3e0-866b6d1244f7");
 				}
 			}
+		},
+
+		hasCustomerIdentifier: function () {
+			if (window.opener) {
+				var customerID = $(window.opener.document).find("meta[name='WT.dcsvid']").attr("content");
+				if (customerID != null) {
+					return true;
+				}
+			} else {
+				if (window.location.hostname == "localhost") {
+					return true;
+				}
+			}
+			return false;
 		},
 
 		onDatabaseUpdate: function () {

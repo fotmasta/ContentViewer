@@ -104,7 +104,7 @@ requirejs.config({
 	}
 });
 
-define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popcorn", "popcorn.timebase", "bootstrap-toolkit", "comments"], function ($, VideoManager) {
+define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popcorn", "popcorn.timebase", "bootstrap-toolkit", "comments", "account"], function ($, VideoManager) {
 	var manifest;
 
 	var contentsPaneDesiredVisible = undefined;
@@ -123,6 +123,14 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 		$("body").addClass("skin-" + manifest.skin);
 
 		$("#comments-panel").Comments( { manager: $("#video"), titlePath: getEscapedPathFromTitle(optionsTitle) });
+
+		$("#account-panel").Account();
+
+		if ($("#video").VideoManager("hasCustomerIdentifier") && manifest.allowComments !== false) {
+			$("#show-comments-button").click(onOpenComments);
+		} else {
+			$("#show-comments-button").hide(0);
+		}
 
 		/*
 		 if (!coachMarksShown) {
@@ -492,6 +500,10 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 		$("#comments-panel").Comments("togglePanel");
 	}
 
+	function onOpenAccountPanel () {
+		$("#account-panel").Account("togglePanel");
+	}
+
 	var BuildPage = {
 		build: function (options) {
 			var url = baseURL + "js/viewer_template.html";
@@ -537,13 +549,16 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 			$("#search-previous").click(onSearchPrevious);
 			$("#search-next").click(onSearchNext);
 
-			$("#account-button").click(function () { window.open("//memberservices.informit.com/my_account/index.aspx"); });
+			//$("#account-button").click(function () { window.open("//memberservices.informit.com/my_account/index.aspx"); });
+			$("#account-button").click(onOpenAccountPanel);
 
-			if (options.allowComments !== true) {
-				$("#show-comments-button").hide(0);
-			} else {
+			/*
+			if (options.allowComments === true) {
 				$("#show-comments-button").click(onOpenComments);
+			} else {
+				$("#show-comments-button").hide(0);
 			}
+			*/
 
 			optionsTitle = options.title;
 

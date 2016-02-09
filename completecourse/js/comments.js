@@ -28,7 +28,7 @@ define(["database", "jquery.ui", "video-manager", "firebase"], function (Databas
 
 			this.element.find("#commentText").on("input", $.proxy(this.onChangeComment, this));
 			this.element.find("#submit-comment").click($.proxy(this.onClickSubmit, this));
-			this.element.find("#close-button").click($.proxy(this.onClickClose, this));
+			this.element.find(".close-button").click($.proxy(this.onClickClose, this));
 			this.element.find("#tab-all").click($.proxy(this.onClickAllComments, this));
 			this.element.find("#tab-page").click($.proxy(this.onClickPageComments, this));
 
@@ -232,22 +232,31 @@ define(["database", "jquery.ui", "video-manager", "firebase"], function (Databas
 			this.element.find("#submit-comment").addClass("disabled");
 		},
 
+		closeOtherPanels: function () {
+			$(".slide-panel.showing").hide("slide", {direction:"right"}).removeClass("showing");
+		},
+
 		onClickClose: function () {
 			this.closePanel();
 		},
 
 		openPanel: function () {
-			this.element.show("slide", {direction: "right"});
+			this.closeOtherPanels();
+
+			this.element.show("slide", {direction: "right"}).addClass("showing");
 			this.element.find(".comment.animated").removeClass("animated");
 		},
 
 		closePanel: function () {
-			this.element.hide("slide", {direction: "right"});
+			this.element.hide("slide", {direction: "right"}).removeClass("showing");
 		},
 
 		togglePanel: function () {
-			this.element.toggle("slide", {direction: "right"});
-			this.element.find(".comment.animated").removeClass("animated");
+			if (this.element.is(":visible")) {
+				this.closePanel();
+			} else {
+				this.openPanel();
+			}
 		},
 
 		showCommentIconsInIframe: function (iframe) {
