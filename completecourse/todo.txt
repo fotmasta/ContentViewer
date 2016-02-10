@@ -193,3 +193,6 @@
 // DONE: account "stats" page (consecutive days read, # of titles, completion %)
 // DONE: only one panel (account or comments) open at a time
 // DONE: activate comments everywhere (for logged-in users)
+// DONE: add customer id to comment record
+// DONE: comments not working for Habitat content
+// DONE: remove "."'s from Firebase keys (and added to Common.js)

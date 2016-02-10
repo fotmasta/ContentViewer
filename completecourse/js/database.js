@@ -1,11 +1,4 @@
-define(["jquery.json", "firebase"], function () {
-
-	function makeKey (s) {
-		s = s.toLowerCase();
-		s = s.replace(/\s/g, "_");
-
-		return s;
-	}
+define(["common", "jquery.json", "firebase"], function (Common) {
 
 	function shrink (itemsArray) {
 		var s = [];
@@ -56,7 +49,7 @@ define(["jquery.json", "firebase"], function () {
 				title = paths[paths.length - 2];
 			}
 
-			this.folder = makeKey(title);
+			this.folder = Common.makeFirebaseFriendly(title);
 
 			this.items = new Array(toc.length);
 			for (var i = 0; i < this.items.length; i++) {
@@ -212,7 +205,12 @@ define(["jquery.json", "firebase"], function () {
 		},
 
 		setCustomerID: function (id) {
+			this.customerID = id;
 			this.userStorageRef = new Firebase("https://ptg-comments.firebaseio.com/users/" + id);
+		},
+
+		getCustomerID: function () {
+			return this.customerID;
 		},
 
 		saveToRemoteStorage: function (folder, data) {

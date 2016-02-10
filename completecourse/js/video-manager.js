@@ -1446,16 +1446,21 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 		},
 
 		getCustomerIdentifier: function () {
+			var customerID;
+
 			if (window.opener) {
-				var customerID = $(window.opener.document).find("meta[name='WT.dcsvid']").attr("content");
+				customerID = $(window.opener.document).find("meta[name='WT.dcsvid']").attr("content");
 				if (customerID != null) {
 					Database.setCustomerID(customerID);
 				}
 			} else {
 				if (window.location.hostname == "localhost") {
-					Database.setCustomerID("5566ba59-a786-400e-a3e0-866b6d1244f7");
+					customerID = "5566ba59-a786-400e-a3e0-866b6d1244f7"
+					Database.setCustomerID(customerID);
 				}
 			}
+
+			return customerID;
 		},
 
 		hasCustomerIdentifier: function () {

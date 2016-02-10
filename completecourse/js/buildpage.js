@@ -335,6 +335,8 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 	function onHabitatTOCLoaded (data) {
 		var metadata = convertHabitatTOCtoMetadata(data);
 
+		addIDsToTOC(metadata);
+
 		$(".toc").TOCTree({ type: "habitat", skin: manifest.skin, data: data, metadata: metadata, expander: "#collapse-button" });
 
 		var settings = { toc: metadata, el: "#video video", player: videojs("main_video"), markers: [], options: manifest };

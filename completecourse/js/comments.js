@@ -1,4 +1,4 @@
-define(["database", "jquery.ui", "video-manager", "firebase"], function (Database) {
+define(["database", "common", "jquery.ui", "video-manager", "firebase"], function (Database, Common) {
 
 	function findParentComment (el) {
 		var this_el = el;
@@ -13,10 +13,6 @@ define(["database", "jquery.ui", "video-manager", "firebase"], function (Databas
 		}
 
 		return parentComment;
-	}
-
-	function makeFirebaseFriendly (path) {
-		return path.replace(".", "");
 	}
 
 	$.widget("que.Comments", {
@@ -51,7 +47,7 @@ define(["database", "jquery.ui", "video-manager", "firebase"], function (Databas
 			this.firebaseRef = new Firebase("https://ptg-comments.firebaseio.com/titles/");
 
 			// use "child_added" or "value"? ("child_added" wasn't triggered for changes; "value" is)
-			var path = makeFirebaseFriendly(this.options.titlePath);
+			var path = Common.makeFirebaseFriendly(this.options.titlePath);
 			this.firebaseRef.child(path + "/comments").orderByChild("timestamp").on("value", $.proxy(this.onLoadComments, this));
 		},
 
@@ -164,7 +160,7 @@ define(["database", "jquery.ui", "video-manager", "firebase"], function (Databas
 		},
 
 		onClickSubmit: function () {
-			var path = makeFirebaseFriendly(this.options.titlePath);
+			var path = Common.makeFirebaseFriendly(this.options.titlePath);
 			var newCommentRef = this.firebaseRef.child(path + "/comments").push();
 
 			var name = this.element.find("#commentName").val();
@@ -174,8 +170,9 @@ define(["database", "jquery.ui", "video-manager", "firebase"], function (Databas
 			var categoryEl = this.element.find("#category input:radio:checked");
 			var category = categoryEl.length ? categoryEl.val() : null;
 			var timestamp = Date.now();
+			var id = Database.getCustomerID();
 
-			var rec = { "name": name, email: email, "text": text, "timestamp": timestamp, category: category, "ok": false };
+			var rec = { "id": id, "name": name, email: email, "text": text, "timestamp": timestamp, category: category, "ok": false };
 
 			var useAnchor = this.element.find("#commentAnchor").prop("checked");
 			if (useAnchor) {
@@ -278,7 +275,7 @@ define(["database", "jquery.ui", "video-manager", "firebase"], function (Databas
 						if (el.length) {
 							var d = $("<div>", { class: "comment-anchor", html: "&#xe0b9" });
 							d.attr("data-key", c.key);
-							el.parent().append(d);
+							el.append(d);
 							c.onPage = true;
 							count++;
 						}
@@ -425,7 +422,7 @@ define(["database", "jquery.ui", "video-manager", "firebase"], function (Databas
 
 			var parentKey = parentComment.attr("data-key");
 
-			var path = makeFirebaseFriendly(this.options.titlePath);
+			var path = Common.makeFirebaseFriendly(this.options.titlePath);
 			var newCommentRef = this.firebaseRef.child(path + "/comments").push();
 
 			var form = el.parents(".comments-entry");
@@ -437,8 +434,9 @@ define(["database", "jquery.ui", "video-manager", "firebase"], function (Databas
 			var categoryEl = form.find("#category input:radio:checked");
 			var category = categoryEl.length ? categoryEl.val() : null;
 			var timestamp = Date.now();
+			var id = Database.getCustomerID();
 
-			var rec = { "name": name, email: email, "text": text, "timestamp": timestamp, category: category, "ok": false, "parent": parentKey };
+			var rec = { "id": id, "name": name, email: email, "text": text, "timestamp": timestamp, category: category, "ok": false, "parent": parentKey };
 
 			newCommentRef.set(rec);
 
