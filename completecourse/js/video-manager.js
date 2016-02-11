@@ -1243,6 +1243,8 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 				if (index != this.getCurrentIndex()) {
 					this.setCurrentIndex(index);
 					isNew = true;
+
+					this.element.trigger("onNewTOC");
 				}
 
 				var entry = $(".toc li[data-index=" + index + "]");

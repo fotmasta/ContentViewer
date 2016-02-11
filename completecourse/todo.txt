@@ -196,3 +196,4 @@
 // DONE: add customer id to comment record
 // DONE: comments not working for Habitat content
 // DONE: remove "."'s from Firebase keys (and added to Common.js)
+// DONE: show name of page comment will be linked to

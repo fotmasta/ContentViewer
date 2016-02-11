@@ -19,7 +19,7 @@ define(["database", "common", "jquery.ui", "video-manager", "firebase"], functio
 
 		options: {},
 
-		_create: function (mgr) {
+		_create: function () {
 			var btn = this.element.find("#submit-comment");
 
 			this.element.find("#commentText").on("input", $.proxy(this.onChangeComment, this));
@@ -32,6 +32,10 @@ define(["database", "common", "jquery.ui", "video-manager", "firebase"], functio
 			this.last_iframe = undefined;
 
 			Database.onAuthorized($.proxy(this.loadCommentsFromFirebase, this));
+
+			if (this.options.manager) {
+				this.options.manager.on("onNewTOC", $.proxy(this.showCurrentAnchorTitle, this));
+			}
 		},
 
 		clearComments: function () {
@@ -242,6 +246,8 @@ define(["database", "common", "jquery.ui", "video-manager", "firebase"], functio
 
 			this.element.show("slide", {direction: "right"}).addClass("showing");
 			this.element.find(".comment.animated").removeClass("animated");
+
+			this.showCurrentAnchorTitle();
 		},
 
 		closePanel: function () {
@@ -448,6 +454,16 @@ define(["database", "common", "jquery.ui", "video-manager", "firebase"], functio
 		onClickDeleteComment: function (event) {
 			var el = $(event.target).parents(".comments-entry");
 			el.remove();
+		},
+
+		showCurrentAnchorTitle: function () {
+			var anchor_id = this.options.manager.VideoManager("getIDForCurrentIndex");
+			var title = this.options.manager.VideoManager("getTOCTitleForID", anchor_id);
+			if (title) {
+				this.element.find(".anchor-title").text(title);
+			} else {
+				this.element.find(".anchor-title").text("");
+			}
 		}
 	});
 });
