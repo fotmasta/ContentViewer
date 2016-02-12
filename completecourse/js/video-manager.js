@@ -1153,11 +1153,13 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 					for (var j = 0; j < me.toc.length; j++) {
 						// THEORY: look for matching header text in this src file only
 						// WARNING: Habitat compatibility
-						var thisSrc = URLPageOnly(URLWithoutHash(me.toc[j].src));
-						var desc = decodeEntities(me.toc[j].desc);
-						if (desc == t && curSrc == thisSrc) {
-							foundindex = j;
-							break;
+						if (me.toc[j] && me.toc[j].src) {
+							var thisSrc = URLPageOnly(URLWithoutHash(me.toc[j].src));
+							var desc = decodeEntities(me.toc[j].desc);
+							if (desc == t && curSrc == thisSrc) {
+								foundindex = j;
+								break;
+							}
 						}
 					}
 					if (foundindex != undefined)
@@ -1451,9 +1453,13 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 			var customerID;
 
 			if (window.opener) {
-				customerID = $(window.opener.document).find("meta[name='WT.dcsvid']").attr("content");
-				if (customerID != null) {
-					Database.setCustomerID(customerID);
+				try {
+					customerID = $(window.opener.document).find("meta[name='WT.dcsvid']").attr("content");
+					if (customerID != null) {
+						Database.setCustomerID(customerID);
+					}
+				} catch (e) {
+					// no access to the opener page
 				}
 			} else {
 				if (window.location.hostname == "localhost") {
@@ -1467,9 +1473,13 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 
 		hasCustomerIdentifier: function () {
 			if (window.opener) {
-				var customerID = $(window.opener.document).find("meta[name='WT.dcsvid']").attr("content");
-				if (customerID != null) {
-					return true;
+				try {
+					var customerID = $(window.opener.document).find("meta[name='WT.dcsvid']").attr("content");
+					if (customerID != null) {
+						return true;
+					}
+				} catch (e) {
+					// no access
 				}
 			} else {
 				if (window.location.hostname == "localhost") {

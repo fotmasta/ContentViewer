@@ -96,6 +96,9 @@ define(["bootstrap-dialog", "imagesloaded", "database", "jquery.ui"], function (
 			this.iframe.load($.proxy(this.onLoaded, this));
 
 			this.element.append(this.iframe);
+
+			// a rather inelegant way to check for size changes :(
+			setInterval($.proxy(this.sizeToBottom, this), 1000);
 		},
 
 		loadNewContent: function (options) {
@@ -111,6 +114,18 @@ define(["bootstrap-dialog", "imagesloaded", "database", "jquery.ui"], function (
 				this.injectWidget(widget.src, widget.params);
 			} else {
 				this.iframe.attr("src", src);
+			}
+		},
+
+		// iOS has fits if you don't give the iframe a specific height
+		sizeToBottom: function () {
+			var bottom = this.iframe.contents().find("[data-iframe-height]");
+			if (bottom.length) {
+				var h = Math.ceil(bottom.offset().top + bottom.outerHeight());
+				var frameh = this.iframe.height();
+				if (h != frameh) {
+					this.iframe.height(h);
+				}
 			}
 		},
 
@@ -163,9 +178,29 @@ define(["bootstrap-dialog", "imagesloaded", "database", "jquery.ui"], function (
 
 					break;
 			}
+
+			/* MutationObserver
+			// select the target node
+			var target = this.iframe.contents().find("body")[0];
+
+			// create an observer instance
+			var observer = new MutationObserver(function(mutations) {
+				mutations.forEach(function(mutation) {
+					console.log("mutation " + mutation.type);
+				});
+			});
+
+			// configuration of the observer:
+			var config = { subtree: true, attributes: true, childList: true, characterData: true };
+
+			// pass in the target node, as well as the observer options
+			observer.observe(target, config);
+			/*/
 		},
 
 		onIframeContentsLoaded: function () {
+			this.sizeToBottom();
+
 			var me = this;
 
 			if (me.iframe.contents()[0]) {
@@ -218,6 +253,7 @@ define(["bootstrap-dialog", "imagesloaded", "database", "jquery.ui"], function (
 				skin = "skin-" + this.options.manager.options.skin;
 
 			var $body = this.iframe.contents().find("body").addClass("habitat-body " + skin);
+			var $html = this.iframe.contents().find("html").addClass("habitat-html");
 		},
 
 		highlight: function (terms) {
@@ -248,7 +284,7 @@ define(["bootstrap-dialog", "imagesloaded", "database", "jquery.ui"], function (
 
 			if (obj) {
 				// add a next button
-				var a = $('<button id="next-button" class="button button-a"><h4>Next </h4>' + obj.title + '</button>').data("goto-index", obj.index);
+				var a = $('<button id="next-button" data-iframe-height="true" class="button button-a"><h4>Next </h4>' + obj.title + '</button>').data("goto-index", obj.index);
 				a.click($.proxy(this.onClickJumpButton, this));
 
 				this.iframe.contents().find("body").append(a);

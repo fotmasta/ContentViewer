@@ -1,3 +1,4 @@
+// TODO: Habitat quizzes do not seem to be loading on iOS
 // TODO: test fallback when Firebase errors out due to max concurrent users
 // TODO: think about security considerations for user data (logged in? using id? more?)
 // TODO: test transcript/captioning [check]/quizzes on iOS
@@ -188,7 +189,7 @@
 // DONE: improve numbering for Habitat ABG
 // DONE: use a different method for loading the viewer_template so we don't get this error: XMLHttpRequest cannot load https://s3.amazonaws.com/storefronts/streaming-video/completecourse/js/viewer_template.html. No 'Access-Control-Allow-Origin' header is present on the requested resource. Origin 'https://memberservices.informit.com' is therefore not allowed access.
 // NOTE: switched from require|text to $.load for loading the viewer_template.html; hopefully this will prevent some of the cross-origin refresh problems.
-// DONE: make all images the same scale?? [can't be done my end]
+// TODONT: make all images the same scale?? [can't be done my end]
 // DONE: save timestamp with status and only overwrite if older
 // DONE: account "stats" page (consecutive days read, # of titles, completion %)
 // DONE: only one panel (account or comments) open at a time
@@ -197,3 +198,6 @@
 // DONE: comments not working for Habitat content
 // DONE: remove "."'s from Firebase keys (and added to Common.js)
 // DONE: show name of page comment will be linked to
+// NOTE: problems with iFrameResizer: it broke hash navigation; momentum scrolling issues in Safari [though it did work on iOS]
+// DONE: set iframe height to contents [using inelegant setInterval rather than looking for all the various content & orientation changes]
+// DONE: on iOS, pages scroll back to top (randomly?) [Habitat titles only, it seems; pages with video only??] [see InDesign, Chapter 1, Lesson Overview]

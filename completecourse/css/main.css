@@ -145,7 +145,8 @@ body.skin-Microsoft {
   .iframe-holder iframe {
     width: 100%;
     height: 100%;
-    display: block !important; }
+    display: block !important;
+    overflow: visible; }
 
 body.skin-Microsoft .iframe-holder > div {
   max-width: 65rem; }
@@ -155,7 +156,7 @@ body.skin-Microsoft .iframe-holder > div {
   transition: width .5s linear;
   background-color: #E5F0F1;
   overflow: hidden;
-  -webkit-overflow-scrolling: touch; }
+  /*-webkit-overflow-scrolling: touch;*/ }
   #video .overlay {
     position: absolute;
     top: 0;
@@ -541,7 +542,8 @@ span.completed {
     font-family: inherit; }
 
 .habitat-body {
-  font-family: 'Source Sans Pro', sans-serif; }
+  font-family: 'Source Sans Pro', sans-serif;
+  overflow: hidden; }
   .habitat-body:not(.xs) {
     margin-left: 5em !important;
     margin-right: 5em !important; }
