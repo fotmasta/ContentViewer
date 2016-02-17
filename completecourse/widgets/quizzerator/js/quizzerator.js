@@ -125,8 +125,7 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 				this.id = quizFile;
 			}
 
-			// get tsv of settings, questions, and responses
-			$.get(quizFile, $.proxy(this.onLoadedData, this));
+			//$.get(quizFile, $.proxy(this.onLoadedData, this));
 
 			var summary = $("<div>", {class: "summary"});
 			var container = $("<div>", {class: "holder"});
@@ -147,19 +146,25 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 
 			var ol = $("<ol>", {class: "quiz-holder"});
 			this.element.append(ol);
+
+			this.onLoadedData(this.options.paramData);
+
+			this.kludgeAffix();
 		},
 
 		// work-around for cross-domain iframe
 		kludgeAffix: function () {
+			//*
 			var doc = this.element.find(".summary")[0].ownerDocument;
 			var win = doc.defaultView;
 			var sum = this.options.jquery("iframe").contents().find(".summary");
 			sum.affix({ offset: { top: 140 }, target: win});
+			//*/
+
+			//$(".summary").affix({ offset: { top: 140 } });
 		},
 
 		onLoadedData: function (data) {
-			this.kludgeAffix();
-
 			this.data = data;
 
 			if (this.options.desc) {
@@ -168,27 +173,20 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 				this.element.find("h3.quiz-title").text(this.data.title);
 			}
 
-			var lines = data.split("\r\n");
+			if (this.data.reviewableAfterEach !== undefined) {
+				this.options.settings.reviewableAfterEach = this.data.reviewableAfterEach;
+			}
 
-			this.processSettings(lines);
+			for (var i = 0; i < this.data.questions.length; i++) {
+				var d_q = this.data.questions[i];
 
-			for (var i = 3; i < lines.length; i++) {
 				var q = {};
 
-				var line = lines[i];
-				var fields = line.split("\t");
-
-				q.q = fields[0];
-				q.hint = fields[1];
-				q.answers = [];
-				for (var j = 2; j < fields.length; j++) {
-					var answer = fields[j];
-					if (answer !== "")
-						q.answers.push(answer);
-				}
+				q.q = d_q.text;
+				q.hint = d_q.ref;
+				q.answers = d_q.answers.slice();
 
 				this.addQuestion(q);
-
 			}
 
 			this.options.iframe.overrideLinks();
@@ -200,28 +198,6 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 			this.updateScore();
 
 			this.adjustSummarySize();
-		},
-
-		processSettings: function (lines) {
-			var i = 1;
-			var done = false;
-
-			while (i < lines.length && !done) {
-				var fields = lines[i].split("\t");
-
-				var setting = fields[0].toLowerCase();
-
-				switch (setting) {
-					case "reviewable after each question":
-						this.options.settings.reviewableAfterEach = fields[1].toLowerCase() == "yes";
-						break;
-					case "question":
-						done = true;
-						break;
-				}
-
-				i++;
-			}
 		},
 
 		addQuestion: function (q_params) {

@@ -119,12 +119,28 @@ define(["bootstrap-dialog", "imagesloaded", "database", "jquery.ui"], function (
 
 		// iOS has fits if you don't give the iframe a specific height
 		sizeToBottom: function () {
-			var bottom = this.iframe.contents().find("[data-iframe-height]");
-			if (bottom.length) {
-				var h = Math.ceil(bottom.offset().top + bottom.outerHeight());
-				var frameh = this.iframe.height();
-				if (h != frameh) {
-					this.iframe.height(h);
+			// on desktop, we can abort early
+			var el = this.iframe;
+			if (el.css("height") == "100%") {
+				return;
+			}
+
+			// size only on iOS
+			if (el.parent() && el.parent().height() != el.height()) {
+				var bottom = this.iframe.contents().find("[data-iframe-height]");
+				if (bottom.length) {
+					var h = Math.ceil(bottom.offset().top + bottom.outerHeight());
+					var frameh = this.iframe.height();
+					if (h != frameh) {
+						this.iframe.height(h);
+					}
+				} else {
+					// no bottom element (ie, Captivate quiz)
+					var h = $(this.iframe.contents().find("body")[0].ownerDocument).height();
+					var frameh = this.iframe.height();
+					if (h != frameh) {
+						this.iframe.height(h);
+					}
 				}
 			}
 		},
@@ -449,8 +465,16 @@ define(["bootstrap-dialog", "imagesloaded", "database", "jquery.ui"], function (
 				if (matches && matches.length) {
 					var js = matches[1];
 
-					require([js], function (widget_name) {
-						me.iframe.contents().find("#the_widget")[widget_name]({data: obj.params, iframe: me, jquery: $, desc: desc});
+					var reqs = [js];
+
+					// load parameters via js
+					if (obj.params) {
+						var path = URLWithoutPage(window.location.pathname);
+						reqs.push(path + "/" + obj.params);
+					}
+
+					require(reqs, function (widget_name, data) {
+						me.iframe.contents().find("#the_widget")[widget_name]({data: obj.params, iframe: me, jquery: $, desc: desc, paramData: data});
 					});
 				}
 			}

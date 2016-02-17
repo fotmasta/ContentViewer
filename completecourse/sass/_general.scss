@@ -233,8 +233,10 @@ body.skin-Microsoft {
 		margin: 0 auto;
 		background-color: white;
 		height: 100%;
+		/*
 		-webkit-overflow-scrolling: touch;
 		overflow: scroll;
+		*/
 	}
 
 	iframe {
@@ -820,6 +822,11 @@ span.completed {
 		font-weight: bold;
 		font-family: inherit;
 	}
+}
+
+.habitat-html {
+	overflow: scroll;
+	height: 100%;
 }
 
 .habitat-body {
