@@ -1,4 +1,4 @@
-// TODO: Habitat quizzes do not seem to be loading on iOS
+// TODO: Habitat quizzes do not seem to be loading in Safari (iOS or Mac)
 // TODO: test fallback when Firebase errors out due to max concurrent users
 // TODO: think about security considerations for user data (logged in? using id? more?)
 // TODO: test transcript/captioning [check]/quizzes on iOS
@@ -205,3 +205,4 @@
 // DONE: quizzerator tsv data wasn't being allowed to load in Safari or Firefox (!); switching to .js data format loaded by iframe-holder [requirejs!text wasn't working in Safari]
 // DONE: test new, new scrolling with Habitat, ePub, and CCNA [on Chrome, Safari, Firefox, IE11 (Windows)]
 // DONE: quizzerator summary wasn't working with new scrolling; try having the habitat-body scroll on desktop and iOS
+// DONE: show customer server email address when tech support comment is clicked [tech support web form]

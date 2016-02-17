@@ -74,6 +74,8 @@ define(["database", "jquery.ui"], function (Database) {
 			var d = new Date(record.firstVisit);
 			this.addFunFact("Your first visit was " + d.toLocaleDateString() + ".");
 
+			this.addFunFact("You've made " + record.visits.length + " total visit" + (record.visits.length > 1 ? "s" : ""));
+
 			// days since last visit
 			if (record.visits.length > 1) {
 				var latest = record.visits[record.visits.length - 1];

@@ -1234,6 +1234,10 @@ button#search-close {
 	}
 
 	#category {
+		label {
+			vertical-align: text-top;
+		}
+
 		label.control-label {
 			margin-right: 15px;
 		}

@@ -865,6 +865,8 @@ button#search-close {
     padding-right: 0; }
   #comments-panel .form-group {
     margin-bottom: 15px; }
+  #comments-panel #category label {
+    vertical-align: text-top; }
   #comments-panel #category label.control-label {
     margin-right: 15px; }
   #comments-panel .container-fluid .form-control {
