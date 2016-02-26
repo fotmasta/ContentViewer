@@ -126,7 +126,8 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 
 		$("#account-panel").Account();
 
-		if ($("#video").VideoManager("hasCustomerIdentifier") && manifest.allowComments !== false) {
+//		if ($("#video").VideoManager("hasCustomerIdentifier") && manifest.allowComments !== false) {
+		if (manifest.allowComments !== false) {
 			$("#show-comments-button").click(onOpenComments);
 		} else {
 			$("#show-comments-button").hide(0);

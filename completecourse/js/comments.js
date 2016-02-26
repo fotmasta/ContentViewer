@@ -174,9 +174,11 @@ define(["database", "common", "jquery.ui", "video-manager", "firebase"], functio
 			var categoryEl = this.element.find("#category input:radio:checked");
 			var category = categoryEl.length ? categoryEl.val() : null;
 			var timestamp = Date.now();
-			var id = Database.getCustomerID();
 
-			var rec = { "id": id, "name": name, email: email, "text": text, "timestamp": timestamp, category: category, "ok": false };
+			var rec = { "name": name, email: email, "text": text, "timestamp": timestamp, category: category, "ok": false };
+
+			var id = Database.getCustomerID();
+			if (id != undefined) rec.id = id;
 
 			var useAnchor = this.element.find("#commentAnchor").prop("checked");
 			if (useAnchor) {
@@ -440,9 +442,11 @@ define(["database", "common", "jquery.ui", "video-manager", "firebase"], functio
 			var categoryEl = form.find("#category input:radio:checked");
 			var category = categoryEl.length ? categoryEl.val() : null;
 			var timestamp = Date.now();
-			var id = Database.getCustomerID();
 
-			var rec = { "id": id, "name": name, email: email, "text": text, "timestamp": timestamp, category: category, "ok": false, "parent": parentKey };
+			var rec = { "name": name, email: email, "text": text, "timestamp": timestamp, category: category, "ok": false, "parent": parentKey };
+
+			var id = Database.getCustomerID();
+			if (id != undefined) rec.id = id;
 
 			newCommentRef.set(rec);
 
