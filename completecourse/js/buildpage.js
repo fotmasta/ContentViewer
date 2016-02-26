@@ -457,7 +457,20 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 		onResize();
 	}
 
+	function onOpenTOC () {
+		var contentsVisible = false;
+		var resourcesVisible = $("#sidebar").is(":visible");
+
+		resizePanes(!contentsVisible, resourcesVisible);
+
+		$("#toc-toggler").addClass("open");
+
+		onResize();
+	}
+
 	function onSearch () {
+		onOpenTOC();
+
 		var term = $("#query").val();
 
 		$("#query-too").val(term);
@@ -509,7 +522,9 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 
 	var BuildPage = {
 		build: function (options) {
-			var url = baseURL + "js/viewer_template.html";
+			// will this help with the xhr error we sometimes get on InformIT?
+			var timestamp = Date.now();
+			var url = baseURL + "js/viewer_template.html?time=" + timestamp;
 			$("body").load(url, $.proxy(this.doBuild, this, options));
 		},
 

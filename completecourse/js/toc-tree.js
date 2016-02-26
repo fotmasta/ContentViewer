@@ -523,7 +523,7 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 			if (resultCount == undefined) {
 				$("#hit-count").text("");
 			} else {
-				var lbl = resultCount + " hit" + (resultCount != 1 ? "s" : "");
+				var lbl = resultCount + " result" + (resultCount != 1 ? "s" : "");
 
 				$("#hit-count").text(lbl);
 			}
@@ -634,7 +634,7 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 			this.options.data[index].completed = true;
 
 			var el = this.holder.find("[data-index=" + index + "]");
-			var a = el.find("> label a span.desc, > a span.desc");
+			var a = el.find("> label a span.desc, > a span.desc, a span.desc");
 			//var checked = a.find("i.checked");
 			var checked = el.find("> i.checked");
 			checked.remove();

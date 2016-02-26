@@ -206,3 +206,4 @@
 // DONE: test new, new scrolling with Habitat, ePub, and CCNA [on Chrome, Safari, Firefox, IE11 (Windows)]
 // DONE: quizzerator summary wasn't working with new scrolling; try having the habitat-body scroll on desktop and iOS
 // DONE: show customer server email address when tech support comment is clicked [tech support web form]
+// DONE: show TOC when search is initiated

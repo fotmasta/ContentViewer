@@ -7,9 +7,11 @@ european/normal/latest.woff') format('woff'),url('https://i.s-microsoft.com/font
 microsoft.com/fonts/segoe-ui/west-european/normal/latest.svg#web') format('svg');font-weight:normal;font-style:normal}
 
 $video-background-color: white;
-$blue-color: #719db7;
+$link-color: #808080;
+$link-visited-color: #1570A6;
 $quiz-color: #569E39;
-$button-blue: #337ab7;
+$button-blue: #0078d7;
+$hover-blue: #0096ff;
 
 html.ui {
 	overflow: hidden;
@@ -21,6 +23,20 @@ body {
 
 body.skin-Microsoft {
 	font-family: 'wf_segoe-ui_normal', 'Segoe UI', Tahoma, Arial, sans-serif;
+
+	.btn-primary, .btn-info {
+		background-color: $button-blue;
+		border: none;
+
+		&:hover, &:active {
+			background-color: $hover-blue;
+		}
+	}
+
+	#query {
+		height: 32px;
+		border: none;
+	}
 
 	button.btn {
 		border-radius: 0;
@@ -47,6 +63,7 @@ body.skin-Microsoft {
 			background-image: none;
 			-webkit-box-shadow: none;
 			box-shadow: none;
+			background-color: #ff9b00;
 		}
 	}
 
@@ -54,7 +71,7 @@ body.skin-Microsoft {
 		background-color: white;
 
 		.row {
-			background-color: #CD4800;
+			background-color: #FFB900;
 		}
 
 		.search-result-list .selected {
@@ -63,10 +80,6 @@ body.skin-Microsoft {
 				color: white;
 			}
 		}
-	}
-
-	.btn-info {
-		background-color: #4F9CF6;
 	}
 }
 
@@ -131,7 +144,7 @@ body.skin-Microsoft {
 
 		a {
 			display: table-row;
-			color: $blue-color;
+			color: $link-color;
 			/*padding-left: 30px;*/
 
 			span.desc {
@@ -249,7 +262,7 @@ body.skin-Microsoft {
 
 body.skin-Microsoft .iframe-holder {
 	& > div {
-		max-width: 65rem;
+		max-width: 75rem;
 	}
 }
 
@@ -395,7 +408,7 @@ video {
 
 	.resource-list {
 		a {
-			color: $blue-color;
+			color: $link-color;
 		}
 
 		li {
@@ -608,7 +621,7 @@ ul.toc-holder {
 
 .level {
     display: block;
-	background-color: $blue-color;
+	background-color: $link-color;
 	color: white;
 	font-size: 12px;
 	font-family: 'Source Sans Pro', sans-serif;
@@ -652,7 +665,7 @@ ul.toc-holder {
 
 span.completed {
 	font-weight: 200;
-	color: rgb(189, 163, 173);
+	color: $link-visited-color;
 }
 
 .video-js {
@@ -792,23 +805,24 @@ span.completed {
 .button-a {
 	width: 100%;
 	display: block;
-	color: #007db6;
+	color: white;
 	text-align: left;
-	background: #e5f2f7;
+	background: #1570A5;
 	text-decoration: none;
 	text-transform: none;
 	padding: 20px 3em 20px 20px;
-	border-radius: 3px;
-	border-bottom: 3px solid #007db6;
+	border-radius: 0;
 	background-position: right 13.3333px top 50%;
 	background-size: auto 1.5em;
 	background-repeat: no-repeat;
-	background-image: url(images/icon-arrow-black.svg);
+	background-image: url(images/icon-arrow-white.svg);
 	font-size: 14px;
+	font-family: inherit !important;
+	border: none;
 
 	&.header-prev-button {
 		background-position: left 13.3333px top 50%;
-		background-image: url(images/icon-arrow-black-back.svg);
+		background-image: url(images/icon-arrow-white-back.svg);
 		padding-left: 4em;
 	}
 
@@ -901,12 +915,6 @@ span.completed {
 	}
 }
 
-.habitat-body.skin-Microsoft {
-	.button-a {
-		width: auto;
-	}
-}
-
 .image_popup {
 	display: flex;
 	align-items: center;
@@ -915,6 +923,18 @@ span.completed {
 	img {
 		height: 100%;
 	}
+}
+
+#query-too::-webkit-input-placeholder {
+	color: white;
+}
+
+#query-too::-moz-placeholder {
+	color: white;
+}
+
+#query-too:-ms-input-placeholder {
+	color: white;
 }
 
 .search-results {

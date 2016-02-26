@@ -14,6 +14,14 @@ body {
 
 body.skin-Microsoft {
   font-family: 'wf_segoe-ui_normal', 'Segoe UI', Tahoma, Arial, sans-serif; }
+  body.skin-Microsoft .btn-primary, body.skin-Microsoft .btn-info {
+    background-color: #0078d7;
+    border: none; }
+    body.skin-Microsoft .btn-primary:hover, body.skin-Microsoft .btn-primary:active, body.skin-Microsoft .btn-info:hover, body.skin-Microsoft .btn-info:active {
+      background-color: #0096ff; }
+  body.skin-Microsoft #query {
+    height: 32px;
+    border: none; }
   body.skin-Microsoft button.btn {
     border-radius: 0;
     -webkit-box-shadow: none;
@@ -30,17 +38,16 @@ body.skin-Microsoft {
     body.skin-Microsoft .progress .progress-bar-warning {
       background-image: none;
       -webkit-box-shadow: none;
-      box-shadow: none; }
+      box-shadow: none;
+      background-color: #ff9b00; }
   body.skin-Microsoft .search-results {
     background-color: white; }
     body.skin-Microsoft .search-results .row {
-      background-color: #CD4800; }
+      background-color: #FFB900; }
     body.skin-Microsoft .search-results .search-result-list .selected {
       background-color: #3B6DCB; }
       body.skin-Microsoft .search-results .search-result-list .selected p {
         color: white; }
-  body.skin-Microsoft .btn-info {
-    background-color: #4F9CF6; }
 
 .col-xs-0 {
   float: left;
@@ -78,7 +85,7 @@ body.skin-Microsoft {
       color: #DAE423; }
     #contents #contents-pane a {
       display: table-row;
-      color: #719db7;
+      color: #808080;
       /*padding-left: 30px;*/ }
       #contents #contents-pane a span.desc {
         display: table-cell; }
@@ -151,7 +158,7 @@ body.skin-Microsoft {
     overflow: visible; }
 
 body.skin-Microsoft .iframe-holder > div {
-  max-width: 65rem; }
+  max-width: 75rem; }
 
 #video {
   padding: 0;
@@ -251,7 +258,7 @@ body.skin-Microsoft .iframe-holder > div {
     padding: 5px;
     border-left: 1px solid #ccc; }
   #sidebar .resource-list a {
-    color: #719db7; }
+    color: #808080; }
   #sidebar .resource-list li:hover, #sidebar .resource-list li:hover:focus {
     text-decoration: none;
     background-color: #ccc; }
@@ -386,7 +393,7 @@ ul.toc-holder {
 
 .level {
   display: block;
-  background-color: #719db7;
+  background-color: #808080;
   color: white;
   font-size: 12px;
   font-family: 'Source Sans Pro', sans-serif;
@@ -401,7 +408,7 @@ ul.toc-holder {
     outline: none; }
   #toc-toggler.open {
     background: white !important;
-    color: #337ab7 !important; }
+    color: #0078d7 !important; }
 
 #show-menu-button {
   padding: 6px 12px;
@@ -413,11 +420,11 @@ ul.toc-holder {
     outline: none; }
   #resource-toggler.open {
     background: white !important;
-    color: #337ab7 !important; }
+    color: #0078d7 !important; }
 
 span.completed {
   font-weight: 200;
-  color: #bda3ad; }
+  color: #1570A6; }
 
 .video-js {
   width: 100% !important;
@@ -518,22 +525,23 @@ span.completed {
 .button-a {
   width: 100%;
   display: block;
-  color: #007db6;
+  color: white;
   text-align: left;
-  background: #e5f2f7;
+  background: #1570A5;
   text-decoration: none;
   text-transform: none;
   padding: 20px 3em 20px 20px;
-  border-radius: 3px;
-  border-bottom: 3px solid #007db6;
+  border-radius: 0;
   background-position: right 13.3333px top 50%;
   background-size: auto 1.5em;
   background-repeat: no-repeat;
-  background-image: url(images/icon-arrow-black.svg);
-  font-size: 14px; }
+  background-image: url(images/icon-arrow-white.svg);
+  font-size: 14px;
+  font-family: inherit !important;
+  border: none; }
   .button-a.header-prev-button {
     background-position: left 13.3333px top 50%;
-    background-image: url(images/icon-arrow-black-back.svg);
+    background-image: url(images/icon-arrow-white-back.svg);
     padding-left: 4em; }
   .button-a:hover {
     background: #A2D1E7; }
@@ -587,15 +595,21 @@ span.completed {
     max-width: 50%;
     max-height: 50%; }
 
-.habitat-body.skin-Microsoft .button-a {
-  width: auto; }
-
 .image_popup {
   display: flex;
   align-items: center;
   justify-content: center; }
   .image_popup img {
     height: 100%; }
+
+#query-too::-webkit-input-placeholder {
+  color: white; }
+
+#query-too::-moz-placeholder {
+  color: white; }
+
+#query-too:-ms-input-placeholder {
+  color: white; }
 
 .search-results {
   display: none;
