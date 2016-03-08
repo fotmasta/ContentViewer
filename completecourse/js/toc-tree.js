@@ -7,6 +7,17 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 		}
 	});
 
+	function htmlEscape(str) {
+		return String(str)
+			/*
+			.replace(/&/g, '&amp;')
+			.replace(/"/g, '&quot;')
+			.replace(/'/g, '&#39;')
+			*/
+			.replace(/</g, '&lt;')
+			.replace(/>/g, '&gt;');
+	}
+
 	function romanize (num) {
 		if (!+num)
 			return false;
@@ -291,7 +302,7 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 				var classes = "desc";
 				if (d.extra_classes) classes += " " + d.extra_classes;
 
-				var sp = $("<span>", {class: classes, html: entry_text});
+				var sp = $("<span>", {class: classes, html: htmlEscape(entry_text)});
 
 				// horizontal line to indicate current selection in TOC
 				var indicator = $("<div>", { class: "indicator" });

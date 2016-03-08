@@ -1,0 +1,166 @@
+/******************************************************************************************************/
+/* CUP change/new/delete styling START */
+/******************************************************************************************************/
+
+div.cup-change, li.cup-change, p.cup-change {
+    background-color: #BEF3BC;
+    padding: 1em .5em;
+    margin-top: 1.5em;
+    position: relative;
+}
+
+div.cup-change:after, p.cup-change:after, li.cup-change:after, figure.cup-change:after {
+    content: "Updated";
+    display: block;
+    position: absolute;
+    left: -1.5em;
+    top: -2em;
+    padding: 0 1em;
+    border-radius: 1em;
+    font-size: 10px;
+    background-color: #3B3F63;
+    color: #D3E4E4;
+    text-indent: 0;
+}
+
+figure.cup-change img {
+    margin-top: 2em;
+}
+
+ol li.cup-change:after, ol figure.cup-change:after {
+    content: "Updated";
+    display: block;
+    position: absolute;
+    left: 1em;
+    top: -2em;
+    padding: 0 1em;
+    border-radius: 1em;
+    font-size: 10px;
+    background-color: #3B3F63;
+    color: #D3E4E4;
+    text-indent: 0;
+}
+
+body.cup-change:before {
+    content: "Updated";
+    display: block;
+    position: absolute;
+    left: 0em;
+    top: 0em;
+    padding: 0 1em;
+    border-radius: 1em;
+    font-size: 10px;
+    background-color: #3B3F63;
+    color: #D3E4E4;
+}
+
+span.cup-change {
+    background-color: #BEF3BC;
+}
+
+span.cup-new {
+    background-color: #E8DB18;
+}
+
+div.cup-new, li.cup-new, p.cup-new {
+    background-color: #E8DB18;
+    border-left: 5px solid #1EC711;
+    padding: 1em .5em;
+}
+
+section.cup-new {
+    position: relative;
+    border: 2px dashed #E8DB18;
+}
+
+section.cup-new:before {
+    left: -1.5em;
+    top: -.5em;
+}
+
+body.cup-new:before {
+    left: .5em;
+    top: .5em;
+}
+
+figure.cup-delete:before {
+    left: -2.5em;
+    top: -1em;
+}
+
+body.cup-delete:before, figure.cup-delete:before {
+    content: "Deleted";
+    display: block;
+    position: absolute;
+    padding: 0 1em;
+    border-radius: 1em;
+    font-size: 14pt;
+    background-color: #FF0000;
+    color: #DAE423;
+    transform: rotate(-15deg);
+    left: .5em;
+    top: .5em;
+}
+
+figure.cup-new:before {
+    left: -2.5em;
+    top: -2em;
+}
+
+body.cup-new:before, section.cup-new:before, figure.cup-new:before, p.cup-new:before {
+    content: "New";
+    display: block;
+    position: absolute;
+    padding: 0 1em;
+    border-radius: 1em;
+    font-size: 14pt;
+    background-color: #E8DB18;
+    color: #9C5110;
+    transform: rotate(-15deg);
+}
+
+ol figure.cup-new:before {
+    content: "New";
+    display: block;
+    position: absolute;
+    padding: 0 1em;
+    border-radius: 1em;
+    font-size: 14pt;
+    background-color: #E8DB18;
+    color: #9C5110;
+    transform: rotate(-15deg);
+}
+
+span.cup-delete {
+    text-decoration: line-through;
+}
+
+p.cup-delete {
+    max-height: 1.4em;
+    overflow: hidden;
+    transition: max-height 1s ease-in-out;
+    text-decoration: line-through;
+    position: relative;
+    padding-left: 5px;
+    border-left: 5px solid red;
+}
+
+p.cup-delete:before {
+    content: "Deleted";
+    display: inline-block;
+    padding: 0 .5em;
+    border-radius: 1em;
+    font-size: 12pt;
+    background-color: #FF0000;
+    color: #DAE423;
+    margin-right: .5em;
+}
+
+p.cup-delete:hover {
+    max-height: 1000px;
+    text-decoration: none;
+}
+
+/*****************************************************************************************************/
+/* CUP change/new/delete styling END */
+/*****************************************************************************************************/

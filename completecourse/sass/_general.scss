@@ -246,10 +246,12 @@ body.skin-Microsoft {
 		margin: 0 auto;
 		background-color: white;
 		height: 100%;
-		/*
-		-webkit-overflow-scrolling: touch;
-		overflow: scroll;
-		*/
+
+		// this seemed to be necessary for best scrolling iOS
+		&.ios {
+			-webkit-overflow-scrolling: touch;
+			overflow: scroll;
+		}
 	}
 
 	iframe {

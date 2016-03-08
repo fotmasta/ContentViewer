@@ -104,7 +104,7 @@ requirejs.config({
 });
 
 define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database) {
-	$.widget("que.quizzerator", {
+	$.widget("que.testengine", {
 		options: {},
 
 		_create: function () {
@@ -124,8 +124,6 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 			} else {
 				this.id = quizFile;
 			}
-
-			//$.get(quizFile, $.proxy(this.onLoadedData, this));
 
 			var summary = $("<div>", {class: "summary"});
 			var container = $("<div>", {class: "holder"});
@@ -186,6 +184,8 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 				q.hint = d_q.ref;
 				q.answers = d_q.answers.slice();
 
+				this.addQuestionSummary(i);
+
 				this.addQuestion(q);
 			}
 
@@ -198,6 +198,17 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 			this.updateScore();
 
 			this.adjustSummarySize();
+		},
+
+		addQuestionSummary: function (n) {
+			var tr = $("<tr>");
+
+			$("<td>", { text: n + 1 }).appendTo(tr);
+			$("<td>", { text: "ICND 1." + n }).appendTo(tr);
+			$("<td>", { text: "0" }).appendTo(tr);
+			$("<td>", { text: "0" }).appendTo(tr);
+
+			this.element.find("#summary tbody").append(tr);
 		},
 
 		addQuestion: function (q_params) {
@@ -464,5 +475,5 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 		}
 	});
 
-	return "quizzerator";
+	return "testengine";
 });

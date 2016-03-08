@@ -1,3 +1,7 @@
+// TODO: see if there are extra pages being pushed into the browser history that can be eliminated to make "Back" more streamlined
+// TODO: sometimes the quizzerator doesn't seem to initialize with data
+// TODO: quizzes should only be marked complete when 100%
+// TODO: does each Firebase request count as a "connection" (limited to 100)?
 // TODO: Habitat quizzes do not seem to be loading in Safari (iOS or Mac)
 // TODO: test fallback when Firebase errors out due to max concurrent users
 // TODO: think about security considerations for user data (logged in? using id? more?)
@@ -207,3 +211,6 @@
 // DONE: quizzerator summary wasn't working with new scrolling; try having the habitat-body scroll on desktop and iOS
 // DONE: show customer server email address when tech support comment is clicked [tech support web form]
 // DONE: show TOC when search is initiated
+// DONE: quiz spreadsheet "Download" button should regenerate download info
+// DONE: htmlEscape the TOC titles (in case they have <, >, etc. in them)
+// DONE: consolidate CUP styles into one place (and preferably add that file to the Habitat projects (?) [didn't see a good way, without Sass available in the projects])

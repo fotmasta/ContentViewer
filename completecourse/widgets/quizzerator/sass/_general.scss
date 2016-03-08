@@ -67,7 +67,8 @@ li.question {
 				}
 
 				code {
-					white-space: pre;
+					// this was preventing word-wrap of code responses:
+					//white-space: pre;
 				}
 			}
 

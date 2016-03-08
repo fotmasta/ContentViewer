@@ -240,6 +240,8 @@ define(["bootstrap-dialog", "imagesloaded", "database", "jquery.ui"], function (
 				if  (!is_iOS) {
 					me.iframe.removeClass("fadeIn animated").hide(0);
 					me.iframe.addClass("fadeIn animated").show(0);
+				} else {
+					this.element.addClass("ios");   // .the-iframe-holder (custom iOS attributes to correct scrolling problems)
 				}
 
 				// NOTE: if we're auto-advancing, don't scroll to any hashtags
@@ -323,7 +325,7 @@ define(["bootstrap-dialog", "imagesloaded", "database", "jquery.ui"], function (
 
 		onClickLink: function (event) {
 			event.preventDefault();
-			var href = $(event.target).attr("href");
+			var href = $(event.currentTarget).attr("href");
 
 			// external link
 			if  (href.indexOf("http:") != -1 || href.indexOf("mailto") != -1) {
