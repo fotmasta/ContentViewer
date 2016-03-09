@@ -461,6 +461,12 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 				var q = questions.eq(entry.index);
 				q.find(".hint a").text(entry.title);
 			}
+		},
+
+		isComplete: function () {
+			var correct = this.element.find(".question[data-correct=true]").length;
+			var total = this.element.find(".question").length;
+			return (correct == total);
 		}
 	});
 

@@ -255,16 +255,40 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 			}
 		},
 
+		currentItemIsCompletable: function () {
+			if (this.iframe) {
+				return this.iframe.iFrameHolder("isCompletable");
+			}
+			return false;
+		},
+
+		currentItemIsComplete: function () {
+			if (this.iframe) {
+				return this.iframe.iFrameHolder("isComplete");
+			}
+			return false;
+		},
+
 		setCurrentIndex: function (index) {
 			// THEORY: when switching, mark the current section completed (should probably be: have we scrolled past everything)
 			if (!this.currentItemIsVideo() && this.currentItemHasContent()) {
-				if (this.currentIndex != undefined && this.currentIndex != index) {
-					this.markItemCompleted(this.currentIndex);
-				}
+				// THEORY: the item we're on has programmatic completion status
+				if (this.currentItemIsCompletable()) {
+					var complete = this.currentItemIsComplete();
+					if (complete) {
+						this.markItemCompleted(this.currentIndex);
+					} else {
+						this.markItemIncomplete(this.currentIndex);
+					}
+				} else {
+					if (this.currentIndex != undefined && this.currentIndex != index) {
+						this.markItemCompleted(this.currentIndex);
+					}
 
-				// THEORY: consecutive sections (of non-video content) are marked complete when going from section to section
-				if (index == this.currentIndex + 1) {
-					this.markItemCompleted(this.currentIndex);
+					// THEORY: consecutive sections (of non-video content) are marked complete when going from section to section
+					if (index == this.currentIndex + 1) {
+						this.markItemCompleted(this.currentIndex);
+					}
 				}
 
 				if (index != undefined) {
@@ -511,18 +535,6 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 		},
 
 		scrollToHash: function (iframe, options, immediate) {
-			// iOS kludge:
-			// TODO: try this, delay, then transform none
-			// TODO: why does it scroll and then reset?!
-			/*
-			$(".the-iframe-holder")[0].style.cssText += ';-webkit-transform:rotateZ(0deg)';
-			$(".the-iframe-holder")[0].offsetHeight;
-			$(".the-iframe-holder")[0].style.cssText += ';-webkit-transform:none';
-			*/
-
-			//$(".the-iframe-holder").css("-webkit-overflow-scrolling", "auto");
-			//$(".the-iframe-holder").css("-webkit-overflow-scrolling", "touch");
-
 			var index, hash;
 
 			if (options.hash == undefined) {
@@ -738,6 +750,13 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 					}
 					break;
 			}
+
+			this.updateProgress();
+		},
+
+		markItemIncomplete: function (index) {
+			Database.setItemProperty(index, "completed", false);
+			$(".toc").TOCTree("markIncomplete", index);
 
 			this.updateProgress();
 		},

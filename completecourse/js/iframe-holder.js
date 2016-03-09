@@ -84,6 +84,7 @@ define(["bootstrap-dialog", "imagesloaded", "database", "jquery.ui"], function (
 			var src = URLWithoutHash(this.options.src);
 
 			if (IsWidget(src)) {
+				this.widgetName = undefined;
 				var widget = ParseWidget(src);
 				this.iframe = $("<iframe>", { class: "content", src: "", frameborder: 0, "allowfullscreen": true });
 				this.injectWidget(widget.src, widget.params);
@@ -103,6 +104,7 @@ define(["bootstrap-dialog", "imagesloaded", "database", "jquery.ui"], function (
 
 		loadNewContent: function (options) {
 			this.options = options;
+			this.widgetName = undefined;
 
 			var src = URLWithoutHash(this.options.src);
 
@@ -476,10 +478,31 @@ define(["bootstrap-dialog", "imagesloaded", "database", "jquery.ui"], function (
 					}
 
 					require(reqs, function (widget_name, data) {
-						me.iframe.contents().find("#the_widget")[widget_name]({data: obj.params, iframe: me, jquery: $, desc: desc, paramData: data});
+						me.widgetName = widget_name;
+						me.theWidget = me.iframe.contents().find("#the_widget")[widget_name]({data: obj.params, iframe: me, jquery: $, desc: desc, paramData: data});
 					});
 				}
 			}
+		},
+
+		isCompletable: function () {
+			if (this.widgetName) {
+				var widget = this.iframe.contents().find("#the_widget")[this.widgetName]("instance");
+				return widget.isComplete != undefined;
+			}
+			return false;
+		},
+
+		isComplete: function () {
+			if (this.widgetName) {
+				var widget = this.iframe.contents().find("#the_widget")[this.widgetName]("instance");
+				if (widget.isComplete) {
+					return widget.isComplete();
+				} else {
+					return false;
+				}
+			}
+			return false;
 		}
 	});
 });

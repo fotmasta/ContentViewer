@@ -627,13 +627,9 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 
 		markStarted: function (index) {
 			var el = this.holder.find("[data-index=" + index + "]");
-			// only mark the first link (not the children)
-			//var a = el.find("a").first().find("span.desc");
-			//var checked = a.find("i.checked");
 			var checked = el.find("> i.checked");
 			checked.remove();
 
-			//a.find(".indicator").before("<i class='checked fa fa-adjust fa-flip-horizontal'></i>");
 			el.append("<i class='checked fa fa-adjust fa-flip-horizontal'></i>");
 		},
 
@@ -654,14 +650,11 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 			if (el.find("ul li").length) {
 				var childrenComplete = this.checkForAllChildrenComplete(index);
 				if (childrenComplete) {
-					//a.find(".indicator").before("<i class='checked fa fa-check-circle'></i>");
 					el.append("<i class='checked fa fa-check-circle'></i>");
 				} else {
-					//a.find(".indicator").before("<i class='checked fa fa-adjust fa-flip-horizontal'></i>");
 					el.append("<i class='checked fa fa-adjust fa-flip-horizontal'></i>");
 				}
 			} else {
-				//a.find(".indicator").before("<i class='checked fa fa-check-circle'></i>");
 				el.append("<i class='checked fa fa-check-circle'></i>");
 			}
 
@@ -679,6 +672,23 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 				} else
 					p = null;
 			}
+		},
+
+		markIncomplete: function (index) {
+			if (index > this.options.data.length - 1) {
+				this.options.data[index] = {};
+			}
+
+			this.options.data[index].completed = false;
+
+			var el = this.holder.find("[data-index=" + index + "]");
+			var a = el.find("> label a span.desc, > a span.desc, a span.desc");
+			var checked = el.find("> i.checked");
+			checked.remove();
+
+			el.append("<i class='checked fa fa-adjust fa-flip-horizontal'></i>");
+
+			a.removeClass("completed");
 		},
 
 		checkForAllChildrenComplete: function (index) {
