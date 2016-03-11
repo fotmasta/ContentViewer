@@ -3,6 +3,12 @@ $incorrect-color: #d9534f;
 
 .quizzerator {
 	margin-left: 140px;
+
+	code {
+		font-family: Courier;
+		color: black;
+		font-size: 100%;
+	}
 }
 
 ol.quiz-holder {
@@ -51,10 +57,10 @@ li.question {
 
 			p.response {
 				display: inline-block;
-				margin: 0 0 5px 0;
+				margin: -5px 0 5px 0;
 				padding: 5px 10px;
 				cursor: pointer;
-				vertical-align: middle;
+				vertical-align: top;
 
 				&:hover:not(.selected) {
 					background-color: #bcbfff;

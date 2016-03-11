@@ -459,7 +459,7 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 				var entry = list[i];
 
 				var q = questions.eq(entry.index);
-				q.find(".hint a").text(entry.title);
+				q.find(".hint a").text(entry.title).attr("href", entry.href);
 			}
 		},
 

@@ -506,6 +506,13 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 			for (var j = 0; j < list.length; j++) {
 				var this_href = list[j].href;
 
+				var heading;
+				if (this_href.indexOf("|") != -1) {
+					var b = this_href.indexOf("|");
+					heading = this_href.substr(b + 1);
+					this_href = this_href.substr(0, b - 1);
+				}
+
 				var title = undefined;
 				for (var i = 0; i < this.toc.length; i++) {
 					// check epub content
@@ -518,6 +525,16 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 					other_href = URLWithoutHash(this.toc[i].video);
 					if (other_href && other_href.indexOf(this_href) != -1) {
 						title = this.toc[i].desc;
+						break;
+					}
+					// check TOC descriptions
+					if (this_href == this.toc[i].desc) {
+						title = this_href;
+						// if this is a video TOC entry, link to it; otherwise, use the next TOC entry
+						if (this.toc[i].video)
+							list[j].href = this.toc[i].video;
+						else
+							list[j].href = this.toc[i + 1].video;
 						break;
 					}
 				}
