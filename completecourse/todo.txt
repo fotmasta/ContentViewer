@@ -1,3 +1,4 @@
+// TODO: does the quizzerator export refresh with each push of the download button?
 // TODO: see if there are extra pages being pushed into the browser history that can be eliminated to make "Back" more streamlined
 // TODO: sometimes the quizzerator doesn't seem to initialize with data
 // TODO: does each Firebase request count as a "connection" (limited to 100)?
@@ -214,3 +215,4 @@
 // DONE: htmlEscape the TOC titles (in case they have <, >, etc. in them)
 // DONE: consolidate CUP styles into one place (and preferably add that file to the Habitat projects (?) [didn't see a good way, without Sass available in the projects])
 // DONE: quizzes should only be marked complete when 100%
+// DONE: image support for quizzerator questions and answers

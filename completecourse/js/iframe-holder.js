@@ -471,15 +471,18 @@ define(["bootstrap-dialog", "imagesloaded", "database", "jquery.ui"], function (
 
 					var reqs = [js];
 
+					var dataPath;
+
 					// load parameters via js
 					if (obj.params) {
 						var path = URLWithoutPage(window.location.pathname);
 						reqs.push(path + "/" + obj.params);
+						dataPath = URLWithoutPage(obj.params);
 					}
 
 					require(reqs, function (widget_name, data) {
 						me.widgetName = widget_name;
-						me.theWidget = me.iframe.contents().find("#the_widget")[widget_name]({data: obj.params, iframe: me, jquery: $, desc: desc, paramData: data});
+						me.theWidget = me.iframe.contents().find("#the_widget")[widget_name]({data: obj.params, iframe: me, jquery: $, desc: desc, paramData: data, path: dataPath});
 					});
 				}
 			}

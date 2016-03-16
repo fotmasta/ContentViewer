@@ -204,6 +204,15 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 			var q = $("<li>", {class: "question"});
 
 			var p_question = $("<p>", {html: q_params.q});
+
+			var me = this;
+
+			p_question.find("img").each(function () {
+				var img = $(this);
+				var path = me.options.path + "/" + img.attr("src");
+				img.attr("src", path);
+			});
+
 			q.append(p_question);
 
 			var answers = $("<ol>", {class: "answers-holder"});
@@ -231,6 +240,14 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 
 				var p = $("<p>", {class: "response", html: answer});
 				if (isCorrect) p.attr("data-correct", true);
+
+				var me = this;
+
+				p.find("img").each(function () {
+					var img = $(this);
+					var path = me.options.path + "/" + img.attr("src");
+					img.attr("src", path);
+				});
 
 				p.click($.proxy(this.onClickAnswer, this));
 				li.append(p);

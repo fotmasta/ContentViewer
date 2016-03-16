@@ -2,6 +2,15 @@
 /* CUP change/new/delete styling START */
 /******************************************************************************************************/
 
+ol.list-no-style li.cup-change, ol.list-no-style li p.cup-change {
+    margin-left: -.5em;
+}
+
+ol.list-no-style li.cup-change:after, ol.list-no-style li p.cup-change:after {
+    left: -1em;
+    top: -1em;
+}
+
 div.cup-change, li.cup-change, p.cup-change {
     background-color: #BEF3BC;
     padding: 1em .5em;

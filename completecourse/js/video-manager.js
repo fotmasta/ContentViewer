@@ -506,11 +506,9 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 			for (var j = 0; j < list.length; j++) {
 				var this_href = list[j].href;
 
-				var heading;
+				// if the hint is in the format "Lesson 1.1 | Learn how JavaScript is used" only use the part after the | separator
 				if (this_href.indexOf("|") != -1) {
-					var b = this_href.indexOf("|");
-					heading = this_href.substr(b + 1);
-					this_href = this_href.substr(0, b - 1);
+					this_href = this_href.substr(this_href.indexOf("|") + 1).trim();
 				}
 
 				var title = undefined;
@@ -521,12 +519,14 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 						title = this.toc[i].desc;
 						break;
 					}
+
 					// check video content
 					other_href = URLWithoutHash(this.toc[i].video);
 					if (other_href && other_href.indexOf(this_href) != -1) {
 						title = this.toc[i].desc;
 						break;
 					}
+
 					// check TOC descriptions
 					if (this_href == this.toc[i].desc) {
 						title = this_href;
