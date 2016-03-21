@@ -146,13 +146,14 @@ body.skin-Microsoft {
     max-width: 1024px;
     margin: 0 auto;
     background-color: white;
-    height: 100%; }
+    height: 100%;
+    overflow: scroll; }
     .iframe-holder > div.the-iframe-holder.ios {
       -webkit-overflow-scrolling: touch;
       overflow: scroll; }
   .iframe-holder iframe {
     width: 100%;
-    height: 100%;
+    /*height: 100%;*/
     display: block !important;
     overflow: visible; }
 
@@ -551,22 +552,22 @@ span.completed {
     font-family: inherit; }
 
 .habitat-html {
-  overflow: scroll;
+  overflow: hidden;
   height: 100%; }
 
 .habitat-body {
   font-family: 'Source Sans Pro', sans-serif;
-  overflow: hidden; }
+  /*overflow: hidden; // removed to show <ol> numbering */ }
   .habitat-body:not(.xs) {
     margin-left: 5em !important;
     margin-right: 5em !important; }
   .habitat-body.xs {
     margin-left: 10px !important;
     margin-right: 10px !important; }
-  .habitat-body figure:not(.figure-table) {
+  .habitat-body.type-epub figure:not(.figure-table) {
     max-width: 600px;
     margin: 2.5em auto; }
-    .habitat-body figure:not(.figure-table) figcaption {
+    .habitat-body.type-epub figure:not(.figure-table) figcaption {
       margin-top: 2em; }
   .habitat-body pre {
     font-family: Courier;
@@ -574,8 +575,6 @@ span.completed {
     margin: 0 !important; }
   .habitat-body .code-snippet, .habitat-body .code-listing {
     margin-bottom: 1.5em; }
-  .habitat-body .objectiveset {
-    /*float: right;*/ }
   .habitat-body span.highlight {
     background-color: yellow; }
   .habitat-body .comment-anchor {

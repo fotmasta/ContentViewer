@@ -269,8 +269,13 @@ define(["bootstrap-dialog", "imagesloaded", "database", "jquery.ui"], function (
 				{ rel: "stylesheet", href: path + "css/main.css", type: "text/css" }));
 
 			var skin = "";
-			if (this.options.manager.options && this.options.manager.options.skin)
-				skin = "skin-" + this.options.manager.options.skin;
+			if (this.options.manager.options) {
+				if (this.options.manager.options.skin)
+					skin = "skin-" + this.options.manager.options.skin;
+
+				if (this.options.manager.options.type)
+					skin += " type-" + this.options.manager.options.type;
+			}
 
 			var $body = this.iframe.contents().find("body").addClass("habitat-body " + skin);
 			var $html = this.iframe.contents().find("html").addClass("habitat-html");
