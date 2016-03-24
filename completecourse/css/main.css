@@ -85,12 +85,15 @@ body.skin-Microsoft {
       color: #DAE423; }
     #contents #contents-pane a {
       display: table-row;
-      color: #808080;
+      color: #404040;
       /*padding-left: 30px;*/ }
       #contents #contents-pane a span.desc {
-        display: table-cell; }
-        #contents #contents-pane a span.desc .badge:not(.delete) {
-          display: none; }
+        display: table-cell;
+        /* not sure why this was here
+        .badge:not(.delete) {
+        	display: none;
+        }
+        */ }
         #contents #contents-pane a span.desc.deleted {
           color: red;
           text-decoration: line-through; }
@@ -258,7 +261,7 @@ body.skin-Microsoft .iframe-holder > div {
     padding: 5px;
     border-left: 1px solid #ccc; }
   #sidebar .resource-list a {
-    color: #808080; }
+    color: #404040; }
   #sidebar .resource-list li:hover, #sidebar .resource-list li:hover:focus {
     text-decoration: none;
     background-color: #ccc; }
@@ -393,7 +396,7 @@ ul.toc-holder {
 
 .level {
   display: block;
-  background-color: #808080;
+  background-color: #404040;
   color: white;
   font-size: 12px;
   font-family: 'Source Sans Pro', sans-serif;
@@ -522,7 +525,7 @@ span.completed {
   letter-spacing: 1px;
   margin-top: 1em; }
 
-.button-a {
+.button-a.nav-button {
   width: 100%;
   display: block;
   color: white;
@@ -539,17 +542,22 @@ span.completed {
   font-size: 14px;
   font-family: inherit !important;
   border: none; }
-  .button-a.header-prev-button {
+  .button-a.nav-button.header-prev-button {
     background-position: left 13.3333px top 50%;
     background-image: url(images/icon-arrow-white-back.svg);
     padding-left: 4em; }
-  .button-a:hover {
-    background: #A2D1E7; }
-  .button-a h4 {
+    .button-a.nav-button.header-prev-button:hover {
+      background-repeat: no-repeat;
+      background-size: auto 1.5em; }
+  .button-a.nav-button:hover {
+    background-color: #23A3AD; }
+  .button-a.nav-button h4 {
     margin-top: initial;
     margin-bottom: initial;
     font-weight: bold;
-    font-family: inherit; }
+    font-family: inherit;
+    font-size: 16px;
+    color: white; }
 
 .habitat-html {
   overflow: hidden;

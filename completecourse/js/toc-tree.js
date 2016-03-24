@@ -69,16 +69,18 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 			var extra_classes = "";
 
 			if (anchor.hasClass("cup-new")) {
-				label += " <span class='badge new'>new</span>";
+				//label += " <span class='badge new'>new</span>";
+				extra_classes += "new ";
 			}
 
 			if (anchor.hasClass("cup-change")) {
-				label += " <span class='badge change'>updated</span>";
+				//label += " <span class='badge change'>updated</span>";
+				extra_classes += "updated ";
 			}
 
 			if (anchor.hasClass("cup-delete")) {
-				label += " <span class='badge delete'>deleted</span>";
-				extra_classes += "deleted";
+				//label += " <span class='badge delete'>deleted</span>";
+				extra_classes += "deleted ";
 			}
 
 			var shortLabel = undefined;
@@ -91,6 +93,12 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 					}
 				} else if (options.skin.trim() == "ABG") {
 					var match = labelText.match(/^Part\s*(\w+):\s*(.*)/);
+					if (match) {
+						shortLabel = match[1];
+						label = match[2];
+					}
+				} else if (options.skin.trim() == "Default" && options.type && options.type.trim() == "habitat") {
+					var match = labelText.match(/^Chapter (\d+): (.*)/);
 					if (match) {
 						shortLabel = match[1];
 						label = match[2];
@@ -302,7 +310,21 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 				var classes = "desc";
 				if (d.extra_classes) classes += " " + d.extra_classes;
 
-				var sp = $("<span>", {class: classes, html: htmlEscape(entry_text)});
+				var text = htmlEscape(entry_text);
+
+				if (d.extra_classes && d.extra_classes.indexOf("updated") != -1) {
+					text += " <span class='badge change'>updated</span>";
+				}
+
+				if (d.extra_classes && d.extra_classes.indexOf("new") != -1) {
+					text += " <span class='badge new'>new</span>";
+				}
+
+				if (d.extra_classes && d.extra_classes.indexOf("deleted") != -1) {
+					text += " <span class='badge deleted'>deleted</span>";
+				}
+
+				var sp = $("<span>", {class: classes, html: text});
 
 				// horizontal line to indicate current selection in TOC
 				var indicator = $("<div>", { class: "indicator" });

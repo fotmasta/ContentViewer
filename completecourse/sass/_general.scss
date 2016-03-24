@@ -7,7 +7,7 @@ european/normal/latest.woff') format('woff'),url('https://i.s-microsoft.com/font
 microsoft.com/fonts/segoe-ui/west-european/normal/latest.svg#web') format('svg');font-weight:normal;font-style:normal}
 
 $video-background-color: white;
-$link-color: #808080;
+$link-color: #404040;
 $link-visited-color: #1570A6;
 $quiz-color: #569E39;
 $button-blue: #0078d7;
@@ -150,9 +150,11 @@ body.skin-Microsoft {
 			span.desc {
 				display: table-cell;
 
+				/* not sure why this was here
 				.badge:not(.delete) {
 					display: none;
 				}
+				*/
 
 				&.deleted {
 					color: red;
@@ -808,7 +810,7 @@ span.completed {
 
 // HABITAT includes:
 
-.button-a {
+.button-a.nav-button {
 	width: 100%;
 	display: block;
 	color: white;
@@ -830,10 +832,15 @@ span.completed {
 		background-position: left 13.3333px top 50%;
 		background-image: url(images/icon-arrow-white-back.svg);
 		padding-left: 4em;
+
+		&:hover {
+			background-repeat: no-repeat;
+			background-size: auto 1.5em;
+		}
 	}
 
 	&:hover {
-		background: #A2D1E7;
+		background-color: #23A3AD;
 	}
 
 	h4 {
@@ -841,6 +848,8 @@ span.completed {
 		margin-bottom: initial;
 		font-weight: bold;
 		font-family: inherit;
+		font-size: 16px;
+		color: white;
 	}
 }
 

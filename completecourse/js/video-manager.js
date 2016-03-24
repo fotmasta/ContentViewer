@@ -567,7 +567,7 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 
 			immediate = (immediate == undefined) ? false : immediate;
 
-			var el = iframe.contents().find(hash);
+			var el = iframe ? iframe.contents().find(hash) : [];
 			var dest = 0;
 
 			if (el.length) {
@@ -672,8 +672,10 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 						this.iframe.iFrameHolder("highlight", options.highlight);
 					}
 				} else {
-					//var sel = $(".iframe-holder *");
-					//sel.remove();
+					if (!options.hash) {
+						// scroll to top
+						this.scrollToHash(this.iframe, {}, true);
+					}
 
 					this.addIFrame({
 						index: index,

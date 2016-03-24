@@ -138,6 +138,9 @@ ol figure.cup-new:before {
     background-color: #E8DB18;
     color: #9C5110;
     transform: rotate(-15deg);
+    text-indent: 0;
+    margin-left: -40px;
+    margin-top: 10px;
 }
 
 span.cup-delete {

@@ -157,11 +157,13 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 			//*
 			var doc = this.element.find(".summary")[0].ownerDocument;
 			var win = doc.defaultView;
+			var iframeholder = $(".the-iframe-holder");
 			var sum = this.options.jquery("iframe").contents().find(".summary");
-			sum.affix({ offset: { top: 140 }, target: win});
+			//sum.affix({ offset: { top: 140 }, target: win});
 			//*/
 
 			//$(".summary").affix({ offset: { top: 140 } });
+			this.options.jquery("iframe").contents().find(".summary").affix({ offset: { top: 140 }, target: win });
 		},
 
 		onLoadedData: function (data) {
@@ -405,6 +407,9 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 
 			this.element.find(".summary").find("#correct-count").text(correct);
 			this.element.find("#incorrect-count").text(incorrect);
+
+			if (this.summary)
+				this.summary.find("#incorrect-count").text(incorrect);
 
 			var total = this.element.find(".question").length;
 

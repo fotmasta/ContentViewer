@@ -1,3 +1,4 @@
+// TODO: re-fix quizzerator's affix (or try whole-page scrolling again: not sure what exactly prevented that from working last time...)
 // TODO: does the quizzerator export refresh with each push of the download button?
 // TODO: see if there are extra pages being pushed into the browser history that can be eliminated to make "Back" more streamlined
 // TODO: sometimes the quizzerator doesn't seem to initialize with data
@@ -216,3 +217,5 @@
 // DONE: consolidate CUP styles into one place (and preferably add that file to the Habitat projects (?) [didn't see a good way, without Sass available in the projects])
 // DONE: quizzes should only be marked complete when 100%
 // DONE: image support for quizzerator questions and answers
+// DONE: "New" badge for images is bold and off-center
+// DONE: add pdf support (using browser-supported embed tag)

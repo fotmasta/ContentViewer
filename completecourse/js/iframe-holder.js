@@ -75,6 +75,10 @@ define(["bootstrap-dialog", "imagesloaded", "database", "jquery.ui"], function (
 		return false;
 	}
 
+	function IsPDF (src) {
+		return src.toLowerCase().substr(-3) == "pdf";
+	}
+
 	$.widget("que.iFrameHolder", {
 		options: {},
 
@@ -86,8 +90,10 @@ define(["bootstrap-dialog", "imagesloaded", "database", "jquery.ui"], function (
 			if (IsWidget(src)) {
 				this.widgetName = undefined;
 				var widget = ParseWidget(src);
-				this.iframe = $("<iframe>", { class: "content", src: "", frameborder: 0, "allowfullscreen": true });
+				this.iframe = $("<iframe>", {class: "content", src: "", frameborder: 0, "allowfullscreen": true});
 				this.injectWidget(widget.src, widget.params);
+			} else if (IsPDF(src)) {
+				this.iframe = $("<iframe>", { class: "content pdf", src: "", frameborder: 0, "allowfullscreen": true, height: "100%"});
 			} else {
 				this.iframe = $("<iframe>", { class: "content", src: src, frameborder: 0, "allowfullscreen": true });
 			}
@@ -108,15 +114,31 @@ define(["bootstrap-dialog", "imagesloaded", "database", "jquery.ui"], function (
 
 			var src = URLWithoutHash(this.options.src);
 
+			this.iframe.removeClass("pdf");
+
 			if (IsWidget(src)) {
 				// clear out the old content
-				this.iframe.attr("src", "index.html").attr("src", "");
+				this.iframe.contents().find("html,body").scrollTop(0);
+				this.iframe.attr("src", "index.html").attr("src", "").height("auto");
 
 				var widget = ParseWidget(src);
 				this.injectWidget(widget.src, widget.params);
+			} else if (IsPDF(src)) {
+				this.iframe.contents().find("html").remove();
+				this.iframe.height("100%");
+				this.iframe.attr("src", "index.html").attr("src", "");
+				this.iframe.addClass("pdf");
 			} else {
-				this.iframe.attr("src", src);
+				this.iframe.attr("src", src).height("auto");
 			}
+		},
+
+		sizePDFToFit: function () {
+			var b = this.iframe.contents().find("button").outerHeight() * 2;
+			var embed = this.iframe.contents().find("embed");
+			var h = this.iframe.height();
+			var embed_height = h - b;
+			embed.height(embed_height);
 		},
 
 		// iOS has fits if you don't give the iframe a specific height
@@ -124,6 +146,9 @@ define(["bootstrap-dialog", "imagesloaded", "database", "jquery.ui"], function (
 			// on desktop, we can abort early
 			var el = this.iframe;
 			if (el.css("height") == "100%") {
+				return;
+			} else if (el.hasClass("pdf")) {
+				this.sizePDFToFit();
 				return;
 			}
 
@@ -197,23 +222,13 @@ define(["bootstrap-dialog", "imagesloaded", "database", "jquery.ui"], function (
 					break;
 			}
 
-			/* MutationObserver
-			// select the target node
-			var target = this.iframe.contents().find("body")[0];
+			var src = URLWithoutHash(this.options.src);
+			if (IsPDF(src)) {
+				var s = $("<embed src=\"" + src + "\" width=\"100%\" height=\"100%\" type=\"application/pdf\"></embed>");
+				var f = this.iframe.contents().find(".header-prev-button").after(s);
+				this.sizePDFToFit();
+			}
 
-			// create an observer instance
-			var observer = new MutationObserver(function(mutations) {
-				mutations.forEach(function(mutation) {
-					console.log("mutation " + mutation.type);
-				});
-			});
-
-			// configuration of the observer:
-			var config = { subtree: true, attributes: true, childList: true, characterData: true };
-
-			// pass in the target node, as well as the observer options
-			observer.observe(target, config);
-			/*/
 		},
 
 		onIframeContentsLoaded: function () {
@@ -297,7 +312,7 @@ define(["bootstrap-dialog", "imagesloaded", "database", "jquery.ui"], function (
 
 			if (obj) {
 				// add a next button
-				var a = $('<button class="button button-a header-prev-button"><h4>Previous </h4>' + obj.title + '</button>').data("goto-index", obj.index);
+				var a = $('<button class="button button-a nav-button header-prev-button"><h4>Previous </h4>' + obj.title + '</button>').data("goto-index", obj.index);
 				a.click($.proxy(this.onClickJumpButton, this));
 
 				this.iframe.contents().find("body").prepend(a);
@@ -309,7 +324,7 @@ define(["bootstrap-dialog", "imagesloaded", "database", "jquery.ui"], function (
 
 			if (obj) {
 				// add a next button
-				var a = $('<button id="next-button" data-iframe-height="true" class="button button-a"><h4>Next </h4>' + obj.title + '</button>').data("goto-index", obj.index);
+				var a = $('<button id="next-button" data-iframe-height="true" class="button button-a nav-button"><h4>Next </h4>' + obj.title + '</button>').data("goto-index", obj.index);
 				a.click($.proxy(this.onClickJumpButton, this));
 
 				this.iframe.contents().find("body").append(a);
