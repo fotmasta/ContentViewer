@@ -24,7 +24,7 @@ requirejs.config({
 		"bootstrap-dialog": "bootstrap-dialog.min",
 		"imagesloaded": "imagesloaded.pkgd.min",
 		"popcorn": "popcorn-complete.min",
-		"bootstrap-toolkit": "bootstrap-toolkit.min",
+		"bootstrap-toolkit": "bootstrap-toolkit",
 		"videojs": "video",
 		"videojs-markers": "videojs-markers",
 		"handlebars": "handlebars-v3.0.3",
@@ -73,7 +73,6 @@ requirejs.config({
 			deps: ['popcorn']
 		},
 		"bootstrap-toolkit": {
-			export: "$",
 			deps: ["jquery"]
 		},
 		"videojs": {
@@ -168,6 +167,12 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 
 		$("#main_video").css("max-height", wh - 50);
 
+		$("#video .iframe-holder .the-iframe-holder iframe").css("min-height", wh - 50);
+
+		var c = Math.floor($("#main").width() * .25) + 8;
+		$(".toc").outerWidth(c);
+		$(".search-results").outerWidth(c);
+
 		doResponsiveLogic();
 	}
 
@@ -181,7 +186,7 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 
 	// THEORY: hide the TOC every time we switch to xs
 	function doResponsiveLogic () {
-		ResponsiveBootstrapToolkit.changed(function () {
+		var func = ResponsiveBootstrapToolkit.changed(function () {
 			var currentSize = ResponsiveBootstrapToolkit.current();
 			if (currentSize != lastSize) {
 				if (currentSize == "xs") {
@@ -207,6 +212,7 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 
 			contentsPaneDesiredVisible = undefined;
 		});
+		func();
 	}
 
 	function addLinkToCSS (url) {
@@ -520,6 +526,16 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 		$("#account-panel").Account("togglePanel");
 	}
 
+	// resize the toc column after bootstrap styles have been applied (eventually)
+	function resizeAfterInitialStyling () {
+		var contents = $("#contents");
+		if (contents.css("width") != $("body").css("width")) {
+			onResize();
+		} else {
+			setTimeout(resizeAfterInitialStyling, 100);
+		}
+	}
+
 	var BuildPage = {
 		build: function (options) {
 			// will this help with the xhr error we sometimes get on InformIT?
@@ -544,6 +560,9 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 			addLinkToCSS(baseURL + "css/videojs.markers.min.css");
 			addLinkToCSS(baseURL + "css/main.css");
 			addLinkToCSS("https://fonts.googleapis.com/css?family=Source+Sans+Pro");
+
+			// have to initialize this toolkit AFTER we've overwritten the body tag
+			ResponsiveBootstrapToolkit.initialize();
 
 			manifest = options;
 
@@ -583,9 +602,12 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 			//$("#comments-panel").Comments( { manager: $("#video"), titlePath: getEscapedPathFromTitle(options.title) });
 
 			// this should get rid of the extra vertical scrollbar on the InformIT site for IE users
+			/*
 			if (window.parent) {
 				window.parent.document.body.style.overflow = "hidden";
 			}
+			*/
+			resizeAfterInitialStyling();
 		},
 
 		setSearchIndex: function (data) {

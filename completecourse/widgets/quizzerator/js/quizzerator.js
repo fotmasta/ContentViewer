@@ -149,7 +149,7 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 
 			this.onLoadedData(this.options.paramData);
 
-			this.kludgeAffix();
+			//this.kludgeAffix();
 		},
 
 		// work-around for cross-domain iframe
@@ -162,8 +162,8 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 			//sum.affix({ offset: { top: 140 }, target: win});
 			//*/
 
-			//$(".summary").affix({ offset: { top: 140 } });
-			this.options.jquery("iframe").contents().find(".summary").affix({ offset: { top: 140 }, target: win });
+			$(".summary").affix({ offset: { top: 140 } });
+			//this.options.jquery("iframe").contents().find(".summary").affix({ offset: { top: 140 }, target: win });
 		},
 
 		onLoadedData: function (data) {
@@ -489,6 +489,15 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 			var correct = this.element.find(".question[data-correct=true]").length;
 			var total = this.element.find(".question").length;
 			return (correct == total);
+		},
+
+		onScroll: function (event) {
+			var t = $(event.target).scrollTop() + 140;
+			var sum = this.element.find(".summary");
+			var curtop = sum.offset().top;
+			if (sum.css("top") == "auto" || Math.abs(curtop - t) > 20) {
+				sum.offset({top: t});
+			}
 		}
 	});
 

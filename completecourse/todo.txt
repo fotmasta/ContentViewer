@@ -1,4 +1,6 @@
-// TODO: re-fix quizzerator's affix (or try whole-page scrolling again: not sure what exactly prevented that from working last time...)
+// TODO: iOS TOC syncing is doing some strange scrolling
+// TODO: quizzerator saving the correct user response, even if response order is randomized
+// TODO: check for double-scrollbars in IE with current scrolling paradigm
 // TODO: does the quizzerator export refresh with each push of the download button?
 // TODO: see if there are extra pages being pushed into the browser history that can be eliminated to make "Back" more streamlined
 // TODO: sometimes the quizzerator doesn't seem to initialize with data
@@ -219,3 +221,5 @@
 // DONE: image support for quizzerator questions and answers
 // DONE: "New" badge for images is bold and off-center
 // DONE: add pdf support (using browser-supported embed tag)
+// DONE: responsive sizing (ResponsiveBootstrapToolkit) stopped working (?!) [had to tweak it to initialize after rewriting DOM]
+// DONE: trying again with full-page scrolling with static elements [complete 4/1/16]

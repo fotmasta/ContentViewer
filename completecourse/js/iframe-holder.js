@@ -119,7 +119,7 @@ define(["bootstrap-dialog", "imagesloaded", "database", "jquery.ui"], function (
 			if (IsWidget(src)) {
 				// clear out the old content
 				this.iframe.contents().find("html,body").scrollTop(0);
-				this.iframe.attr("src", "index.html").attr("src", "").height("auto");
+				this.iframe.attr("src", "index.html").attr("src", "").height("100%");
 
 				var widget = ParseWidget(src);
 				this.injectWidget(widget.src, widget.params);
@@ -134,15 +134,40 @@ define(["bootstrap-dialog", "imagesloaded", "database", "jquery.ui"], function (
 		},
 
 		sizePDFToFit: function () {
-			var b = this.iframe.contents().find("button").outerHeight() * 2;
+			var b = this.iframe.contents().find("button").outerHeight() * 2 + 20;
 			var embed = this.iframe.contents().find("embed");
-			var h = this.iframe.height();
+			var h = this.element.parents("#video").height();
 			var embed_height = h - b;
 			embed.height(embed_height);
+			this.iframe.height(h);
 		},
 
 		// iOS has fits if you don't give the iframe a specific height
 		sizeToBottom: function () {
+			if (this.iframe.hasClass("pdf")) {
+				this.sizePDFToFit();
+				return;
+			}
+
+			var bottom = this.iframe.contents().find("[data-iframe-height]");
+			if (bottom.length) {
+				var h = Math.ceil(bottom.offset().top + bottom.outerHeight());
+				var frameh = this.iframe.height();
+				if (h != frameh) {
+					this.iframe.height(h);
+				}
+			} else {
+				// no bottom element (ie, Captivate quiz)
+				var body = this.iframe.contents().find("body");
+				if (body.length) {
+					var h = $(body[0].ownerDocument).height();
+					var frameh = this.iframe.height();
+					if (h != frameh) {
+						this.iframe.height(h);
+					}
+				}
+			}
+			/*
 			// on desktop, we can abort early
 			var el = this.iframe;
 			if (el.css("height") == "100%") {
@@ -163,13 +188,17 @@ define(["bootstrap-dialog", "imagesloaded", "database", "jquery.ui"], function (
 					}
 				} else {
 					// no bottom element (ie, Captivate quiz)
-					var h = $(this.iframe.contents().find("body")[0].ownerDocument).height();
-					var frameh = this.iframe.height();
-					if (h != frameh) {
-						this.iframe.height(h);
+					var body = this.iframe.contents().find("body");
+					if (body.length) {
+						var h = $(body[0].ownerDocument).height();
+						var frameh = this.iframe.height();
+						if (h != frameh) {
+							this.iframe.height(h);
+						}
 					}
 				}
 			}
+			*/
 		},
 
 		onLoaded: function ()  {
@@ -182,10 +211,12 @@ define(["bootstrap-dialog", "imagesloaded", "database", "jquery.ui"], function (
 
 			this.overrideLinks();
 
+			/*
 			// desktop:
 			this.iframe.contents().scroll($.proxy(this.onScrollIframe, this));
 			// iOS:
 			$(".the-iframe-holder").scroll($.proxy(this.onScrollIframe, this));
+			*/
 
 			var me = this;
 
@@ -447,6 +478,12 @@ define(["bootstrap-dialog", "imagesloaded", "database", "jquery.ui"], function (
 				this.options.manager.onScrollContent();
 		},
 
+		// parent window scrolled
+		onScroll: function (event) {
+			var widget = this.getWidget();
+			if (widget && widget.onScroll) widget.onScroll(event);
+		},
+
 		returnHumanReadableTOCNames: function (list) {
 			return this.options.manager.getTOCNames(list);
 		},
@@ -508,24 +545,24 @@ define(["bootstrap-dialog", "imagesloaded", "database", "jquery.ui"], function (
 			}
 		},
 
-		isCompletable: function () {
+		getWidget: function () {
 			if (this.widgetName) {
 				var widget = this.iframe.contents().find("#the_widget")[this.widgetName]("instance");
-				return widget.isComplete != undefined;
+				return widget;
 			}
-			return false;
+			return undefined;
+		},
+
+		isCompletable: function () {
+			var widget = this.getWidget();
+
+			return widget && widget.isComplete != undefined;
 		},
 
 		isComplete: function () {
-			if (this.widgetName) {
-				var widget = this.iframe.contents().find("#the_widget")[this.widgetName]("instance");
-				if (widget.isComplete) {
-					return widget.isComplete();
-				} else {
-					return false;
-				}
-			}
-			return false;
+			var widget = this.getWidget();
+
+			return widget && widget.isComplete && widget.isComplete();
 		}
 	});
 });

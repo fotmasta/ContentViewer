@@ -7,7 +7,8 @@
   font-weight: normal;
   font-style: normal; }
 html.ui {
-  overflow: hidden; }
+  overflow: scroll;
+  margin-top: 50px; }
 
 body {
   font-family: "Source Sans Pro", "Helvetica Neue", Helvetica, Arial, sans-serif; }
@@ -143,20 +144,25 @@ body.skin-Microsoft {
   display: none; }
 
 .iframe-holder {
+  /*
   height: 100%;
-  overflow: hidden; }
+  overflow: hidden;
+  */
+  background-color: #E5F0F1; }
   .iframe-holder > div.the-iframe-holder {
     max-width: 1024px;
     margin: 0 auto;
     background-color: white;
-    height: 100%;
-    overflow: scroll; }
-    .iframe-holder > div.the-iframe-holder.ios {
-      -webkit-overflow-scrolling: touch;
-      overflow: scroll; }
+    /*height: 100%;*/
+    /*overflow: scroll;*/
+    /*
+    &.ios {
+    	-webkit-overflow-scrolling: touch;
+    	overflow: scroll;
+    }
+    */ }
   .iframe-holder iframe {
     width: 100%;
-    /*height: 100%;*/
     display: block !important;
     overflow: visible; }
 
@@ -167,7 +173,7 @@ body.skin-Microsoft .iframe-holder > div {
   padding: 0;
   transition: width .5s linear;
   background-color: #E5F0F1;
-  overflow: hidden;
+  /*overflow: hidden;*/
   /*-webkit-overflow-scrolling: touch;*/ }
   #video .overlay {
     position: absolute;
@@ -273,7 +279,9 @@ body.skin-Microsoft .iframe-holder > div {
   overflow-y: scroll;
   overflow-x: hidden;
   height: 100%;
-  width: 100%; }
+  width: 100%;
+  -webkit-backface-visibility: hidden;
+  -webkit-perspective: 1000; }
 
 .nav-list {
   position: relative; }
@@ -355,6 +363,7 @@ ul.toc-holder {
   position: relative; }
 
 .toc {
+  position: fixed;
   overflow: hidden; }
   .toc .dropper {
     position: absolute;
@@ -560,8 +569,11 @@ span.completed {
     color: white; }
 
 .habitat-html {
+  /*
   overflow: hidden;
-  height: 100%; }
+  height: 100%;
+  */
+  overflow: hidden; }
 
 .habitat-body {
   font-family: 'Source Sans Pro', sans-serif;
@@ -619,6 +631,8 @@ span.completed {
 
 .search-results {
   display: none;
+  position: fixed;
+  overflow: hidden;
   background-color: #F7E1D1; }
   .search-results .row {
     background-color: #e86414; }

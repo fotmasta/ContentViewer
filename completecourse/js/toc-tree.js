@@ -572,9 +572,8 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 			if (!this.searchIndex) {
 				this.searchByTitles("");
 			} else {
-				this.element.parent().find(".toc").delay(300).show("slide");
-				this.element.parent().find(".search-results").hide("slide");
-
+				this.element.parents("#contents").find(".toc").delay(300).show("slide");
+				this.element.parents("#contents").find(".search-results").hide("slide");
 				this.element.trigger("closesearch");
 			}
 		},

@@ -65,7 +65,7 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 		var $iframe = $(iframe);
 
 		// NOTE: iOS fix has to account for scrolling because getBoundingClientRect doesn't
-		var h = $(window).height() + $(".the-iframe-holder").scrollTop();
+		var h = $(window).height() + $(window).scrollTop();//$(".the-iframe-holder").scrollTop();
 
 		for (var i = 0; i < elements.length; i++) {
 			var elem = elements[i];
@@ -204,6 +204,8 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 				var loc = document.location.search;
 				$("#video").VideoManager("tryToGotoLocationSearch", loc);
 			};
+
+			$(window).scroll($.proxy(this.onScrollContent, this));
 
 			this.player.markers({
 				markerStyle: {
@@ -575,6 +577,7 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 				dest = top - 30;
 			}
 
+			/*
 			// kludge for iOS scrolling (I don't like this one bit)
 			var scrollingDOM;
 			if ($(".the-iframe-holder").height() == $("iframe").height()) {
@@ -584,6 +587,8 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 				// iOS
 				scrollingDOM = $(".the-iframe-holder");
 			}
+			*/
+			scrollingDOM = $(window);
 
 			if (immediate) {
 				scrollingDOM.scrollTop(dest);
@@ -1256,7 +1261,7 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 			return foundIndex;
 		},
 
-		onScrollContent: function () {
+		onScrollContent: function (event) {
 			if (!this.busyScrolling && !this.waitingForIFrameToLoad) {
 				var curIndex = this.getCurrentIndex();
 
@@ -1270,6 +1275,9 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 				if (this.options.infinite_scrolling === true) {
 					this.checkForAutoAdvance();
 				}
+
+				if (this.iframe && this.iframe.iFrameHolder)
+					this.iframe.iFrameHolder("onScroll", event);
 			}
 		},
 
@@ -1299,10 +1307,8 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 				var scroller = $("#contents-pane .scroller");
 				var t = scroller.scrollTop();
 				var h = scroller.height();
-				var p = entry.offset().top;
-				var desired_top = (h * .5);// - entry.height();
-				var adj = p - desired_top;
-				var dest = (t + adj);
+				var p = entry[0].getBoundingClientRect().top + t - h * .6;
+				var dest = p;
 				var currTarget = scroller.attr("data-scrolltarget");
 				var diff = (currTarget - dest);
 				if (currTarget == undefined || Math.abs(diff) > 20) {

@@ -14,7 +14,8 @@ $button-blue: #0078d7;
 $hover-blue: #0096ff;
 
 html.ui {
-	overflow: hidden;
+	overflow: scroll;
+	margin-top: 50px;
 }
 
 body {
@@ -240,29 +241,32 @@ body.skin-Microsoft {
 }
 
 .iframe-holder {
+	/*
 	height: 100%;
 	overflow: hidden;
+	*/
+	background-color: #E5F0F1;
 
 	& > div.the-iframe-holder {
 		max-width: 1024px;
 		margin: 0 auto;
 		background-color: white;
-		height: 100%;
+		/*height: 100%;*/
 
 		// this was needed for scrolling after viewing video full-screen:
-		overflow: scroll;
+		/*overflow: scroll;*/
 
-		// this seemed to be necessary for best scrolling iOS:
+		// this seemed to be necessary for best scrolling iOS: (but probably breaks affix)
+		/*
 		&.ios {
 			-webkit-overflow-scrolling: touch;
 			overflow: scroll;
 		}
+		*/
 	}
 
 	iframe {
 		width: 100%;
-		// trying this off:
-		/*height: 100%;*/
 		display: block !important;
 		overflow: visible;
 	}
@@ -285,7 +289,7 @@ video {
 	
 	background-color: #E5F0F1; //$video-background-color;
 
-	overflow: hidden;
+	/*overflow: hidden;*/
 	/*-webkit-overflow-scrolling: touch;*/
 
 	.overlay {
@@ -438,6 +442,9 @@ video {
 	overflow-x: hidden;
 	height: 100%;
 	width: 100%;
+	// this might reduce flicker:
+	-webkit-backface-visibility: hidden;
+	-webkit-perspective: 1000;
 }
 
 .nav-list {
@@ -563,6 +570,7 @@ ul.toc-holder {
 }
 
 .toc {
+	position: fixed;
 	overflow: hidden;
 
 	.dropper {
@@ -855,8 +863,12 @@ span.completed {
 
 .habitat-html {
 	// turning this from scroll to hidden to prevent double scrollbars on Windows
+	// overflow: visible is needed for the iframe itself to scroll (for affix to work)
+	/*
 	overflow: hidden;
 	height: 100%;
+	*/
+	overflow: hidden;
 }
 
 .habitat-body {
@@ -951,6 +963,9 @@ span.completed {
 
 .search-results {
 	display: none;
+	position: fixed;
+	overflow: hidden;
+
 	background-color: #F7E1D1;
 
 	.row {
