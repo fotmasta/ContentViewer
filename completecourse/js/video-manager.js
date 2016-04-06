@@ -508,7 +508,7 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 			for (var j = 0; j < list.length; j++) {
 				var this_href = list[j].href;
 
-				// if the hint is in the format "Lesson 1.1 | Learn how JavaScript is used" only use the part after the | separator
+				// if the hint is in the format "Lesson 1.1 | Learn how JavaScript is used" only use the part after the | separator to look for it in the TOC
 				if (this_href.indexOf("|") != -1) {
 					this_href = this_href.substr(this_href.indexOf("|") + 1).trim();
 				}
@@ -531,7 +531,11 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 
 					// check TOC descriptions
 					if (this_href == this.toc[i].desc) {
-						title = this_href;
+						// use the full hint name if it has a | separator
+						if (list[j].href.indexOf("|") != -1)
+							title = list[j].href;
+						else
+							title = this_href;
 						// if this is a video TOC entry, link to it; otherwise, use the next TOC entry
 						if (this.toc[i].video)
 							list[j].href = this.toc[i].video;
@@ -562,7 +566,9 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 				} else {
 					index = options.index;
 				}
-				hash = VideoManager.HashInURL(this.toc[index].src);
+
+				if (this.toc[index])
+					hash = VideoManager.HashInURL(this.toc[index].src);
 			} else {
 				hash = options.hash;
 			}

@@ -223,3 +223,6 @@
 // DONE: add pdf support (using browser-supported embed tag)
 // DONE: responsive sizing (ResponsiveBootstrapToolkit) stopped working (?!) [had to tweak it to initialize after rewriting DOM]
 // DONE: trying again with full-page scrolling with static elements [complete 4/1/16]
+// NOTE: scrolling issues: iPad; desktop; Safari in general; extra IE scrollbars; after full-screen video plays; affix (iframe awareness of scroll position); PDF sizing; scrollable after PDF viewing; iOS pages with video; jumping to internal links; Captivate sizing
+// DONE: save multiple responses (if allowed) in quizzerator
+// DONE: quizzerator "start over" button

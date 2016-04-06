@@ -20,6 +20,10 @@ html.ui {
 
 body {
 	font-family: "Source Sans Pro", "Helvetica Neue", Helvetica, Arial, sans-serif;
+
+	&.modal-open {
+		overflow: visible;
+	}
 }
 
 body.skin-Microsoft {
@@ -898,6 +902,7 @@ span.completed {
 		font-family: Courier;
 		font-size: 80%;
 		margin: 0 !important;
+		white-space: pre-wrap;
 	}
 
 	.code-snippet, .code-listing {

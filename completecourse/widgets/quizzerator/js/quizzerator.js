@@ -142,28 +142,20 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 			btn.click($.proxy(this.onClickCheckAll, this));
 			container.append(btn);
 
+			btn = $("<button>", {
+				id: "start-over",
+				class: "btn btn-warning btn-sm center-block shrunk",
+				text: "Start Over"
+			});
+			btn.click($.proxy(this.onClickStartOver, this));
+			container.append(btn);
+
 			this.element.append(summary);
 
 			var ol = $("<ol>", {class: "quiz-holder"});
 			this.element.append(ol);
 
 			this.onLoadedData(this.options.paramData);
-
-			//this.kludgeAffix();
-		},
-
-		// work-around for cross-domain iframe
-		kludgeAffix: function () {
-			//*
-			var doc = this.element.find(".summary")[0].ownerDocument;
-			var win = doc.defaultView;
-			var iframeholder = $(".the-iframe-holder");
-			var sum = this.options.jquery("iframe").contents().find(".summary");
-			//sum.affix({ offset: { top: 140 }, target: win});
-			//*/
-
-			$(".summary").affix({ offset: { top: 140 } });
-			//this.options.jquery("iframe").contents().find(".summary").affix({ offset: { top: 140 }, target: win });
 		},
 
 		onLoadedData: function (data) {
@@ -177,6 +169,10 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 
 			if (this.data.reviewableAfterEach !== undefined) {
 				this.options.settings.reviewableAfterEach = (String(this.data.reviewableAfterEach) == "true");
+			}
+
+			if (this.data.usesExplanations !== undefined) {
+				this.options.settings.usesExplanations = (String(this.data.usesExplanations) == "true");
 			}
 
 			for (var i = 0; i < this.data.questions.length; i++) {
@@ -243,6 +239,8 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 				var p = $("<p>", {class: "response", html: answer});
 				if (isCorrect) p.attr("data-correct", true);
 
+				p.attr("data-index", each);
+
 				var me = this;
 
 				p.find("img").each(function () {
@@ -264,10 +262,17 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 			btn.appendTo(checker);
 
 			if (q_params.hint) {
-				var hint = $("<p>", {class: "hint", html: "<i class='fa fa-bookmark text-danger'></i> Hint: "});
-				var link = $("<a>", {href: q_params.hint, text: q_params.hint});
-				hint.append(link);
-				checker.append(hint);
+				if (this.options.settings.usesExplanations) {
+					var expl = $("<p>", {class: "hint explanation", html: "<i class='fa fa-bookmark text-danger'></i> "});
+					var text = $("<span>", {text: q_params.hint});
+					expl.append(text);
+					checker.append(expl);
+				} else {
+					var hint = $("<p>", {class: "hint", html: "<i class='fa fa-bookmark text-danger'></i> Hint: "});
+					var link = $("<a>", {href: q_params.hint, text: q_params.hint});
+					hint.append(link);
+					checker.append(hint);
+				}
 			}
 
 			this.element.find(".quiz-holder").append(q);
@@ -280,21 +285,34 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 		},
 
 		clickResponse: function (response, alsoCheck) {
+			var me = this;
+
 			var q = $(response).parents(".question");
 
 			var alreadySelected = response.hasClass("selected");
 
-			response.parents(".answers-holder").find(".selected").removeClass("selected");
-
-			var me = this;
+			var correctAnswer = q.find(".response[data-correct=true]");
+			var chosenAnswer = q.find(".response.selected");
+			if (correctAnswer.length > 1) {
+				response.toggleClass("selected");
+			} else {
+				response.parents(".answers-holder").find(".selected").removeClass("selected");
+			}
 
 			if (!alreadySelected) {
 				response.addClass("selected");
 				if (this.options.settings.reviewableAfterEach)
 					q.find(".checker").removeClass("inactive animated fadeOut").addClass("animated fadeInLeft").find("button").removeClass("btn-danger").addClass("btn-primary").text("Check Answer");
+			} else if (chosenAnswer.length > 1) {
+				if (this.options.settings.reviewableAfterEach)
+					q.find(".checker").removeClass("inactive animated fadeOut").addClass("animated fadeInLeft").find("button").removeClass("btn-danger").addClass("btn-primary").text("Check Answer");
 			} else {
 				if (this.options.settings.reviewableAfterEach)
 					q.find(".checker").addClass("animated fadeOut").animate({_nothing: 0}, 1000, $.proxy(me.resetButton, me, q));
+			}
+
+			if (!alsoCheck && !this.options.settings.reviewableAfterEach) {
+				q.find(".checker button").removeClass("btn-danger").addClass("btn-primary").text("Check Answer");
 			}
 
 			q.find(".icon").addClass("hidden");
@@ -309,7 +327,8 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 
 			this.adjustSummarySize();
 
-			this.saveResponses();
+			if (!alsoCheck)
+				this.saveResponses();
 		},
 
 		resetButton: function (question) {
@@ -317,13 +336,24 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 			$(question).find(".checker button").text("Check Answer").removeClass("btn-success btn-danger").addClass("btn-primary");
 		},
 
+		getQuestionsAnswered: function () {
+			return $.unique(this.element.find(".selected").parents(".question"));
+		},
+
+		allQuestionsAnswered: function () {
+			var answered = this.getQuestionsAnswered();
+			var questions = this.element.find(".question");
+			return (answered && questions && answered.length == questions.length);
+		},
+
 		adjustSummarySize: function () {
-			var answered = this.element.find(".selected");
+			var answered = this.getQuestionsAnswered();
 
 			var me = this;
 
 			var doHeightAdjustment = function () {
 				me.element.find("#check-all").addClass("unhidden");
+				me.element.find("#start-over").addClass("unhidden");
 				var h = me.element.find(".holder").outerHeight();
 				me.element.find(".summary").height(h);
 			}
@@ -331,20 +361,22 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 			if (this.options.settings.reviewableAfterEach) {
 				if (answered.length) {
 					this.element.find("#check-all").removeClass("shrunk");
-					setTimeout(doHeightAdjustment, 500);
+					this.element.find("#start-over").removeClass("shrunk");
 				} else {
 					this.element.find("#check-all").addClass("shrunk");
-					setTimeout(doHeightAdjustment, 500);
+					this.element.find("#start-over").addClass("shrunk");
 				}
+				setTimeout(doHeightAdjustment, 500);
 			} else {
 				var questions = this.element.find(".question");
 				if (answered.length == questions.length) {
 					this.element.find("#check-all").removeClass("shrunk");
-					setTimeout(doHeightAdjustment, 500);
+					this.element.find("#start-over").removeClass("shrunk");
 				} else {
 					this.element.find("#check-all").addClass("shrunk");
-					setTimeout(doHeightAdjustment, 500);
+					this.element.find("#start-over").addClass("shrunk");
 				}
+				setTimeout(doHeightAdjustment, 500);
 			}
 		},
 
@@ -360,7 +392,8 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 			var correctAnswer = q.find(".response[data-correct=true]");
 			var chosenAnswer = q.find(".response.selected");
 
-			if (correctAnswer.is(chosenAnswer)) {
+			if (correctAnswer.not(chosenAnswer).length == 0 && chosenAnswer.not(correctAnswer).length == 0) {
+				// all correct
 				chosenAnswer.parent("li").find(".correct").removeClass("hidden");
 				if (animate != false) {
 					chosenAnswer.parent("li").find(".icons").removeClass("hidden animated").hide(0).addClass("animated rollIn").show(0);
@@ -373,7 +406,13 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 
 				q.attr("data-correct", true);
 			} else {
-				chosenAnswer.parent("li").find(".incorrect").removeClass("hidden");
+				// some incorrect
+				chosenAnswer.each(function (index, item) {
+					if ($.inArray(item, correctAnswer) > -1)
+						$(item).parent("li").find(".correct").removeClass("hidden");
+					else
+						$(item).parent("li").find(".incorrect").removeClass("hidden");
+				});
 				if (animate != false) {
 					chosenAnswer.parent("li").find(".icons").removeClass("hidden animated").hide(0).addClass("animated rollIn").show(0);
 					q.find(".checker button").text("That's Not Correct! Try Again?").removeClass("btn-primary").addClass("btn-danger animated fadeInLeft");
@@ -413,7 +452,7 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 
 			var total = this.element.find(".question").length;
 
-			var answered = this.element.find(".selected");
+			var answered = this.getQuestionsAnswered();
 
 			this.element.find("#answered-count").text(answered.length + " / " + total);
 
@@ -430,14 +469,27 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 
 				for (var i = 0; i < obj.responses.length; i++) {
 					var resp = obj.responses[i];
-					if (resp != -1) {
-						var q = this.element.find(".question").eq(i);
-						if (q.length) {
-							var r = q.find(".response").eq(resp);
-							if (r.length)
-								this.clickResponse(r, true);
+
+					if (resp.length == undefined) resp = [resp];
+
+					var alsoCheckAnswers = (this.options.settings.reviewableAfterEach || this.allQuestionsAnswered());
+
+					for (var j = 0; j < resp.length; j++) {
+						var r = resp[j];
+						if (r != -1) {
+							var q = this.element.find(".question").eq(i);
+							if (q.length) {
+								var r_el = q.find(".response[data-index=" + r + "]");
+								if (r_el.length)
+									this.clickResponse(r_el, alsoCheckAnswers);
+							}
 						}
 					}
+				}
+
+				// if all questions were answered, grade them
+				if (!this.options.settings.reviewableAfterEach && this.allQuestionsAnswered()) {
+					this.onClickCheckAll();
 				}
 			}
 		},
@@ -450,8 +502,10 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 				var q = questions.eq(i);
 				var answers = q.find(".response");
 				var chosen = q.find(".response.selected");
-				var index = answers.index(chosen);
-				responses.push(index);
+				var indices = $.map(chosen, function (item, index) {
+					return $(item).attr("data-index");
+				});
+				responses.push(indices);
 			}
 
 			var obj = {responses: responses};
@@ -498,6 +552,23 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 			if (sum.css("top") == "auto" || Math.abs(curtop - t) > 20) {
 				sum.offset({top: t});
 			}
+		},
+
+		onStartOver: function () {
+			this.element.find(".question").attr( { "data-correct": null  } );
+			this.element.find(".response").removeClass("selected");
+
+			this.element.find(".icon").addClass("hidden");
+			this.element.find(".checker").addClass("inactive");
+			this.element.find(".hint").css("display", "none");
+
+			this.updateScore();
+
+			this.adjustSummarySize();
+		},
+
+		onClickStartOver: function () {
+			this.options.iframe.showAlert("Start Over", "Are you sure you want to clear your quiz responses and start over?", $.proxy(this.onStartOver, this));
 		}
 	});
 

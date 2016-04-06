@@ -563,6 +563,30 @@ define(["bootstrap-dialog", "imagesloaded", "database", "jquery.ui"], function (
 			var widget = this.getWidget();
 
 			return widget && widget.isComplete && widget.isComplete();
+		},
+
+		showAlert: function (title, text, yesCallback) {
+			BootstrapDialog.show({
+				title: title,
+				message: text,
+				buttons: [
+					{
+						label: 'Yes',
+						cssClass: 'btn-primary',
+						action: function (dialog) {
+							dialog.close();
+							yesCallback();
+						}
+					},
+					{
+						label: 'Cancel',
+						cssClass: 'btn-warning',
+						action: function (dialog) {
+							dialog.close();
+						}
+					}
+				]
+			});
 		}
 	});
 });

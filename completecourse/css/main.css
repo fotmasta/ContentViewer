@@ -12,6 +12,8 @@ html.ui {
 
 body {
   font-family: "Source Sans Pro", "Helvetica Neue", Helvetica, Arial, sans-serif; }
+  body.modal-open {
+    overflow: visible; }
 
 body.skin-Microsoft {
   font-family: 'wf_segoe-ui_normal', 'Segoe UI', Tahoma, Arial, sans-serif; }
@@ -592,7 +594,8 @@ span.completed {
   .habitat-body pre {
     font-family: Courier;
     font-size: 80%;
-    margin: 0 !important; }
+    margin: 0 !important;
+    white-space: pre-wrap; }
   .habitat-body .code-snippet, .habitat-body .code-listing {
     margin-bottom: 1.5em; }
   .habitat-body span.highlight {

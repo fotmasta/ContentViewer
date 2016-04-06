@@ -29,6 +29,10 @@ ol.quiz-holder {
 			margin-top: 10px;
 			margin-left: 25px;
 		}
+
+		p.explanation {
+			text-indent: -8px;
+		}
 	}
 }
 
@@ -155,7 +159,7 @@ li.question {
 		}
 	}
 
-	#check-all {
+	button {
 		margin-top: 1em;
 		opacity: 0;
 		transition: opacity linear .5s;
