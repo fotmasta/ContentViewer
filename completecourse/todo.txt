@@ -1,4 +1,6 @@
-// TODO: iOS TOC syncing is doing some strange scrolling
+// TODO: why aren't TOC download buttons aligned (ex: 9780134505848)
+// TODO: system for bypassing cache or alerting customers to reload (Rhapsody-style)?
+// TODO: iOS TOC syncing to TOC is doing some strange scrolling
 // TODO: quizzerator saving the correct user response, even if response order is randomized
 // TODO: check for double-scrollbars in IE with current scrolling paradigm
 // TODO: does the quizzerator export refresh with each push of the download button?
@@ -226,3 +228,4 @@
 // NOTE: scrolling issues: iPad; desktop; Safari in general; extra IE scrollbars; after full-screen video plays; affix (iframe awareness of scroll position); PDF sizing; scrollable after PDF viewing; iOS pages with video; jumping to internal links; Captivate sizing
 // DONE: save multiple responses (if allowed) in quizzerator
 // DONE: quizzerator "start over" button
+// DONE: quizzerator tracking: response click, restart click, check-all click with score

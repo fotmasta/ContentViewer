@@ -18,6 +18,8 @@ define(["database", "jquery.ui"], function (Database) {
 			this.element.find(".close-button").click($.proxy(this.onClickClose, this));
 
 			Database.getUserData("history", $.proxy(this.onHistory, this));
+
+			this.element.find("#version").text("Version " + Database.getVersion());
 		},
 
 		closeOtherPanels: function () {

@@ -39,6 +39,10 @@ define(["common", "jquery.json", "firebase"], function (Common) {
 		last_save: undefined,
 		attemptedRemoteLoad: false,
 
+		getVersion: function () {
+			return "1.0.4";
+		},
+
 		initialize: function (toc, title, updateCallback) {
 			this.authorize();
 

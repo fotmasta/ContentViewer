@@ -282,6 +282,12 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 			var el = $(event.currentTarget);
 
 			this.clickResponse(el);
+
+			var num = el.parents(".question").index();
+
+			var id = this.id + ":" + num + ":" + el.attr("data-index");
+
+			ga("send", "event", "interface", "quiz-response", id);
 		},
 
 		clickResponse: function (response, alsoCheck) {
@@ -438,6 +444,19 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 				var q = questions.eq(i);
 				this.checkQuestion(q);
 			}
+
+			if (event) {
+				var score = this.getScore() + "%";
+				var note = this.id + ":" + score;
+				ga("send", "event", "interface", "quiz-check-all", note);
+			}
+		},
+
+		getScore: function () {
+			var correct = this.element.find(".question[data-correct=true]").length;
+			var total = this.element.find(".question").length;
+			var score = Math.round((correct / total) * 100);
+			return score;
 		},
 
 		updateScore: function () {
@@ -565,6 +584,8 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 			this.updateScore();
 
 			this.adjustSummarySize();
+
+			ga("send", "event", "interface", "quiz-restart", this.id);
 		},
 
 		onClickStartOver: function () {
