@@ -1,6 +1,5 @@
 // TODO: system for bypassing cache or alerting customers to reload (Rhapsody-style)?
 // TODO: iOS TOC syncing to TOC is doing some strange scrolling
-// TODO: quizzerator saving the correct user response, even if response order is randomized
 // TODO: check for double-scrollbars in IE with current scrolling paradigm
 // TODO: does the quizzerator export refresh with each push of the download button?
 // TODO: see if there are extra pages being pushed into the browser history that can be eliminated to make "Back" more streamlined
@@ -229,3 +228,5 @@
 // DONE: quizzerator "start over" button
 // DONE: quizzerator tracking: response click, restart click, check-all click with score
 // DONE: why aren't TOC download buttons aligned (ex: 9780134505848)
+// DONE: quizzerator: "randomize response" option
+// DONE: quizzerator saving the correct user response, even if response order is randomized [using original load order as data-index]

@@ -175,6 +175,10 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 				this.options.settings.usesExplanations = (String(this.data.usesExplanations) == "true");
 			}
 
+			if (this.data.randomizeResponses !== undefined) {
+				this.options.settings.randomizeResponses = (String(this.data.randomizeResponses) == "true");
+			}
+
 			for (var i = 0; i < this.data.questions.length; i++) {
 				var d_q = this.data.questions[i];
 
@@ -225,7 +229,7 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 					answer = answer.substr(1);
 				}
 
-				var li = $("<li>");
+				var li = $("<li>", { class: "answer" });
 
 				var icons = $("<div>", {class: "icons"});
 				li.append(icons);
@@ -254,6 +258,14 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 
 				answers.append(li);
 
+			}
+
+			if (this.options.settings.randomizeResponses) {
+				var responses = answers.find("li.answer");
+
+				answers.children("li.answer").sort(function () {
+					return Math.round(Math.random()) - 0.5;
+				}).detach().appendTo(answers);
 			}
 
 			var checker = $("<div>", {class: "checker inactive"}).appendTo(q);
