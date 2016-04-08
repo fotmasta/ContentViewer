@@ -92,6 +92,7 @@ body.skin-Microsoft {
       /*padding-left: 30px;*/ }
       #contents #contents-pane a span.desc {
         display: table-cell;
+        padding-left: 6px;
         /* not sure why this was here
         .badge:not(.delete) {
         	display: none;
@@ -320,8 +321,7 @@ body.skin-Microsoft .iframe-holder > div {
       color: #1D1A58; }
 
 .tree-toggler {
-  cursor: pointer;
-  margin-right: 6px; }
+  cursor: pointer; }
 
 .short.invisible {
   display: none; }
@@ -331,7 +331,7 @@ ul.toc-holder {
   padding-right: 0; }
   ul.toc-holder .download-button {
     position: absolute;
-    right: -58px;
+    right: -52px;
     top: 50%;
     transform: translateY(-50%); }
 

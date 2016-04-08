@@ -154,6 +154,7 @@ body.skin-Microsoft {
 
 			span.desc {
 				display: table-cell;
+				padding-left: 6px;
 
 				/* not sure why this was here
 				.badge:not(.delete) {
@@ -515,7 +516,6 @@ video {
 
 .tree-toggler {
 	cursor: pointer;
-	margin-right: 6px;
 }
 
 .short.invisible {
@@ -528,7 +528,7 @@ ul.toc-holder {
 
 	.download-button {
 		position: absolute;
-		right: -58px;
+		right: -52px;
 		top: 50%;
 		transform: translateY(-50%);
 	}

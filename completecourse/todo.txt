@@ -1,4 +1,3 @@
-// TODO: why aren't TOC download buttons aligned (ex: 9780134505848)
 // TODO: system for bypassing cache or alerting customers to reload (Rhapsody-style)?
 // TODO: iOS TOC syncing to TOC is doing some strange scrolling
 // TODO: quizzerator saving the correct user response, even if response order is randomized
@@ -229,3 +228,4 @@
 // DONE: save multiple responses (if allowed) in quizzerator
 // DONE: quizzerator "start over" button
 // DONE: quizzerator tracking: response click, restart click, check-all click with score
+// DONE: why aren't TOC download buttons aligned (ex: 9780134505848)
