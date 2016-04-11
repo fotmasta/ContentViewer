@@ -29,10 +29,14 @@ requirejs.config({
 
 define(["jquery", "jquery.ui", "commentmoderator"], function ($) {
 	$("#sign-in").click(signIn);
+	$(".password-form").on("submit", signIn);
 
 	$(".moderator").CommentModerator();
 
-	function signIn () {
+	function signIn (event) {
+		console.log("here");
+		event.preventDefault();
+
 		var email = $("#inputEmail").val();
 		var password = $("#inputPassword").val();
 
