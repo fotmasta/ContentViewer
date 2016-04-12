@@ -132,6 +132,12 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 			$("#show-comments-button").hide(0);
 		}
 
+		if (manifest.buyButton != undefined) {
+			var buyButton = $("<a>", { class: "buy-btn btn btn-danger", target: "_blank", href: "https://www.informit.com/buy.aspx?isbn=" + manifest.buyButton, text: " Add to cart"});
+			$("<i>", { class: "fa fa-shopping-cart"}).prependTo(buyButton);
+			$("#header-nav .navbar-brand").append(buyButton);
+		}
+
 		/*
 		 if (!coachMarksShown) {
 		 $("#coach-marks").CoachMarks().CoachMarks("instance").open();

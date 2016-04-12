@@ -230,3 +230,4 @@
 // DONE: quizzerator saving the correct user response, even if response order is randomized [using original load order as data-index]
 // DONE: check for double-scrollbars in IE with current scrolling paradigm [looks ok, 4/8/16]
 // DONE: does the quizzerator export refresh with each push of the download button?
+// DONE: option to add "buy button" to header [manifest.js: buyButton: "<ISBN>"]
