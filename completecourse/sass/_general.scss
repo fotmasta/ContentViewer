@@ -612,6 +612,9 @@ ul.toc-holder {
 }
 
 .navbar-brand {
+	&:hover {
+		color: #9d9d9d !important;
+	}
 }
 
 .buy-btn {
@@ -882,7 +885,8 @@ span.completed {
 		background-color: #23A3AD;
 	}
 
-	h4 {
+	p.button-label {
+		display: block;
 		margin-top: initial;
 		margin-bottom: initial;
 		font-weight: bold;

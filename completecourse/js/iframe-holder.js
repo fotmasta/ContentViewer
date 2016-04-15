@@ -347,7 +347,7 @@ define(["bootstrap-dialog", "imagesloaded", "database", "jquery.ui"], function (
 
 			if (obj) {
 				// add a next button
-				var a = $('<button class="button button-a nav-button header-prev-button"><h4>Previous </h4>' + obj.title + '</button>').data("goto-index", obj.index);
+				var a = $('<button class="button button-a nav-button header-prev-button"><p class="button-label">Previous </p>' + obj.title + '</button>').data("goto-index", obj.index);
 				a.click($.proxy(this.onClickJumpButton, this));
 
 				this.iframe.contents().find("body").prepend(a);
@@ -359,7 +359,7 @@ define(["bootstrap-dialog", "imagesloaded", "database", "jquery.ui"], function (
 
 			if (obj) {
 				// add a next button
-				var a = $('<button id="next-button" data-iframe-height="true" class="button button-a nav-button"><h4>Next </h4>' + obj.title + '</button>').data("goto-index", obj.index);
+				var a = $('<button id="next-button" data-iframe-height="true" class="button button-a nav-button"><p class="button-label">Next </p>' + obj.title + '</button>').data("goto-index", obj.index);
 				a.click($.proxy(this.onClickJumpButton, this));
 
 				this.iframe.contents().find("body").append(a);

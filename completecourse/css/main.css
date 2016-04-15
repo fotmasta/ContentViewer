@@ -385,6 +385,9 @@ ul.toc-holder {
     #contents .toc .dropper:hover {
       transform: scale(1.5); }
 
+.navbar-brand:hover {
+  color: #9d9d9d !important; }
+
 .buy-btn {
   margin-left: 10px;
   margin-top: -8px;
@@ -576,7 +579,8 @@ span.completed {
       background-size: auto 1.5em; }
   .button-a.nav-button:hover {
     background-color: #23A3AD; }
-  .button-a.nav-button h4 {
+  .button-a.nav-button p.button-label {
+    display: block;
     margin-top: initial;
     margin-bottom: initial;
     font-weight: bold;

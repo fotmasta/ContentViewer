@@ -555,7 +555,12 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 
 			$("html").addClass("ui");
 
-			//$("body").append($(html));
+			if (options.skin == "Microsoft") {
+				$("#show-comments-button").hide(0);
+				$("#account-button").hide(0);
+				$("#clear-search-button").hide(0);
+				$("#query").hide(0);
+			}
 
 			addLinkToCSS(baseURL + "css/bootstrap.min.css");
 			addLinkToCSS(baseURL + "css/bootstrap-theme.min.css");

@@ -610,6 +610,9 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 			var t = scroller.scrollTop();
 			var h = scroller.height();
 			var entry = $(".hit.selected");
+
+			if (!entry.length) return;
+
 			var p = entry.offset().top;
 			var desired_top = (h * .5);
 			var adj = p - desired_top;
