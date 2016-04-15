@@ -309,6 +309,9 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 
 				var classes = "desc";
 				if (d.extra_classes) classes += " " + d.extra_classes;
+				if (d.node.disabled) {
+					a.addClass("disabled");
+				}
 
 				var text = htmlEscape(entry_text);
 
@@ -322,6 +325,10 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 
 				if (d.extra_classes && d.extra_classes.indexOf("deleted") != -1) {
 					text += " <span class='badge deleted'>deleted</span>";
+				}
+
+				if (d.node.free) {
+					text += " <span class='badge free'>free</span>";
 				}
 
 				var sp = $("<span>", {class: classes, html: text});

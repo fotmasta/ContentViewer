@@ -398,10 +398,16 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 
 			this.syncTOCToContent(index);
 
-			this.sendGoogleAnalytics(this.toc[index].desc);
+			var src = this.toc[index].src;
+
+			if (this.toc[index].disabled) {
+				src = "paywall.html?index=" + index;
+			} else {
+				this.sendGoogleAnalytics(this.toc[index].desc);
+			}
 
 			// if this is iframe content, open it now; otherwise, it's video
-			if (this.toc[index].src) {
+			if (src) {
 				this.playExtraFromTOC(index, options);
 
 				$(".iframe-holder").show();
@@ -625,16 +631,23 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 		addIFrame: function (params) {
 			$(".loading-indicator").show();
 
+			var src = this.toc[params.index].src;
+
+			if (this.toc[params.index].disabled) {
+				src = "paywall.html?index=" + params.index;
+			}
+
 			if (this.iframe == undefined) {
 				var iframe = $("<div>").iFrameHolder({
 					manager: this,
-					src: this.toc[params.index].src,
+					src: src,
 					index: params.index,
 					scrollTo: params.scrollTo,
 					infinite_scrolling: this.options.infinite_scrolling,
 					hash: params.hash,
 					highlight: params.highlight,
-					type: params.type
+					type: params.type,
+					disabledContent: params.disabledContent
 				});
 
 				iframe.appendTo(".iframe-holder");
@@ -645,13 +658,14 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 			} else {
 				var options = {
 					manager: this,
-					src: this.toc[params.index].src,
+					src: src,
 					index: params.index,
 					scrollTo: params.scrollTo,
 					infinite_scrolling: this.options.infinite_scrolling,
 					hash: params.hash,
 					highlight: params.highlight,
-					type: params.type
+					type: params.type,
+					disabledContent: params.disabledContent
 				};
 
 				this.waitingForIFrameToLoad = true;
@@ -660,11 +674,20 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 		},
 
 		playExtraFromTOC: function (index, options) {
+			var reloadAnyway = false;
+
 			if (options.replaceAll == undefined) options.replaceAll = true;
 
 			if (options.replaceAll == true) {
 				// check to see if any of the current iframes have our source
-				var new_source = URLWithoutHash(this.toc[index].src);
+				var src = this.toc[index].src;
+
+				if (this.toc[index].disabled) {
+					src = "paywall.html?index=" + index;
+					//reloadAnyway = true;
+				}
+
+				var new_source = URLWithoutHash(src);
 				var existing = $(".iframe-holder").find("iframe").map(function (ind, item) {
 					var src = $(item).attr("src");
 					if (new_source == URLWithoutHash(src)) {
@@ -673,7 +696,7 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 					return null;
 				});
 
-				if (existing.length) {
+				if (!reloadAnyway && existing.length) {
 					// same page we're already on
 					existing.attr({"data-index": index}).show();
 
@@ -693,7 +716,8 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 						scrollTo: true,
 						hash: options.hash,
 						highlight: options.highlight,
-						type: this.options.type
+						type: this.options.type,
+						disabledContent: this.toc[index].disabled
 					});
 				}
 
@@ -1141,15 +1165,15 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 			index = parseInt(index);
 
 			// return the title of the next entry with a different src (ie, a different section)
-			var curSrc = URLWithoutHash(this.toc[index].src);
+			var curSrc = URLWithoutHash(this.toc[index].src) || this.toc[index].video;
 
 			for (var i = index - 1; i >= 0; i--) {
-				var nextSrc = URLWithoutHash(this.toc[i].src);
+				var nextSrc = URLWithoutHash(this.toc[i].src) || this.toc[i].video;
 				if (nextSrc != curSrc) {
 					var indexToReturn = i;
 					// return the first one with this new source
 					for (j = i - 1; j >= 0; j--) {
-						var nextNextSrc = URLWithoutHash(this.toc[j].src);
+						var nextNextSrc = URLWithoutHash(this.toc[j].src) || this.toc[j].video;
 						if (nextNextSrc != nextSrc) {
 							indexToReturn = j + 1;
 							break;
@@ -1168,10 +1192,10 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 			index = parseInt(index);
 
 			// return the title of the next entry with a different src (ie, a different section)
-			var curSrc = URLWithoutHash(this.toc[index].src);
+			var curSrc = URLWithoutHash(this.toc[index].src) || this.toc[index].video;
 
 			for (var i = index + 1; i < this.toc.length; i++) {
-				var nextSrc = URLWithoutHash(this.toc[i].src);
+				var nextSrc = URLWithoutHash(this.toc[i].src) || this.toc[i].video;
 				if (nextSrc != curSrc) {
 					return {index: i, title: this.toc[i].desc, src: nextSrc};
 				}

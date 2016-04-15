@@ -145,6 +145,12 @@ body.skin-Microsoft {
 				background-color: #FF0000;
 				color: #DAE423;
 			}
+
+			&.free {
+				background-color: #a8180e;
+				color: white;
+				text-transform: none;
+			}
 		}
 
 		a {
@@ -166,6 +172,11 @@ body.skin-Microsoft {
 					color: red;
 					text-decoration: line-through;
 				}
+			}
+
+			&.disabled span.desc {
+				color: #bbb;
+				text-shadow: 0px 0px 2px #bbb
 			}
 		}
 
@@ -482,10 +493,12 @@ video {
 		/* // NOTE: Added this because elements using animate.css were disappearing */
 		animation-fill-mode: none;
 		-webkit-animation-fill-mode: none;
-		
-		&:hover, &:hover:focus {
-			text-decoration: none;
-			background-color: #ccc;
+
+		&:not(.disabled) {
+			&:hover, &:hover:focus {
+				text-decoration: none;
+				background-color: #ccc;
+			}
 		}
 
 		&:focus {
@@ -573,25 +586,27 @@ ul.toc-holder {
 	position: relative;
 }
 
-.toc {
-	position: fixed;
-	overflow: hidden;
+#contents {
+	.toc {
+		position: fixed;
+		overflow: hidden;
 
-	.dropper {
-		position: absolute;
-		top: 4px;
-		left: -14px;
+		.dropper {
+			position: absolute;
+			top: 4px;
+			left: -14px;
 
-		&.opened {
-			display: inline-block;
-		}
+			&.opened {
+				display: inline-block;
+			}
 
-		&.closed {
-			display: none;
-		}
+			&.closed {
+				display: none;
+			}
 
-		&:hover {
-			transform: scale(1.5);
+			&:hover {
+				transform: scale(1.5);
+			}
 		}
 	}
 }
@@ -645,16 +660,22 @@ ul.toc-holder {
 	max-width: 350px;
 }
 
-.level {
-    display: block;
-	background-color: $link-color;
-	color: white;
-	font-size: 12px;
-	font-family: 'Source Sans Pro', sans-serif;
-	border-radius: 3px;
-	vertical-align: middle;
-	padding: 0 6px 0 6px;
-	text-align: center;
+#contents {
+	.level {
+		display: block;
+		background-color: $link-color;
+		color: white;
+		font-size: 12px;
+		font-family: 'Source Sans Pro', sans-serif;
+		border-radius: 3px;
+		vertical-align: middle;
+		padding: 0 6px 0 6px;
+		text-align: center;
+	}
+
+	.disabled .level {
+		background-color: lightgrey;
+	}
 }
 
 #toc-toggler {

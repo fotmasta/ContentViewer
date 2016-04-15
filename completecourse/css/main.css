@@ -86,6 +86,10 @@ body.skin-Microsoft {
     #contents #contents-pane .badge.delete {
       background-color: #FF0000;
       color: #DAE423; }
+    #contents #contents-pane .badge.free {
+      background-color: #a8180e;
+      color: white;
+      text-transform: none; }
     #contents #contents-pane a {
       display: table-row;
       color: #404040;
@@ -101,6 +105,9 @@ body.skin-Microsoft {
         #contents #contents-pane a span.desc.deleted {
           color: red;
           text-decoration: line-through; }
+      #contents #contents-pane a.disabled span.desc {
+        color: #bbb;
+        text-shadow: 0px 0px 2px #bbb; }
     #contents #contents-pane .toc-label a.active span {
       color: black; }
 
@@ -306,7 +313,7 @@ body.skin-Microsoft .iframe-holder > div {
     /* // NOTE: Added this because elements using animate.css were disappearing */
     animation-fill-mode: none;
     -webkit-animation-fill-mode: none; }
-    .nav-list > li > a:hover, .nav-list > li > a:hover:focus {
+    .nav-list > li > a:not(.disabled):hover, .nav-list > li > a:not(.disabled):hover:focus {
       text-decoration: none;
       background-color: #ccc; }
     .nav-list > li > a:focus {
@@ -364,18 +371,18 @@ ul.toc-holder {
   text-transform: uppercase;
   position: relative; }
 
-.toc {
+#contents .toc {
   position: fixed;
   overflow: hidden; }
-  .toc .dropper {
+  #contents .toc .dropper {
     position: absolute;
     top: 4px;
     left: -14px; }
-    .toc .dropper.opened {
+    #contents .toc .dropper.opened {
       display: inline-block; }
-    .toc .dropper.closed {
+    #contents .toc .dropper.closed {
       display: none; }
-    .toc .dropper:hover {
+    #contents .toc .dropper:hover {
       transform: scale(1.5); }
 
 .buy-btn {
@@ -410,7 +417,7 @@ ul.toc-holder {
 [data-notify="container"] {
   max-width: 350px; }
 
-.level {
+#contents .level {
   display: block;
   background-color: #404040;
   color: white;
@@ -420,6 +427,8 @@ ul.toc-holder {
   vertical-align: middle;
   padding: 0 6px 0 6px;
   text-align: center; }
+#contents .disabled .level {
+  background-color: lightgrey; }
 
 #toc-toggler {
   margin: 8px 0 0 8px; }

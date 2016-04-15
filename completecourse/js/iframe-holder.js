@@ -260,6 +260,10 @@ define(["bootstrap-dialog", "imagesloaded", "database", "jquery.ui"], function (
 				this.sizePDFToFit();
 			}
 
+			if (this.options.disabledContent) {
+				var desc = this.options.manager.getTOCTitleForID(this.options.index);
+				this.iframe.contents().find(".panel-title").text(desc);
+			}
 		},
 
 		onIframeContentsLoaded: function () {

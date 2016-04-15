@@ -1,3 +1,5 @@
+// TODO: get rid of top search box for Microsoft
+// TODO: turn off comments and account page for Microsoft
 // TODO: system for bypassing cache or alerting customers to reload (Rhapsody-style)?
 // TODO: iOS TOC syncing to TOC is doing some strange scrolling
 // TODO: see if there are extra pages being pushed into the browser history that can be eliminated to make "Back" more streamlined
@@ -231,3 +233,5 @@
 // DONE: check for double-scrollbars in IE with current scrolling paradigm [looks ok, 4/8/16]
 // DONE: does the quizzerator export refresh with each push of the download button?
 // DONE: option to add "buy button" to header [manifest.js: buyButton: "<ISBN>"]
+// DONE: style .toc with more specificity to avoid problems with Microsoft
+// DONE: flag sample links in the TOC [toc.js: disabled: true, free: true; paywall.html in the title directory]
