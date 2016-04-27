@@ -116,7 +116,7 @@ figure.cup-new:before {
     top: -2em;
 }
 
-body.cup-new:before, section.cup-new:before, figure.cup-new:before, p.cup-new:before {
+body.cup-new:before, section.cup-new:before, figure.cup-new:before, p.cup-new:before, aside.cup-new:before {
     content: "New";
     display: block;
     position: absolute;
@@ -126,6 +126,11 @@ body.cup-new:before, section.cup-new:before, figure.cup-new:before, p.cup-new:be
     background-color: #E8DB18;
     color: #9C5110;
     transform: rotate(-15deg);
+}
+
+aside.cup-new:before {
+    left: -5px;
+    transform: translateX(-100%) rotate(-15deg);
 }
 
 ol figure.cup-new:before {

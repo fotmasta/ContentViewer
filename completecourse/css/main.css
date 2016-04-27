@@ -87,8 +87,9 @@ body.skin-Microsoft {
       background-color: #FF0000;
       color: #DAE423; }
     #contents #contents-pane .badge.free {
-      background-color: #a8180e;
-      color: white;
+      background-color: transparent !important;
+      border-radius: 0;
+      color: black;
       text-transform: none; }
     #contents #contents-pane a {
       display: table-row;
@@ -106,8 +107,7 @@ body.skin-Microsoft {
           color: red;
           text-decoration: line-through; }
       #contents #contents-pane a.disabled span.desc {
-        color: #bbb;
-        text-shadow: 0px 0px 2px #bbb; }
+        color: #bbb; }
     #contents #contents-pane .toc-label a.active span {
       color: black; }
 
@@ -331,7 +331,7 @@ body.skin-Microsoft .iframe-holder > div {
   cursor: pointer; }
 
 .short.invisible {
-  display: none; }
+  display: none !important; }
 
 ul.toc-holder {
   margin: 5px 55px 5px 0px;

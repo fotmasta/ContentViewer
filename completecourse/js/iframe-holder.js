@@ -225,7 +225,8 @@ define(["bootstrap-dialog", "imagesloaded", "database", "jquery.ui"], function (
 					this.element.show(0);
 
 					var wh = $(window).outerHeight();
-					//this.iframe.css("min-height", wh);
+					// added this back in for Captivates
+					this.iframe.css("min-height", wh - 50);
 
 					this.iframe.removeClass("fadeIn animated").hide(0);
 					this.iframe.addClass("fadeIn animated").show(0);

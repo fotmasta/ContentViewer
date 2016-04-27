@@ -328,7 +328,7 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 				}
 
 				if (d.node.free) {
-					text += " <span class='badge free'>free</span>";
+					text += " <span class='badge free'>(Free)</span>";
 				}
 
 				var sp = $("<span>", {class: classes, html: text});

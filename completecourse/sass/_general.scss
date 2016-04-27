@@ -147,8 +147,9 @@ body.skin-Microsoft {
 			}
 
 			&.free {
-				background-color: #a8180e;
-				color: white;
+				background-color: transparent !important;
+				border-radius: 0;
+				color: black;
 				text-transform: none;
 			}
 		}
@@ -176,7 +177,6 @@ body.skin-Microsoft {
 
 			&.disabled span.desc {
 				color: #bbb;
-				text-shadow: 0px 0px 2px #bbb
 			}
 		}
 
@@ -532,7 +532,7 @@ video {
 }
 
 .short.invisible {
-	display: none;
+	display: none !important;
 }
 
 ul.toc-holder {
