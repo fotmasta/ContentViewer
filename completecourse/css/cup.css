@@ -2,6 +2,36 @@
 /* CUP change/new/delete styling START */
 /******************************************************************************************************/
 
+/*
+Update History:
+*/
+
+.table-b.update-history {
+    table-layout: auto;
+    color: black;
+}
+
+.table-b.update-history td:first-child {
+    white-space: nowrap;
+    padding: 0 .5em;
+}
+
+.table-b.update-history tr:nth-child(odd){
+    background: white !important;
+}
+
+.table-b.update-history tr:nth-child(even){
+    background: #E7E7FF !important;
+}
+
+.table-b.update-history tr.major-row {
+    background-color: #ee8d21 !important;
+}
+
+/*
+Content flags and styles:
+*/
+
 ol.list-no-style li.cup-change, ol.list-no-style li p.cup-change {
     margin-left: -.5em;
 }
