@@ -1,31 +1,5 @@
-var baseURL;
-
-if (window.getInformITBaseURL)
-	baseURL = window.getInformITBaseURL();
-else if (window.parent.getInformITBaseURL)
-	baseURL = window.parent.getInformITBaseURL();
-else {
-	if (window.location.hostname == "localhost") {
-		baseURL = "../completecourse/";
-	} else {
-		baseURL = "https://s3.amazonaws.com/storefronts/streaming-video/completecourse/";
-	}
-}
-
-requirejs.config({
-	baseUrl: baseURL + "js/",
-	paths: {
-		"textfit": "../widgets/flashcardset/js/textfit.min",
-		"dots": "../widgets/flashcardset/js/dots",
-	},
-	shim: {
-		"dots": {
-			export: "DotNav"
-		},
-	}
-});
-
-define(["textfit", "dots"], function (textFit) {
+// NOTE: this file is shared between the Habitat flashcardset widget and the Web Edition flashcardset widget
+define(["textfit", "dots", "jquery"], function (textFit) {
 	var CARD_MARGIN = 50;
 
 	var _currentCardIndex = -1;
@@ -36,81 +10,6 @@ define(["textfit", "dots"], function (textFit) {
 
 	var dotRatio = 1;
 
-	function getSampleData () {
-		var json = {
-			cards: [{
-				"chapters": [1, 2],
-				"term": "adjacent-layer interaction",
-				"definition": "The general topic of how on one computer, two adjacent layers in a networking architectural model work together, with the lower layer providing services to the higher layer."
-			}, {
-				"chapters": [1],
-				"term": "de-encapsulation",
-				"definition": "On a computer that receives data over a network, the process in which the device interprets the lower-layer headers and, when finished with each header, removes the header, revealing the next-higher-layer PDU."
-			}, {
-				"chapters": [1],
-				"term": "encapsulation",
-				"definition": "The placement of data from a higher-layer protocol behind the header (and in some cases, between a header and trailer) of the next-lower-layer protocol. For example, an IP packet could be encapsulated in an Ethernet header and trailer before being sent over an Ethernet."
-			}, {
-				"chapters": [1],
-				"term": "frame",
-				"definition": "A term referring to a data link header and trailer, plus the data encapsulated between the header and trailer."
-			}, {
-				"chapters": [2],
-				"term": "networking model",
-				"definition": "A generic term referring to any set of protocols and standards collected into a comprehensive grouping that, when followed by the devices in a network, allows all the devices to communicate. Examples include TCP/IP and OSI."
-			}, {
-				"chapters": [3],
-				"term": "packet",
-				"definition": "A logical grouping of bytes that includes the network layer header and encapsulated data, but specifically does not include any headers and trailers below the network layer."
-			}]
-		};
-
-		return json;
-	}
-
-	var _defaultSettings = {
-		cards: [],
-		randomize: false,
-		selectedChapters: [],
-		hideMastered: false,
-		cardOrder: []
-	};
-
-	function getSearchParameter (search) {
-		return search.slice(1).split("&").reduce(function(t, e) {
-			var i = e.split("="),
-				n = decodeURIComponent(i[0]),
-				s = i.length > 1 ? decodeURIComponent(i[1]) : null;
-			return n && (t[n] = s), t
-		}, {});
-	}
-
-	/*
-	 var configFile = getSearchParameter(window.location.search)["configFile"];
-
-	 $.getJSON(configFile, onConfigFile).fail(onFailConfig);
-	 */
-
-	function onConfigFile (data) {
-		data = $.extend({}, _defaultSettings, data);
-
-		initialize(data);
-	}
-
-	function onFailConfig () {
-		_defaultSettings.cards = getSampleData().cards;
-
-		/* adding 295 test records
-		 var c = getSampleData().cards;
-
-		 while (_defaultSettings.cards.length < 295) {
-		 _defaultSettings.cards.push(c[0]);
-		 }
-		 */
-
-		initialize(_defaultSettings);
-	}
-
 	function getDocHeight() {
 		var D = document;
 		return Math.max(
@@ -120,6 +19,7 @@ define(["textfit", "dots"], function (textFit) {
 		);
 	}
 
+	// for Habitat
 	function setWidgetHeight () {
 		window.parent.postMessage({
 			"type": "view",

@@ -15,7 +15,14 @@ else {
 requirejs.config({
 	baseUrl: baseURL + "js/",
 	paths: {
-		"view": "../widgets/flashcardset/js/view"
+		"textfit": "../widgets/flashcardset/js/textfit.min",
+		"view": "../widgets/flashcardset/js/view",
+		"dots": "../widgets/flashcardset/js/dots",
+	},
+	shim: {
+		"dots": {
+			export: "DotNav"
+		},
 	}
 });
 
