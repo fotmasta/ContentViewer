@@ -28,69 +28,67 @@
 </head>
 <body>
 
-<div class="flashcardset" id="the_widget" data-js="../widgets/flashcardset/js/view" data-css="widgets/flashcardset/css/view.css">
-	<h3 class="quiz-title"></h3>
-</div>
-
-<div class="container-fluid">
-	<div class="row">
-		<div class="col-xs-12">
-			<div id="chapter-chooser">
-				<h3 class="text-center">Show Flash Cards from Chapters: <span class="small">(click to select)</span></h3>
-				<div id="chapter-checkboxes">
-				</div>
-				<div class="text-center">
-					<p id="chapter-count" class="small"><span class="badge"></span> <span id="chapter-label">chapters selected</span></p>
-					<button id="toggle-all" class="btn btn-sm btn-info">Toggle All</button>
+<div class="flashcardset" id="the_widget" data-js="../widgets/flashcardset/js/flashcardset" data-css="widgets/flashcardset/css/view.css">
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-xs-12">
+				<div id="chapter-chooser">
+					<h3 class="text-center">Show Flash Cards from Chapters: <span class="small">(click to select)</span></h3>
+					<div id="chapter-checkboxes">
+					</div>
+					<div class="text-center">
+						<p id="chapter-count" class="small"><span class="badge"></span> <span id="chapter-label">chapters selected</span></p>
+						<button id="toggle-all" class="btn btn-sm btn-info">Toggle All</button>
+					</div>
 				</div>
 			</div>
 		</div>
-	</div>
-	<div class="row">
-		<div id="card-column" class="col-xs-12">
-			<div class="card-holder">
-				<p id="no-card-label">No Cards Selected</p>
-				<div class="card animated">
-					<div class="front cardface">
-						<h1 class="text-contents"></h1>
-					</div>
-					<p id="card-hint" class="small">Click card to reveal answer.</p>
-					<div class="back cardface">
-						<p id="definition" class="text-contents"></p>
-						<div class="funkycheckbox">
-							<div id="mastered-checkbox-holder" class="funkycheckbox-danger small">
-								<input type="checkbox" name="checkbox" id="mastered-checkbox" checked/>
-								<label for="mastered-checkbox">Mastered?</label>
+		<div class="row">
+			<div id="card-column" class="col-xs-12">
+				<div class="card-holder">
+					<p id="no-card-label">No Cards Selected</p>
+					<div class="card animated">
+						<div class="front cardface">
+							<h1 class="text-contents"></h1>
+						</div>
+						<p id="card-hint" class="small">Click card to reveal answer.</p>
+						<div class="back cardface">
+							<p id="definition" class="text-contents"></p>
+							<div class="funkycheckbox">
+								<div id="mastered-checkbox-holder" class="funkycheckbox-danger small">
+									<input type="checkbox" name="checkbox" id="mastered-checkbox" checked/>
+									<label for="mastered-checkbox">Mastered?</label>
+								</div>
 							</div>
 						</div>
 					</div>
 				</div>
-			</div>
-			<div id="navigator" class="text-center">
-				<div class="dotstyle dotstyle-dotmove">
-					<ul>
-					</ul>
+				<div id="navigator" class="text-center">
+					<div class="dotstyle dotstyle-dotmove">
+						<ul>
+						</ul>
+					</div>
 				</div>
-			</div>
-			<div id="controls" class="text-center">
-				<button id="prev-button" class="btn btn-primary"><span class="glyphicon glyphicon-chevron-left"></span> Prev</button>
-				<p id="position"><span id="current-count" class="badge">1</span><span id="total-count"> of 295</span></p>
-				<div id="sort-selector">
-					<label class="radio-inline" for="order-default">
-						<input type="radio" name="sort-order" id="order-default" value="default" checked />
-						<i></i> <span>Default Order</span>
-					</label>
-					<label class="radio-inline" for="order-random">
-						<input type="radio" name="sort-order" id="order-random" value="random" />
-						<i></i> <span>Random</span>
-					</label>
-				</div>
-				<button id="next-button" class="btn btn-primary">Next <span class="glyphicon glyphicon-chevron-right"></span></button>
-				<div id="mastery-indicator">
-					<label class="checkbox-inline" for="hide-mastered">
-						<input type="checkbox" id="hide-mastered" />
-						<span>Hide Mastered Cards?</span>
-					</label>
+				<div id="controls" class="text-center">
+					<button id="prev-button" class="btn btn-primary"><span class="glyphicon glyphicon-chevron-left"></span> Prev</button>
+					<p id="position"><span id="current-count" class="badge">1</span><span id="total-count"> of 295</span></p>
+					<div id="sort-selector">
+						<label class="radio-inline" for="order-default">
+							<input type="radio" name="sort-order" id="order-default" value="default" checked />
+							<i></i> <span>Default Order</span>
+						</label>
+						<label class="radio-inline" for="order-random">
+							<input type="radio" name="sort-order" id="order-random" value="random" />
+							<i></i> <span>Random</span>
+						</label>
+					</div>
+					<button id="next-button" class="btn btn-primary">Next <span class="glyphicon glyphicon-chevron-right"></span></button>
+					<div id="mastery-indicator">
+						<label class="checkbox-inline" for="hide-mastered">
+							<input type="checkbox" id="hide-mastered" />
+							<span>Hide Mastered Cards?</span>
+						</label>
+					</div>
 				</div>
 			</div>
 		</div>

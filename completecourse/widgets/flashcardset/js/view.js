@@ -16,7 +16,7 @@ requirejs.config({
 	baseUrl: baseURL + "js/",
 	paths: {
 		"textfit": "../widgets/flashcardset/js/textfit.min",
-		"dots": "../widgets/flashcardset/js/dots"
+		"dots": "../widgets/flashcardset/js/dots",
 	},
 	shim: {
 		"dots": {
@@ -26,16 +26,6 @@ requirejs.config({
 });
 
 define(["textfit", "dots"], function (textFit) {
-	var _defaultSettings = {
-		cards: [],
-		randomize: false,
-		selectedChapters: [],
-		hideMastered: false,
-		cardOrder: []
-	};
-
-	var body;
-
 	var CARD_MARGIN = 50;
 
 	var _currentCardIndex = -1;
@@ -45,20 +35,6 @@ define(["textfit", "dots"], function (textFit) {
 	var hintInterval;
 
 	var dotRatio = 1;
-
-	$.widget("itp.flashcardset", {
-		options: {},
-
-		_create: function () {
-			_defaultSettings.cards = this.options.paramData.cards;
-
-			body = this.element.parent("body");
-
-			initialize(_defaultSettings);
-		}
-	});
-
-	return "flashcardset";
 
 	function getSampleData () {
 		var json = {
@@ -92,6 +68,14 @@ define(["textfit", "dots"], function (textFit) {
 		return json;
 	}
 
+	var _defaultSettings = {
+		cards: [],
+		randomize: false,
+		selectedChapters: [],
+		hideMastered: false,
+		cardOrder: []
+	};
+
 	function getSearchParameter (search) {
 		return search.slice(1).split("&").reduce(function(t, e) {
 			var i = e.split("="),
@@ -101,14 +85,14 @@ define(["textfit", "dots"], function (textFit) {
 		}, {});
 	}
 
-	function onConfigFile (data) {
-		var defaults = {
-			randomize: false,
-			selectedChapters: [],
-			hideMastered: false
-		};
+	/*
+	 var configFile = getSearchParameter(window.location.search)["configFile"];
 
-		$.extend(data, defaults);
+	 $.getJSON(configFile, onConfigFile).fail(onFailConfig);
+	 */
+
+	function onConfigFile (data) {
+		data = $.extend({}, _defaultSettings, data);
 
 		initialize(data);
 	}
@@ -116,7 +100,34 @@ define(["textfit", "dots"], function (textFit) {
 	function onFailConfig () {
 		_defaultSettings.cards = getSampleData().cards;
 
+		/* adding 295 test records
+		 var c = getSampleData().cards;
+
+		 while (_defaultSettings.cards.length < 295) {
+		 _defaultSettings.cards.push(c[0]);
+		 }
+		 */
+
 		initialize(_defaultSettings);
+	}
+
+	function getDocHeight() {
+		var D = document;
+		return Math.max(
+			D.body.scrollHeight, D.documentElement.scrollHeight,
+			D.body.offsetHeight, D.documentElement.offsetHeight,
+			D.body.clientHeight, D.documentElement.clientHeight
+		);
+	}
+
+	function setWidgetHeight () {
+		window.parent.postMessage({
+			"type": "view",
+			"method": "set",
+			"payload": {
+				"height": getDocHeight()
+			}
+		}, "*");
 	}
 
 	function shuffleArray (array) {
@@ -130,10 +141,10 @@ define(["textfit", "dots"], function (textFit) {
 	}
 
 	function initializeDots () {
-		var ul = body.find("#navigator .dotstyle ul");
+		var ul = _settings.el.find("#navigator .dotstyle ul");
 		ul.empty();
 
-		var w = body.find(".card").width() - 100;
+		var w = _settings.el.find(".card").width() - 100;
 
 		var SPACE_BETWEEN_DOTS = 30;
 
@@ -151,7 +162,7 @@ define(["textfit", "dots"], function (textFit) {
 
 			ul.append($("<li>", {class: "dummy"}));
 
-			body.find(".dotstyle > ul").each(function (index, item) {
+			_settings.el.find(".dotstyle > ul").each(function (index, item) {
 				var dots = new DotNav(item, {
 					callback: function (idx) {
 						gotoCardByDot(idx);
@@ -184,12 +195,12 @@ define(["textfit", "dots"], function (textFit) {
 			var sp = $("<span>", { text: chapters[i] });
 			sp.appendTo(d);
 
-			body.find("#chapter-checkboxes").append(d);
+			_settings.el.find("#chapter-checkboxes").append(d);
 
 			d.click(onClickChapter);
 		}
 
-		body.find("#chapter-count span.badge").text(chapters.length);
+		_settings.el.find("#chapter-count span.badge").text(chapters.length);
 
 		_settings.selectedChapters = chapters;
 	}
@@ -233,9 +244,9 @@ define(["textfit", "dots"], function (textFit) {
 		var maxh = 500;
 
 		// set height to 4x3
-		var w = body.find(".card-holder").width();
+		var w = _settings.el.find(".card-holder").width();
 		var h = Math.min(maxh, w * .75);
-		body.find(".card-holder").height(h - CARD_MARGIN * 2);
+		_settings.el.find(".card-holder").height(h - CARD_MARGIN * 2);
 
 		initializeChapterSelector();
 
@@ -245,21 +256,23 @@ define(["textfit", "dots"], function (textFit) {
 
 		showNextCard();
 
-		body.find(".card").click(onClickCard);
+		_settings.el.find(".card").click(onClickCard);
 
-		body.find("#next-button").click(onClickNext);
-		body.find("#prev-button").click(onClickPrevious);
+		_settings.el.find("#next-button").click(onClickNext);
+		_settings.el.find("#prev-button").click(onClickPrevious);
 
-		body.find("#toggle-all").click(onToggleAll);
+		_settings.el.find("#toggle-all").click(onToggleAll);
 
-		body.find("input[name='sort-order']").click(onClickSortOrder);
+		_settings.el.find("input[name='sort-order']").click(onClickSortOrder);
 
-		body.find("#mastered-checkbox").click(onClickMastered);
-		body.find("#hide-mastered").click(onClickHideMastered);
+		_settings.el.find("#mastered-checkbox").click(onClickMastered);
+		_settings.el.find("#hide-mastered").click(onClickHideMastered);
 
 		hintInterval = setInterval(function () {
-			body.find("#card-hint").removeClass("animated").hide(0).addClass("animated swing").show(0);
+			_settings.el.find("#card-hint").removeClass("animated").hide(0).addClass("animated swing").show(0);
 		}, 5000);
+
+		setWidgetHeight();
 	}
 
 	function getCurrentCard () {
@@ -316,33 +329,33 @@ define(["textfit", "dots"], function (textFit) {
 		var card = getCurrentCard();
 
 		if (card) {
-			body.find(".card").css("display", "block");
-			body.find("#no-card-label").css("display", "none");
+			_settings.el.find(".card").css("display", "block");
+			_settings.el.find("#no-card-label").css("display", "none");
 
-			var id = body.find(".card").data("id");
+			var id = _settings.el.find(".card").data("id");
 
 			var curCard = getActiveCard(_currentCardIndex);
 
-			if (id != curCard.index && body.find(".card").hasClass("flip180"))
+			if (id != curCard.index && _settings.el.find(".card").hasClass("flip180"))
 				flipCardToFront();
 
-			body.find(".card").data("id", curCard.index);
+			_settings.el.find(".card").data("id", curCard.index);
 
-			var term = body.find(".card .front h1");
+			var term = _settings.el.find(".card .front h1");
 			term.css("white-space", "normal").text(card.term);
 			textFit(term[0], {maxFontSize: 80});
 
-			body.find("#mastered-checkbox").prop("checked", card.mastered == true);
+			_settings.el.find("#mastered-checkbox").prop("checked", card.mastered == true);
 
 			// delay a bit so the back of the card doesn't show right away (hey, no cheating!)
 			setTimeout(function () {
-				var def = body.find(".card .back #definition");
+				var def = _settings.el.find(".card .back #definition");
 				def.css("white-space", "normal").text(card.definition);
 				textFit(def[0], {maxFontSize: 40});
 			}, 200);
 		} else {
-			body.find(".card").css("display", "none");
-			body.find("#no-card-label").css("display", "block");
+			_settings.el.find(".card").css("display", "none");
+			_settings.el.find("#no-card-label").css("display", "block");
 		}
 
 		updatePositionStatus();
@@ -352,10 +365,10 @@ define(["textfit", "dots"], function (textFit) {
 		var lbl = _currentCardIndex + 1;
 		if (_settings.activeCards.length == 0) lbl = "-";
 
-		body.find("#current-count").text(lbl);
-		body.find("#total-count").text(" of " + _settings.activeCards.length);
+		_settings.el.find("#current-count").text(lbl);
+		_settings.el.find("#total-count").text(" of " + _settings.activeCards.length);
 
-		var ul = body.find("#navigator .dotstyle ul");
+		var ul = _settings.el.find("#navigator .dotstyle ul");
 		var dots = ul.data("dots");
 		if (dots) {
 			var dotIndex = Math.ceil(_currentCardIndex / dotRatio);
@@ -368,11 +381,11 @@ define(["textfit", "dots"], function (textFit) {
 
 		if (_currentCardIndex < _settings.activeCards.length - 1) {
 			if (_currentCardIndex != -1) {
-				var w = body.find(".card").width();
-				body.find(".card").animate({left: -w - CARD_MARGIN - 20}, 300, "easeInOutCubic", function () {
+				var w = _settings.el.find(".card").width();
+				_settings.el.find(".card").animate({left: -w - CARD_MARGIN - 20}, 300, "easeInOutCubic", function () {
 					_currentCardIndex++;
 					updateCard();
-					body.find(".card").css("left", w + CARD_MARGIN + 20).animate({left: 0}, 300, "easeInOutCubic");
+					_settings.el.find(".card").css("left", w + CARD_MARGIN + 20).animate({left: 0}, 300, "easeInOutCubic");
 				});
 			} else {
 				// show card on startup
@@ -381,7 +394,7 @@ define(["textfit", "dots"], function (textFit) {
 			}
 		} else {
 			// make card bump against the right
-			body.find(".card").animate({ left: -25 }, 100).animate( { left: 0 }, 600, "easeOutElastic");
+			_settings.el.find(".card").animate({ left: -25 }, 100).animate( { left: 0 }, 600, "easeOutElastic");
 		}
 	}
 
@@ -389,15 +402,15 @@ define(["textfit", "dots"], function (textFit) {
 		flipCardToFront();
 
 		if (_currentCardIndex > 0) {
-			var w = body.find(".card").width();
-			body.find(".card").animate({left: w + CARD_MARGIN + 20}, 300, "easeInOutCubic", function () {
+			var w = _settings.el.find(".card").width();
+			_settings.el.find(".card").animate({left: w + CARD_MARGIN + 20}, 300, "easeInOutCubic", function () {
 				_currentCardIndex--;
 				updateCard();
-				body.find(".card").css("left", -w - CARD_MARGIN - 20).animate({left: 0}, 300, "easeInOutCubic");
+				_settings.el.find(".card").css("left", -w - CARD_MARGIN - 20).animate({left: 0}, 300, "easeInOutCubic");
 			});
 		} else {
 			// make card bump against the left
-			body.find(".card").animate({ left: 25 }, 100).animate( { left: 0 }, 600, "easeOutElastic");
+			_settings.el.find(".card").animate({ left: 25 }, 100).animate( { left: 0 }, 600, "easeOutElastic");
 		}
 	}
 
@@ -407,18 +420,18 @@ define(["textfit", "dots"], function (textFit) {
 		var idx = Math.floor(dotIndex * dotRatio);
 
 		if (idx > _currentCardIndex) {
-			var w = body.find(".card").width();
-			body.find(".card").animate({left: -w - CARD_MARGIN - 20}, 300, "easeInOutCubic", function () {
+			var w = _settings.el.find(".card").width();
+			_settings.el.find(".card").animate({left: -w - CARD_MARGIN - 20}, 300, "easeInOutCubic", function () {
 				_currentCardIndex = idx;
 				updateCard();
-				body.find(".card").css("left", w + CARD_MARGIN + 20).animate({left: 0}, 300, "easeInOutCubic");
+				_settings.el.find(".card").css("left", w + CARD_MARGIN + 20).animate({left: 0}, 300, "easeInOutCubic");
 			});
 		} else {
-			var w = body.find(".card").width();
-			body.find(".card").animate({left: w + CARD_MARGIN + 20}, 300, "easeInOutCubic", function () {
+			var w = _settings.el.find(".card").width();
+			_settings.el.find(".card").animate({left: w + CARD_MARGIN + 20}, 300, "easeInOutCubic", function () {
 				_currentCardIndex = idx;
 				updateCard();
-				body.find(".card").css("left", -w - CARD_MARGIN - 20).animate({left: 0}, 300, "easeInOutCubic");
+				_settings.el.find(".card").css("left", -w - CARD_MARGIN - 20).animate({left: 0}, 300, "easeInOutCubic");
 			});
 		}
 	}
@@ -429,24 +442,22 @@ define(["textfit", "dots"], function (textFit) {
 			return;
 		}
 
-		var card = body.find(".card");
-
-		if (card.hasClass("flip180")) {
-			card.removeClass("flip180 flip360");
-			card.addClass("flip360")
-		} else if (card.hasClass("flip360")) {
-			card.removeClass("animated flip180 flip360");
+		if (_settings.el.find(".card").hasClass("flip180")) {
+			_settings.el.find(".card").removeClass("flip180 flip360");
+			_settings.el.find(".card").addClass("flip360")
+		} else if (_settings.el.find(".card").hasClass("flip360")) {
+			_settings.el.find(".card").removeClass("animated flip180 flip360");
 			// flip back from zero after a refresh
 			setTimeout(function () {
-				card.addClass("flip180 animated");
+				_settings.el.find(".card").addClass("flip180 animated");
 			}, 10);
 		} else {
-			card.removeClass("flip180 flip360");
-			card.addClass("flip180");
+			_settings.el.find(".card").removeClass("flip180 flip360");
+			_settings.el.find(".card").addClass("flip180");
 		}
 
 		clearInterval(hintInterval);
-		body.find("#card-hint").hide(1000);
+		_settings.el.find("#card-hint").hide(1000);
 	}
 
 	function onClickNext (event) {
@@ -462,27 +473,25 @@ define(["textfit", "dots"], function (textFit) {
 	}
 
 	function flipCardToFront (immediate) {
-		var card = body.find(".card");
-
 		if (immediate) {
-			card.removeClass("animated flip180 flip360");
+			_settings.el.find(".card").removeClass("animated flip180 flip360");
 			setTimeout(function () {
-				card.addClass("animated");
+				_settings.el.find(".card").addClass("animated");
 			}, 10);
 		} else {
-			card.removeClass("flip180 flip360");
+			_settings.el.find(".card").removeClass("flip180 flip360");
 		}
 	}
 
 	function cancelAnimations () {
-		body.find(".card").stop();
+		_settings.el.find(".card").stop();
 	}
 
 	function onToggleAll (event) {
 		if (toggleAll)
-			body.find(".chapter-checkbox").addClass("selected");
+			_settings.el.find(".chapter-checkbox").addClass("selected");
 		else
-			body.find(".chapter-checkbox").removeClass("selected");
+			_settings.el.find(".chapter-checkbox").removeClass("selected");
 
 		toggleAll = !toggleAll;
 
@@ -492,16 +501,16 @@ define(["textfit", "dots"], function (textFit) {
 	}
 
 	function updateChapterCount () {
-		var ch = body.find(".chapter-checkbox.selected");
+		var ch = _settings.el.find(".chapter-checkbox.selected");
 		var chapters = ch.map(function (index, item) {
 			return $(item).attr("data-index");
 		});
 
 		var count = chapters.length == 0 ? "no" : chapters.length;
 
-		body.find("#chapter-count span.badge").text(count);
+		_settings.el.find("#chapter-count span.badge").text(count);
 
-		body.find("span#chapter-label").text( (chapters.length == 1 ? "chapter" : "chapters") + " selected");
+		_settings.el.find("span#chapter-label").text( (chapters.length == 1 ? "chapter" : "chapters") + " selected");
 	}
 
 	function onClickChapter (event) {
@@ -511,7 +520,7 @@ define(["textfit", "dots"], function (textFit) {
 	}
 
 	function refreshFromChapters () {
-		var ch = body.find(".chapter-checkbox.selected");
+		var ch = _settings.el.find(".chapter-checkbox.selected");
 		var chapters = ch.map(function (index, item) {
 			return parseInt($(item).attr("data-index"));
 		});
@@ -599,5 +608,9 @@ define(["textfit", "dots"], function (textFit) {
 				c.mastered = (progress[i] === "m");
 			}
 		}
+	}
+
+	return {
+		initialize: initialize
 	}
 });
