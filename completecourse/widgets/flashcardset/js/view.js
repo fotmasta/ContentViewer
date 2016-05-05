@@ -404,7 +404,7 @@ define(["textfit", "dots"], function (textFit) {
 	function gotoCard (dotIndex) {
 		flipCardToFront();
 
-		var idx = Math.floor(dotIndex * dotRatio + 1);
+		var idx = Math.round(dotIndex * dotRatio);
 
 		if (idx > _currentCardIndex) {
 			var w = body.find(".card").width();
