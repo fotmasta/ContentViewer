@@ -154,7 +154,7 @@ define(["textfit", "dots"], function (textFit) {
 			body.find(".dotstyle > ul").each(function (index, item) {
 				var dots = new DotNav(item, {
 					callback: function (idx) {
-						gotoCard(idx);
+						gotoCardByDot(idx);
 					}
 				});
 
@@ -358,7 +358,7 @@ define(["textfit", "dots"], function (textFit) {
 		var ul = body.find("#navigator .dotstyle ul");
 		var dots = ul.data("dots");
 		if (dots) {
-			var dotIndex = Math.floor(_currentCardIndex / dotRatio);
+			var dotIndex = Math.ceil(_currentCardIndex / dotRatio);
 			dots.selectByIndex(dotIndex);
 		}
 	}
@@ -401,10 +401,10 @@ define(["textfit", "dots"], function (textFit) {
 		}
 	}
 
-	function gotoCard (dotIndex) {
+	function gotoCardByDot (dotIndex) {
 		flipCardToFront();
 
-		var idx = Math.round(dotIndex * dotRatio);
+		var idx = Math.floor(dotIndex * dotRatio);
 
 		if (idx > _currentCardIndex) {
 			var w = body.find(".card").width();
