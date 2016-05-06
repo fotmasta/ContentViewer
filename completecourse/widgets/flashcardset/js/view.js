@@ -10,6 +10,8 @@ define(["textfit", "dots", "jquery"], function (textFit) {
 
 	var dotRatio = 1;
 
+	var _settings;
+
 	function getDocHeight() {
 		var D = document;
 		return Math.max(
@@ -172,6 +174,16 @@ define(["textfit", "dots", "jquery"], function (textFit) {
 			_settings.el.find("#card-hint").removeClass("animated").hide(0).addClass("animated swing").show(0);
 		}, 5000);
 
+		_settings.el.find("#chapter-chooser").css("display", _settings.showChapterSelector != false ? "block" : "none");
+
+		setWidgetHeight();
+
+		window.addEventListener("resize", onWindowResize);
+	}
+
+	function onWindowResize (event) {
+		initializeDots();
+		updateCard();
 		setWidgetHeight();
 	}
 
@@ -192,7 +204,7 @@ define(["textfit", "dots", "jquery"], function (textFit) {
 		var ok = false;
 
 		for (var i = 0; i < card.chapters.length; i++) {
-			var ch = card.chapters[i];
+			var ch = parseInt(card.chapters[i]);
 			if (_settings.selectedChapters.indexOf(ch) != -1)
 				ok = true;
 		}
