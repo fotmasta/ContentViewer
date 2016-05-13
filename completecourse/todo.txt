@@ -1,8 +1,8 @@
+// TODO: does each Firebase request count as a "connection" (limited to 100) [also: why so many connections? 10 realtime users = 100 Firebase users?]
 // TODO: system for bypassing cache or alerting customers to reload (Rhapsody-style)?
 // TODO: iOS TOC syncing to TOC is doing some strange scrolling
 // TODO: see if there are extra pages being pushed into the browser history that can be eliminated to make "Back" more streamlined
 // TODO: sometimes the quizzerator doesn't seem to initialize with data
-// TODO: does each Firebase request count as a "connection" (limited to 100)?
 // TODO: Habitat quizzes do not seem to be loading in Safari (iOS or Mac)
 // TODO: test fallback when Firebase errors out due to max concurrent users
 // TODO: think about security considerations for user data (logged in? using id? more?)

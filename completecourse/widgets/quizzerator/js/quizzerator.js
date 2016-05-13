@@ -209,10 +209,14 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 
 			var me = this;
 
+			// add paths to the images (unless they're data URIs)
 			p_question.find("img").each(function () {
 				var img = $(this);
-				var path = me.options.path + "/" + img.attr("src");
-				img.attr("src", path);
+				var src = img.attr("src");
+				if (src && src.indexOf("data:image/") == -1) {
+					var path = me.options.path + "/" + src;
+					img.attr("src", path);
+				}
 			});
 
 			q.append(p_question);
