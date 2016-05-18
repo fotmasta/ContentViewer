@@ -133,7 +133,7 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 		}
 
 		if (manifest.buyButton != undefined) {
-			var buyButton = $("<a>", { class: "buy-btn btn btn-danger", target: "_blank", href: "https://www.informit.com/buy.aspx?isbn=" + manifest.buyButton, text: " Add to cart"});
+			var buyButton = $("<a>", { class: "buy-btn btn btn-danger", target: "_blank", href: manifest.buyButton, text: " Add to cart"});
 			$("<i>", { class: "fa fa-shopping-cart"}).prependTo(buyButton);
 			$("#header-nav .navbar-brand").append(buyButton);
 		}
