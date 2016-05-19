@@ -676,6 +676,7 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 		playExtraFromTOC: function (index, options) {
 			var reloadAnyway = false;
 
+			if (options == undefined) options = {};
 			if (options.replaceAll == undefined) options.replaceAll = true;
 
 			if (options.replaceAll == true) {
