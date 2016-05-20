@@ -3,6 +3,8 @@ define(["textfit", "dots", "jquery"], function (textFit) {
 	var CARD_MARGIN = 50;
 
 	var _currentCardIndex = -1;
+	var _temporaryCardIndex = -1;
+	var _temporaryCardOverride = false;
 
 	var toggleAll = false;
 
@@ -83,14 +85,18 @@ define(["textfit", "dots", "jquery"], function (textFit) {
 			var card = _settings.cards[i];
 			var ch = card.chapters;
 			for (var j = 0; j < ch.length; j++) {
-				var c = parseInt(ch[j]);
+				var c = ch[j].toString();
 				if (chapters.indexOf(c) === -1) {
 					chapters.push(c);
 				}
 			}
 		}
 
-		chapters = chapters.sort(function (a, b) { return a - b; });
+		chapters = chapters.sort(function (a, b) {
+			if (a == "Extras") return 1;
+			else if (b == "Extras") return -1;
+			else return a - b;
+		});
 
 		for (i = 0; i < chapters.length; i++) {
 			var d = $("<div>", { class: "chapter-checkbox selected", "data-index": chapters[i] });
@@ -123,6 +129,30 @@ define(["textfit", "dots", "jquery"], function (textFit) {
 			seedCardOrder();
 		}
 
+		for (var i = 0; i < _settings.cards.length; i++) {
+			var card = _settings.cards[i];
+			var linkPos = card.definition.indexOf("[[");
+			var linkEndPos = card.definition.indexOf("]]");
+			if (linkPos != -1 && linkEndPos != -1) {
+				var otherTerm = card.definition.substr(linkPos + 2, linkEndPos - linkPos - 2);
+				var linkText = $("<a>", { text: otherTerm });
+
+				var found = false;
+				for (var j = 0; j < _settings.cards.length; j++) {
+					if (_settings.cards[j].term == otherTerm) {
+						found = true;
+						break;
+					}
+				}
+
+				if (!found) {
+					console.log("not found: " + otherTerm);
+				}
+
+				card.definition = card.definition.substr(0, linkPos) + linkText[0].outerHTML + card.definition.substr(linkEndPos + 2);
+			}
+		}
+
 		refilterCards();
 	}
 
@@ -142,8 +172,8 @@ define(["textfit", "dots", "jquery"], function (textFit) {
 
 		_settings.cardOrder = [];
 
-		// use 500 as max height?
-		var maxh = 500;
+		// use 60% of window height as max height?
+		var maxh = $(window).height() * .6;
 
 		// set height to 4x3
 		var w = _settings.el.find(".card-holder").width();
@@ -188,23 +218,27 @@ define(["textfit", "dots", "jquery"], function (textFit) {
 	}
 
 	function getCurrentCard () {
-		if (_settings.activeCards.length == 0) return null;
+		if (_temporaryCardOverride) {
+			return _settings.cards[_temporaryCardIndex];
+		} else {
+			if (_settings.activeCards.length == 0) return null;
 
-		if (_currentCardIndex == -1) {
-			_currentCardIndex = 0;
-		} else if (_currentCardIndex >= _settings.activeCards.length) {
-			_currentCardIndex = _settings.activeCards.length - 1;
+			if (_currentCardIndex == -1) {
+				_currentCardIndex = 0;
+			} else if (_currentCardIndex >= _settings.activeCards.length) {
+				_currentCardIndex = _settings.activeCards.length - 1;
+			}
+
+			// get the nth active card (either from the ordered list or the randomized list)
+			return getActiveCard(_currentCardIndex);
 		}
-
-		// get the nth active card (either from the ordered list or the randomized list)
-		return getActiveCard(_currentCardIndex);
 	}
 
 	function isValid (card) {
 		var ok = false;
 
 		for (var i = 0; i < card.chapters.length; i++) {
-			var ch = parseInt(card.chapters[i]);
+			var ch = card.chapters[i].toString();
 			if (_settings.selectedChapters.indexOf(ch) != -1)
 				ok = true;
 		}
@@ -248,7 +282,7 @@ define(["textfit", "dots", "jquery"], function (textFit) {
 
 			var curCard = getActiveCard(_currentCardIndex);
 
-			if (id != curCard.index && _settings.el.find(".card").hasClass("flip180"))
+			if (curCard && id != curCard.index && _settings.el.find(".card").hasClass("flip180"))
 				flipCardToFront();
 
 			_settings.el.find(".card").data("id", curCard.index);
@@ -262,7 +296,7 @@ define(["textfit", "dots", "jquery"], function (textFit) {
 			// delay a bit so the back of the card doesn't show right away (hey, no cheating!)
 			setTimeout(function () {
 				var def = _settings.el.find(".card .back #definition");
-				def.css("white-space", "normal").text(card.definition);
+				def.css("white-space", "normal").html(card.definition);
 				textFit(def[0], {maxFontSize: 40});
 			}, 200);
 		} else {
@@ -291,6 +325,8 @@ define(["textfit", "dots", "jquery"], function (textFit) {
 	function showNextCard () {
 		flipCardToFront();
 
+		_temporaryCardOverride = false;
+
 		if (_currentCardIndex < _settings.activeCards.length - 1) {
 			if (_currentCardIndex != -1) {
 				var w = _settings.el.find(".card").width();
@@ -313,6 +349,8 @@ define(["textfit", "dots", "jquery"], function (textFit) {
 	function showPreviousCard () {
 		flipCardToFront();
 
+		_temporaryCardOverride = false;
+
 		if (_currentCardIndex > 0) {
 			var w = _settings.el.find(".card").width();
 			_settings.el.find(".card").animate({left: w + CARD_MARGIN + 20}, 300, "easeInOutCubic", function () {
@@ -322,33 +360,52 @@ define(["textfit", "dots", "jquery"], function (textFit) {
 			});
 		} else {
 			// make card bump against the left
+			updateCard();
+
 			_settings.el.find(".card").animate({ left: 25 }, 100).animate( { left: 0 }, 600, "easeOutElastic");
 		}
 	}
 
-	function gotoCardByDot (dotIndex) {
-		flipCardToFront();
+	function gotoCardByIndex (idx, opts) {
+		_temporaryCardOverride = opts && opts.definitelyShow;
+		if (_temporaryCardOverride) {
+			_temporaryCardIndex = idx;
+		}
 
-		var idx = Math.floor(dotIndex * dotRatio);
+		flipCardToFront();
 
 		if (idx > _currentCardIndex) {
 			var w = _settings.el.find(".card").width();
 			_settings.el.find(".card").animate({left: -w - CARD_MARGIN - 20}, 300, "easeInOutCubic", function () {
-				_currentCardIndex = idx;
+				if (!_temporaryCardOverride)
+					_currentCardIndex = idx;
 				updateCard();
 				_settings.el.find(".card").css("left", w + CARD_MARGIN + 20).animate({left: 0}, 300, "easeInOutCubic");
 			});
 		} else {
 			var w = _settings.el.find(".card").width();
 			_settings.el.find(".card").animate({left: w + CARD_MARGIN + 20}, 300, "easeInOutCubic", function () {
-				_currentCardIndex = idx;
+				if (!_temporaryCardOverride)
+					_currentCardIndex = idx;
 				updateCard();
 				_settings.el.find(".card").css("left", -w - CARD_MARGIN - 20).animate({left: 0}, 300, "easeInOutCubic");
 			});
 		}
 	}
 
+	function gotoCardByDot (dotIndex) {
+		var idx = Math.floor(dotIndex * dotRatio);
+
+		gotoCardByIndex(idx);
+	}
+
 	function onClickCard (event) {
+		var target = $(event.target);
+		if (target.is("a")) {
+			onClickLink(target.text());
+			return;
+		}
+
 		var t = $(event.target).parents("#mastered-checkbox-holder");
 		if (t.length) {
 			return;
@@ -434,7 +491,7 @@ define(["textfit", "dots", "jquery"], function (textFit) {
 	function refreshFromChapters () {
 		var ch = _settings.el.find(".chapter-checkbox.selected");
 		var chapters = ch.map(function (index, item) {
-			return parseInt($(item).attr("data-index"));
+			return $(item).attr("data-index");
 		});
 
 		_settings.selectedChapters = $.makeArray(chapters);
@@ -486,8 +543,23 @@ define(["textfit", "dots", "jquery"], function (textFit) {
 		updatePositionStatus();
 	}
 
+	function getSearchParameter (search) {
+		return search.slice(1).split("&").reduce(function(t, e) {
+			var i = e.split("="),
+				n = decodeURIComponent(i[0]),
+				s = i.length > 1 ? decodeURIComponent(i[1]) : null;
+			return n && (t[n] = s), t
+		}, {});
+	}
+
 	function getKey () {
-		return "flashcards-" + window.location.pathname;
+		var key = getSearchParameter(window.location.search)["configFile"];
+		if (key === undefined) {
+			key = "flashcards-" + window.location.pathname;
+		} else {
+			key = "flashcards-" + key;
+		}
+		return key;
 	}
 
 	function getProgress () {
@@ -518,6 +590,17 @@ define(["textfit", "dots", "jquery"], function (textFit) {
 			for (var i = 0; i < _settings.cards.length; i++) {
 				var c = _settings.cards[i];
 				c.mastered = (progress[i] === "m");
+			}
+		}
+	}
+
+	function onClickLink (otherTerm) {
+		// TODO: jump to other card (even if it's not in the activeCard set) and make sure the back button works
+		for (var i = 0; i < _settings.cards.length; i++) {
+			var c = _settings.cards[i];
+			if (c.term == otherTerm) {
+				gotoCardByIndex(i, { definitelyShow: true });
+				break;
 			}
 		}
 	}
