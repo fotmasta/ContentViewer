@@ -172,13 +172,17 @@ define(["textfit", "dots", "jquery"], function (textFit) {
 
 		_settings.cardOrder = [];
 
-		// use 60% of window height as max height?
-		var maxh = $(window).height() * .6;
+		// use 60% of window height as max height (and at least 500)
+		var maxh = Math.max(500, $(window).height() * .6);
 
 		// set height to 4x3
 		var w = _settings.el.find(".card-holder").width();
 		var h = Math.min(maxh, w * .75);
 		_settings.el.find(".card-holder").height(h - CARD_MARGIN * 2);
+
+		_settings.el.find("#chapter-chooser").css("display", _settings.showChapterSelector != false ? "block" : "none");
+
+		setWidgetHeight();
 
 		initializeChapterSelector();
 
@@ -203,10 +207,6 @@ define(["textfit", "dots", "jquery"], function (textFit) {
 		hintInterval = setInterval(function () {
 			_settings.el.find("#card-hint").removeClass("animated").hide(0).addClass("animated swing").show(0);
 		}, 5000);
-
-		_settings.el.find("#chapter-chooser").css("display", _settings.showChapterSelector != false ? "block" : "none");
-
-		setWidgetHeight();
 
 		window.addEventListener("resize", onWindowResize);
 	}
