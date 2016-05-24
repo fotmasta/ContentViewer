@@ -48,11 +48,10 @@ define(["database", "common", "jquery.ui", "video-manager", "firebase"], functio
 		},
 
 		loadCommentsFromFirebase: function () {
-			this.firebaseRef = new Firebase("https://ptg-comments.firebaseio.com/titles/");
-
 			// use "child_added" or "value"? ("child_added" wasn't triggered for changes; "value" is)
 			var path = Common.makeFirebaseFriendly(this.options.titlePath);
-			this.firebaseRef.child(path + "/comments").orderByChild("timestamp").on("value", $.proxy(this.onLoadComments, this));
+			var titleRef = Database.getTitlesRef();
+			titleRef.child(path + "/comments").orderByChild("timestamp").on("value", $.proxy(this.onLoadComments, this));
 		},
 
 		onLoadComments: function (snapshot) {
@@ -164,8 +163,10 @@ define(["database", "common", "jquery.ui", "video-manager", "firebase"], functio
 		},
 
 		onClickSubmit: function () {
+			if (!Database.getTitlesRef()) return;
+
 			var path = Common.makeFirebaseFriendly(this.options.titlePath);
-			var newCommentRef = this.firebaseRef.child(path + "/comments").push();
+			var newCommentRef = Database.getTitlesRef().child(path + "/comments").push();
 
 			var name = this.element.find("#commentName").val();
 			name = name ? name : "Anonymous";
@@ -431,7 +432,7 @@ define(["database", "common", "jquery.ui", "video-manager", "firebase"], functio
 			var parentKey = parentComment.attr("data-key");
 
 			var path = Common.makeFirebaseFriendly(this.options.titlePath);
-			var newCommentRef = this.firebaseRef.child(path + "/comments").push();
+			var newCommentRef = Database.getTitlesRef().child(path + "/comments").push();
 
 			var form = el.parents(".comments-entry");
 

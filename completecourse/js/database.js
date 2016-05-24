@@ -40,10 +40,12 @@ define(["common", "jquery.json", "firebase"], function (Common) {
 		attemptedRemoteLoad: false,
 
 		getVersion: function () {
-			return "1.0.4";
+			return "1.0.5";
 		},
 
 		initialize: function (toc, title, updateCallback) {
+			this.databaseRef = undefined;
+
 			this.authorize();
 
 			if (title === undefined) {
@@ -182,8 +184,8 @@ define(["common", "jquery.json", "firebase"], function (Common) {
 		},
 
 		authorize: function () {
-			var ref = new Firebase("https://ptg-comments.firebaseio.com");
-			ref.authAnonymously($.proxy(this.onAuthorizedCallback, this));
+			this.databaseRef = new Firebase("https://ptg-comments.firebaseio.com");
+			this.databaseRef.authAnonymously($.proxy(this.onAuthorizedCallback, this));
 		},
 
 		onAuthorizedCallback: function (error, authData) {
@@ -210,7 +212,7 @@ define(["common", "jquery.json", "firebase"], function (Common) {
 
 		setCustomerID: function (id) {
 			this.customerID = id;
-			this.userStorageRef = new Firebase("https://ptg-comments.firebaseio.com/users/" + id);
+			//this.userStorageRef = new Firebase("https://ptg-comments.firebaseio.com/users/" + id);
 		},
 
 		getCustomerID: function () {
@@ -220,19 +222,19 @@ define(["common", "jquery.json", "firebase"], function (Common) {
 		saveToRemoteStorage: function (folder, data) {
 			// THEORY: don't save to remote until we've tried loading from the remote
 			if (this.attemptedRemoteLoad) {
-				if (this.userStorageRef) {
-					this.userStorageRef.child(folder).set(data);
+				if (this.customerID) {
+					this.databaseRef.child("users/" + this.customerID + "/" + folder).set(data);
 				}
 			}
 		},
 
 		loadFromRemoteStorage: function () {
-			if (this.userStorageRef) {
+			if (this.customerID) {
 				this.attemptedRemoteLoad = true;
 
 				var me = this;
 
-				this.userStorageRef.child(this.folder).once("value", function (snapshot) {
+				this.databaseRef.child("users/" + this.customerID + "/" + this.folder).once("value", function (snapshot) {
 					var item = snapshot.val();
 
 					if (item) {
@@ -258,14 +260,14 @@ define(["common", "jquery.json", "firebase"], function (Common) {
 		},
 
 		setUserData: function (key, value) {
-			if (this.userStorageRef) {
-				this.userStorageRef.child("userdata").child(key).set(value);
+			if (this.customerID) {
+				this.databaseRef.child("users/" + this.customerID + "/userdata").child(key).set(value);
 			}
 		},
 
 		getUserData: function (key, callback) {
-			if (this.userStorageRef) {
-				this.userStorageRef.child("userdata").child(key).once("value", function (snapshot) {
+			if (this.customerID) {
+				this.databaseRef.child("users/" + this.customerID + "/userdata").child(key).once("value", function (snapshot) {
 					var item = snapshot.val();
 
 					callback(item);
@@ -274,9 +276,14 @@ define(["common", "jquery.json", "firebase"], function (Common) {
 		},
 
 		getTitleData: function (callback) {
-			if (this.userStorageRef) {
-				this.userStorageRef.once("value", callback);
+			if (this.customerID) {
+				this.databaseRef.child("users/" + this.customerID).once("value", callback);
 			}
+		},
+
+		getTitlesRef: function () {
+			if (this.databaseRef)
+				return this.databaseRef.child("titles");
 		}
 	};
 
