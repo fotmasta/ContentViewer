@@ -1,4 +1,3 @@
-// TODO: does each Firebase request count as a "connection" (limited to 100) [also: why so many connections? 10 realtime users = 100 Firebase users?]
 // TODO: system for bypassing cache or alerting customers to reload (Rhapsody-style)?
 // TODO: iOS TOC syncing to TOC is doing some strange scrolling
 // TODO: see if there are extra pages being pushed into the browser history that can be eliminated to make "Back" more streamlined
@@ -238,3 +237,4 @@
 // DONE: add checkbox for "Sample Mode?" to video-toc-converter
 // DONE: system for using Habitat widgets in video courses? [can use exported HTML -or- use the slightly-modified flashcardset widget]
 // DONE: consolidate widgets so one codebase can be used for Habitat and Web Editions/VOSP
+// DONE: does each Firebase request count as a "connection" (limited to 100) [also: why so many connections? 10 realtime users = 100 Firebase users?] [tried to reduce to just one per session]
