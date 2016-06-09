@@ -20,6 +20,7 @@ html.ui {
 
 body {
 	font-family: "Source Sans Pro", "Helvetica Neue", Helvetica, Arial, sans-serif;
+	-webkit-font-smoothing: antialiased;
 
 	&.modal-open {
 		overflow: visible;

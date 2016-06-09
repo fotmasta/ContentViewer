@@ -238,3 +238,5 @@
 // DONE: system for using Habitat widgets in video courses? [can use exported HTML -or- use the slightly-modified flashcardset widget]
 // DONE: consolidate widgets so one codebase can be used for Habitat and Web Editions/VOSP
 // DONE: does each Firebase request count as a "connection" (limited to 100) [also: why so many connections? 10 realtime users = 100 Firebase users?] [tried to reduce to just one per session]
+// DONE: resizePanes in buildpage.js calls to iframes, not all of which (ie, Firebase) it has access to [filter]
+// DONE: BUG: Safari 9.1.1 and OSX 10.11.5 users report text is white (Select All shows the text but otherwise it's invisible) [-webkit-font-smoothing: antialiased or turning off animated fadeIn for Safari?]

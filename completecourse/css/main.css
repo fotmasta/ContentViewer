@@ -11,7 +11,8 @@ html.ui {
   margin-top: 50px; }
 
 body {
-  font-family: "Source Sans Pro", "Helvetica Neue", Helvetica, Arial, sans-serif; }
+  font-family: "Source Sans Pro", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased; }
   body.modal-open {
     overflow: visible; }
 

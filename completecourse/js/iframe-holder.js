@@ -291,12 +291,8 @@ define(["bootstrap-dialog", "imagesloaded", "database", "jquery.ui"], function (
 				// NOTE: I think this was disrupting the render and touch-scrolling of the iframe on iOS (probably because of 3D rendering "optimizations")
 				var is_iOS = /iPad|iPhone|iPod/.test(navigator.platform);
 				if  (!is_iOS) {
-					// NOTE: newer versions of Safari MAY have been having trouble with this fading code
-					var is_Safari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
-					if (!is_Safari) {
-						me.iframe.removeClass("fadeIn animated").hide(0);
-						me.iframe.addClass("fadeIn animated").show(0);
-					}
+					me.iframe.removeClass("fadeIn animated").hide(0);
+					me.iframe.addClass("fadeIn animated").show(0);
 				} else {
 					this.element.addClass("ios");   // .the-iframe-holder (custom iOS attributes to correct scrolling problems)
 				}
