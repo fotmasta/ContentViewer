@@ -9,6 +9,35 @@ $incorrect-color: #d9534f;
 		color: black;
 		font-size: 100%;
 	}
+
+	&.single-view {
+		ol.quiz-holder {
+			position: relative;
+			min-height: 500px;
+			overflow: hidden;
+
+			border: 2px solid black;
+			border-radius: 15px;
+
+			li.question {
+				position: absolute;
+
+				&:not(.current) {
+					left: 20000px;
+				}
+			}
+		}
+
+		#controls {
+			margin-bottom: 15px;
+		}
+	}
+
+	&:not(.single-view) {
+		#controls {
+			display: none;
+		}
+	}
 }
 
 ol.quiz-holder {

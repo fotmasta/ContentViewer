@@ -112,6 +112,8 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 
 			this.id = "quiz_id";
 
+			this.currentQuestion = 0;
+
 			this.options.settings = { reviewableAfterEach: true };
 
 			var quizFile = this.options.data;
@@ -153,7 +155,10 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 			this.element.append(summary);
 
 			var ol = $("<ol>", {class: "quiz-holder"});
-			this.element.append(ol);
+			this.element.find("#controls").prepend(ol);
+
+			this.element.find("#previous-button").click($.proxy(this.onClickPrevious, this));
+			this.element.find("#next-button").click($.proxy(this.onClickNext, this));
 
 			this.onLoadedData(this.options.paramData);
 		},
@@ -179,6 +184,14 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 				this.options.settings.randomizeResponses = (String(this.data.randomizeResponses) == "true");
 			}
 
+			if (this.data.singleView !== undefined) {
+				this.options.settings.singleView = (String(this.data.singleView) == "true");
+			}
+
+			if (this.options.settings.singleView) {
+				this.element.addClass("single-view");
+			}
+
 			for (var i = 0; i < this.data.questions.length; i++) {
 				var d_q = this.data.questions[i];
 
@@ -189,6 +202,10 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 				q.answers = d_q.answers.slice();
 
 				this.addQuestion(q);
+			}
+
+			if (this.options.settings.singleView) {
+				this.updateCurrentQuestion();
 			}
 
 			this.options.iframe.overrideLinks();
@@ -606,6 +623,27 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 
 		onClickStartOver: function () {
 			this.options.iframe.showAlert("Start Over", "Are you sure you want to clear your quiz responses and start over?", $.proxy(this.onStartOver, this));
+		},
+
+		onClickPrevious: function () {
+			if (this.currentQuestion > 0) {
+				this.currentQuestion--;
+				this.updateCurrentQuestion();
+			}
+		},
+
+		onClickNext: function () {
+			if (this.currentQuestion < this.element.find(".question").length - 1) {
+				this.currentQuestion++;
+				this.updateCurrentQuestion();
+			}
+		},
+
+		updateCurrentQuestion: function () {
+			var thisQ = this.element.find(".question").eq(this.currentQuestion);
+
+			this.element.find(".question").removeClass("current");
+			thisQ.hide(0).addClass("current").show(0);
 		}
 	});
 
