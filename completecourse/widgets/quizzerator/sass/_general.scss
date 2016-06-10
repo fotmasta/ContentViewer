@@ -28,6 +28,10 @@ $incorrect-color: #d9534f;
 			}
 		}
 
+		.quiz-title .position-label {
+			float: right;
+		}
+
 		#controls {
 			margin-bottom: 15px;
 		}
@@ -35,6 +39,10 @@ $incorrect-color: #d9534f;
 
 	&:not(.single-view) {
 		#controls {
+			display: none;
+		}
+
+		.position-label {
 			display: none;
 		}
 	}

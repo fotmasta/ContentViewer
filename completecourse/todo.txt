@@ -1,3 +1,6 @@
+// TODO: quizzerator single-view, find way for quiz questions to size enough to fit each question (CSS solution?)
+// TODO: quizzerator single-view, show score summary side panel when "Check All" is clicked or write out summary?
+// TODO: quizzerator single-view, review (shows explanation and correct and selected response for each question with back/next buttons)
 // TODO: system for bypassing cache or alerting customers to reload (Rhapsody-style)?
 // TODO: iOS TOC syncing to TOC is doing some strange scrolling
 // TODO: see if there are extra pages being pushed into the browser history that can be eliminated to make "Back" more streamlined

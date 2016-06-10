@@ -167,9 +167,9 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 			this.data = data;
 
 			if (this.options.desc) {
-				this.element.find("h3.quiz-title").text(this.options.desc);
+				this.element.find("h3.quiz-title .contents").text(this.options.desc);
 			} else if (this.data.title) {
-				this.element.find("h3.quiz-title").text(this.data.title);
+				this.element.find("h3.quiz-title .contents").text(this.data.title);
 			}
 
 			if (this.data.reviewableAfterEach !== undefined) {
@@ -644,6 +644,9 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 
 			this.element.find(".question").removeClass("current");
 			thisQ.hide(0).addClass("current").show(0);
+
+			var total = this.element.find(".question").length;
+			this.element.find(".position-label").text("Question " + (this.currentQuestion + 1) + " of " + total);
 		}
 	});
 
