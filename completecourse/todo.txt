@@ -1,5 +1,3 @@
-// TODO: quizzerator single-view, find way for quiz questions to size enough to fit each question (CSS solution?)
-// TODO: quizzerator single-view, show score summary side panel when "Check All" is clicked or write out summary?
 // TODO: quizzerator single-view, review (shows explanation and correct and selected response for each question with back/next buttons)
 // TODO: system for bypassing cache or alerting customers to reload (Rhapsody-style)?
 // TODO: iOS TOC syncing to TOC is doing some strange scrolling
@@ -243,3 +241,5 @@
 // DONE: does each Firebase request count as a "connection" (limited to 100) [also: why so many connections? 10 realtime users = 100 Firebase users?] [tried to reduce to just one per session]
 // DONE: resizePanes in buildpage.js calls to iframes, not all of which (ie, Firebase) it has access to [filter]
 // DONE: BUG: Safari 9.1.1 and OSX 10.11.5 users report text is white (Select All shows the text but otherwise it's invisible) [-webkit-font-smoothing: antialiased or turning off animated fadeIn for Safari?]
+// DONE: quizzerator single-view, find way for quiz questions to size enough to fit each question (CSS solution?)
+// DONE: quizzerator single-view, show score summary side panel when "Check All" is clicked or write out summary?

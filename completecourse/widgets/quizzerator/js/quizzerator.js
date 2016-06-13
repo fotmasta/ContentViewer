@@ -157,8 +157,10 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 			var ol = $("<ol>", {class: "quiz-holder"});
 			this.element.find("#controls").prepend(ol);
 
+			this.element.find("#clear-button").click($.proxy(this.onClickStartOver, this));
 			this.element.find("#previous-button").click($.proxy(this.onClickPrevious, this));
 			this.element.find("#next-button").click($.proxy(this.onClickNext, this));
+			this.element.find("#submit-button").click($.proxy(this.onClickSubmit, this));
 
 			this.onLoadedData(this.options.paramData);
 		},
@@ -220,7 +222,9 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 		},
 
 		addQuestion: function (q_params) {
-			var q = $("<li>", {class: "question"});
+			var n = this.element.find(".quiz-holder li.question").length;
+
+			var q = $("<li>", {class: "question animated fadeInRight", "data-number": (n + 1) + "." });
 
 			var p_question = $("<p>", {html: q_params.q});
 
@@ -393,8 +397,11 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 			var doHeightAdjustment = function () {
 				me.element.find("#check-all").addClass("unhidden");
 				me.element.find("#start-over").addClass("unhidden");
-				var h = me.element.find(".holder").outerHeight();
-				me.element.find(".summary").height(h);
+
+				if (!me.options.settings.singleView) {
+					var h = me.element.find(".holder").outerHeight();
+					me.element.find(".summary").height(h);
+				}
 			}
 
 			if (this.options.settings.reviewableAfterEach) {
@@ -598,11 +605,13 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 		},
 
 		onScroll: function (event) {
-			var t = $(event.target).scrollTop() + 140;
-			var sum = this.element.find(".summary");
-			var curtop = sum.offset().top;
-			if (sum.css("top") == "auto" || Math.abs(curtop - t) > 20) {
-				sum.offset({top: t});
+			if (!this.options.settings.singleView) {
+				var t = $(event.target).scrollTop() + 140;
+				var sum = this.element.find(".summary");
+				var curtop = sum.offset().top;
+				if (sum.css("top") == "auto" || Math.abs(curtop - t) > 20) {
+					sum.offset({top: t});
+				}
 			}
 		},
 
@@ -614,7 +623,17 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 			this.element.find(".checker").addClass("inactive");
 			this.element.find(".hint").css("display", "none");
 
+			this.element.find(".current").removeClass("current");
+			this.element.removeClass("grading");
+
+			if (this.options.settings.singleView) {
+				this.currentQuestion = 0;
+				this.updateCurrentQuestion();
+			}
+
 			this.updateScore();
+
+			this.saveResponses();
 
 			this.adjustSummarySize();
 
@@ -643,10 +662,24 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 			var thisQ = this.element.find(".question").eq(this.currentQuestion);
 
 			this.element.find(".question").removeClass("current");
-			thisQ.hide(0).addClass("current").show(0);
+			thisQ.addClass("current");
 
 			var total = this.element.find(".question").length;
 			this.element.find(".position-label").text("Question " + (this.currentQuestion + 1) + " of " + total);
+		},
+
+		onClickSubmit: function () {
+			this.element.toggleClass("grading");
+
+			// this will show the summary pane and scroll to it
+
+			var me = this;
+
+			setTimeout(function () {
+				var t = me.element.find(".summary").offset().top;
+				var h = $(window).height() * .5;
+				$(window).animate({scrollTop: t - h}, 1000);
+			}, 200);
 		}
 	});
 
