@@ -113,6 +113,7 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 			this.id = "quiz_id";
 
 			this.currentQuestion = 0;
+			this.attempts = 1;
 
 			this.options.settings = { reviewableAfterEach: true };
 
@@ -133,7 +134,7 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 			var container = $("<div>", {class: "holder"});
 			summary.append(container);
 			container.append($("<h3>Score:</h3>"));
-			var t = $("<table><tr class='answered'><td>Answered</td><td id='answered-count'></td></tr><tr><td>Correct</td><td id='correct-count'></td></tr><tr><td>Incorrect</td><td id='incorrect-count'></td></tr><tr class='total'><td>Score</td><td id='score-result'></td></tr></table>");
+			var t = $("<table><tr class='attempts'><td>Attempts</td><td id='attempts-count'></td></tr><tr class='answered'><td>Answered</td><td id='answered-count'></td></tr><tr><td>Correct</td><td id='correct-count'></td></tr><tr><td>Incorrect</td><td id='incorrect-count'></td></tr><tr class='total'><td>Score</td><td id='score-result'></td></tr></table>");
 			t.addClass("results");
 			container.append(t);
 			var btn = $("<button>", {
@@ -155,7 +156,7 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 			this.element.append(summary);
 
 			var ol = $("<ol>", {class: "quiz-holder"});
-			this.element.find("#controls").prepend(ol);
+			this.element.find("#controls").before(ol);
 
 			this.element.find("#clear-button").click($.proxy(this.onClickStartOver, this));
 			this.element.find("#previous-button").click($.proxy(this.onClickPrevious, this));
@@ -224,7 +225,13 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 		addQuestion: function (q_params) {
 			var n = this.element.find(".quiz-holder li.question").length;
 
-			var q = $("<li>", {class: "question animated fadeInRight", "data-number": (n + 1) + "." });
+			var classes = "question";
+
+			if (this.options.settings.singleView) {
+				classes += " animated fadeInRight";
+			}
+
+			var q = $("<li>", {class: classes, "data-number": (n + 1) + "." });
 
 			var p_question = $("<p>", {html: q_params.q});
 
@@ -478,11 +485,31 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 			this.updateScore();
 		},
 
-		onClickCheckAll: function (event) {
+		markAllCorrectResponses: function () {
 			var questions = this.element.find(".question");
 			for (var i = 0; i < questions.length; i++) {
 				var q = questions.eq(i);
-				this.checkQuestion(q);
+
+				var correctAnswer = q.find(".response[data-correct=true]");
+
+				// show the right responses
+				correctAnswer.parent("li").find(".correct").removeClass("hidden");
+
+				// show the hint
+				q.find(".checker").removeClass("inactive");
+				q.find(".hint").css("display", "block");
+			}
+		},
+
+		onClickCheckAll: function (event) {
+			this.checkAllQuestions(true);
+		},
+
+		checkAllQuestions: function (animate) {
+			var questions = this.element.find(".question");
+			for (var i = 0; i < questions.length; i++) {
+				var q = questions.eq(i);
+				this.checkQuestion(q, animate);
 			}
 
 			if (event) {
@@ -509,6 +536,8 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 			if (this.summary)
 				this.summary.find("#incorrect-count").text(incorrect);
 
+			this.element.find("#attempts-count").text(this.attempts);
+
 			var total = this.element.find(".question").length;
 
 			var answered = this.getQuestionsAnswered();
@@ -525,6 +554,10 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 
 			if (quizData) {
 				var obj = $.evalJSON(quizData);
+
+				if (obj.attempts) {
+					this.attempts = obj.attempts;
+				}
 
 				for (var i = 0; i < obj.responses.length; i++) {
 					var resp = obj.responses[i];
@@ -567,7 +600,7 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 				responses.push(indices);
 			}
 
-			var obj = {responses: responses};
+			var obj = {responses: responses, attempts: this.attempts};
 			var to_json = $.toJSON(obj);
 
 			this.db.setTitleProperty(this.id, to_json);
@@ -669,6 +702,17 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 		},
 
 		onClickSubmit: function () {
+			this.attempts++;
+
+			this.checkAllQuestions(false);
+
+			this.updateScore();
+
+			this.saveResponses();
+
+			// now show correct answers and explanations
+			this.markAllCorrectResponses();
+
 			this.element.toggleClass("grading");
 
 			// this will show the summary pane and scroll to it
