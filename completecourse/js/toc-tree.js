@@ -1,4 +1,5 @@
 define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
+	var tabindex = 0;
 
 	// case-insensitive search (found on web)
 	$.extend($.expr[":"], {
@@ -275,7 +276,7 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 				d.node.depth = depth;
 				d.node.index = params.counter;
 
-				li = $("<li>");
+				li = $("<li>", { tabindex: tabindex++ });
 				dest.append(li);
 
 				if (d && d.children && d.children.length > 0) {
@@ -403,13 +404,34 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 					case "video": // ie, video
 						if (d.node.video || d.node.src) {
 							a.click($.proxy(this.launchVideo, this, params.counter, {toggle: false}));
+							li.keydown(function (event) {
+								if (event.keyCode == 13 || event.keyCode == 32) {
+									//func(event);
+								}
+							});
 						} else {
 							linkholder.addClass("header");
 							a.click(toggleDropper);
+							li.keydown(function (event) {
+								if (event.keyCode == 13 || event.keyCode == 32) {
+									toggleDropper(event);
+								}
+							});
 						}
 						break;
 					default:
 						a.click($.proxy(this.launchVideo, this, params.counter, {toggle: false}));
+						var func = $.proxy(this.launchVideo, this, params.counter, {toggle: false});
+						var me = this;
+						li.keydown(function (event) {
+							if (event.keyCode == 13 || event.keyCode == 32) {
+								event.preventDefault();
+								event.stopPropagation();
+								var index = $(event.target).attr("data-index");
+								console.log(index);
+								me.launchVideo(index, {toggle:false}, event);
+							}
+						});
 						break;
 				}
 
@@ -451,7 +473,7 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 		},
 		
 		launchVideo: function (index, options, event) {
-			event.preventDefault();
+			if (event) event.preventDefault();
 			this.element.trigger("playvideo", { depth: index, options: options });
 
 			if (options && options.toggle) {
@@ -551,8 +573,7 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 			if (term != "") {
 				this.showSearchPane(results.length);
 			} else {
-				this.element.parent().find(".toc").delay(300).show("slide");
-				this.element.parent().find(".search-results").hide("slide");
+				$("#hit-count").text("");
 			}
 		},
 
@@ -572,6 +593,10 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 			var me = this;
 			setTimeout(function () {
 				me.element.parent().find(".search-results").show("slide");
+
+				setTimeout(function () {
+					me.element.parent().find("#query-too").focus();
+				}, 300);
 			}, 500);
 		},
 
@@ -661,7 +686,7 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 			var checked = el.find("> i.checked");
 			checked.remove();
 
-			el.append("<i class='checked fa fa-adjust fa-flip-horizontal'></i>");
+			el.append("<i class='checked fa fa-adjust fa-flip-horizontal' title='Progress started.'></i>");
 		},
 
 		markCompleted: function (index) {
@@ -681,12 +706,12 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 			if (el.find("ul li").length) {
 				var childrenComplete = this.checkForAllChildrenComplete(index);
 				if (childrenComplete) {
-					el.append("<i class='checked fa fa-check-circle'></i>");
+					el.append("<i class='checked fa fa-check-circle' title='Progress completed.'></i>");
 				} else {
-					el.append("<i class='checked fa fa-adjust fa-flip-horizontal'></i>");
+					el.append("<i class='checked fa fa-adjust fa-flip-horizontal' title='Progress started.'></i>");
 				}
 			} else {
-				el.append("<i class='checked fa fa-check-circle'></i>");
+				el.append("<i class='checked fa fa-check-circle' title='Progress completed.'></i>");
 			}
 
 			a.removeClass("completed").addClass("completed");
@@ -717,7 +742,7 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 			var checked = el.find("> i.checked");
 			checked.remove();
 
-			el.append("<i class='checked fa fa-adjust fa-flip-horizontal'></i>");
+			el.append("<i class='checked fa fa-adjust fa-flip-horizontal' title='Progress started.'></i>");
 
 			a.removeClass("completed");
 		},

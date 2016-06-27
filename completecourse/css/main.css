@@ -23,6 +23,8 @@ body.skin-Microsoft {
     border: none; }
     body.skin-Microsoft .btn-primary:hover, body.skin-Microsoft .btn-primary:active, body.skin-Microsoft .btn-info:hover, body.skin-Microsoft .btn-info:active {
       background-color: #0096ff; }
+  body.skin-Microsoft .nav-list li:focus {
+    outline: auto; }
   body.skin-Microsoft #query {
     height: 32px;
     border: none; }
@@ -52,6 +54,8 @@ body.skin-Microsoft {
       background-color: #3B6DCB; }
       body.skin-Microsoft .search-results .search-result-list .selected p {
         color: white; }
+  body.skin-Microsoft #toc-toggler:focus {
+    outline: auto; }
 
 .col-xs-0 {
   float: left;
@@ -296,6 +300,8 @@ body.skin-Microsoft .iframe-holder > div {
 
 .nav-list {
   position: relative; }
+  .nav-list li:focus {
+    outline: none; }
   .nav-list li.active {
     background-color: #f0f0f7; }
   .nav-list .divider {
@@ -386,8 +392,10 @@ ul.toc-holder {
     #contents .toc .dropper:hover {
       transform: scale(1.5); }
 
-.navbar-brand:hover {
-  color: #9d9d9d !important; }
+.navbar-brand {
+  margin: 0; }
+  .navbar-brand:hover {
+    color: #9d9d9d !important; }
 
 .buy-btn {
   margin-left: 10px;
@@ -655,6 +663,7 @@ span.completed {
   display: none;
   position: fixed;
   overflow: hidden;
+  z-index: 500;
   background-color: #F7E1D1; }
   .search-results .row {
     background-color: #e86414; }

@@ -1,4 +1,3 @@
-// TODO: quizzerator single-view, review (shows explanation and correct and selected response for each question with back/next buttons)
 // TODO: system for bypassing cache or alerting customers to reload (Rhapsody-style)?
 // TODO: iOS TOC syncing to TOC is doing some strange scrolling
 // TODO: see if there are extra pages being pushed into the browser history that can be eliminated to make "Back" more streamlined
@@ -243,3 +242,5 @@
 // DONE: BUG: Safari 9.1.1 and OSX 10.11.5 users report text is white (Select All shows the text but otherwise it's invisible) [-webkit-font-smoothing: antialiased or turning off animated fadeIn for Safari?]
 // DONE: quizzerator single-view, find way for quiz questions to size enough to fit each question (CSS solution?)
 // DONE: quizzerator single-view, show score summary side panel when "Check All" is clicked or write out summary?
+// DONE: hide search too when TOC is hidden
+// DONE: quizzerator single-view, review (shows explanation and correct and selected response for each question with back/next buttons)

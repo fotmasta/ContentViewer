@@ -39,6 +39,10 @@ body.skin-Microsoft {
 		}
 	}
 
+	.nav-list li:focus {
+		outline: auto;
+	}
+
 	#query {
 		height: 32px;
 		border: none;
@@ -85,6 +89,12 @@ body.skin-Microsoft {
 			p {
 				color: white;
 			}
+		}
+	}
+
+	#toc-toggler {
+		&:focus {
+			outline: auto;
 		}
 	}
 }
@@ -467,6 +477,10 @@ video {
 .nav-list {
 	position: relative;
 
+	li:focus {
+		outline: none;
+	}
+
 	li.active {
 		background-color: rgb(240, 240, 247);
 	}
@@ -613,6 +627,8 @@ ul.toc-holder {
 }
 
 .navbar-brand {
+	margin: 0;
+
 	&:hover {
 		color: #9d9d9d !important;
 	}
@@ -1002,6 +1018,7 @@ span.completed {
 	display: none;
 	position: fixed;
 	overflow: hidden;
+	z-index: 500;
 
 	background-color: #F7E1D1;
 

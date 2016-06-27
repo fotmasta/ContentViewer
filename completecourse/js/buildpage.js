@@ -441,6 +441,7 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 			$("#contents").removeClass("col-xs-0").addClass("col-xs-" + contentsSize);
 		} else {
 			$("#contents").removeClass("col-xs-3").addClass("col-xs-0");
+			$(".toc").TOCTree("closeSearch");
 		}
 
 		if (resourcesVisible) {
@@ -564,6 +565,8 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 				$("#account-button").hide(0);
 				$("#clear-search-button").hide(0);
 				$("#query").hide(0);
+
+				$("#query-too").attr("placeholder", "Enter search text");
 			}
 
 			addLinkToCSS(baseURL + "css/bootstrap.min.css");
