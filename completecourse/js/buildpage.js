@@ -561,10 +561,12 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 			$("html").addClass("ui");
 
 			if (options.skin == "Microsoft") {
-				$("#show-comments-button").hide(0);
-				$("#account-button").hide(0);
-				$("#clear-search-button").hide(0);
-				$("#query").hide(0);
+				$("#show-comments-button").hide(0).attr("aria-hidden", true);
+				$("#account-button").hide(0).attr("aria-hidden", true);
+				$("#clear-search-button").hide(0).attr("aria-hidden", true);
+				$("#query").hide(0).attr("aria-hidden", true);
+				$("#comments-panel").attr("aria-hidden", true);
+				$("#account-panel").attr("aria-hidden", true);
 
 				$("#query-too").attr("placeholder", "Enter search text");
 			}
