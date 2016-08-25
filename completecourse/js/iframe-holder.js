@@ -204,6 +204,8 @@ define(["bootstrap-dialog", "imagesloaded", "database", "jquery.ui"], function (
 		onLoaded: function ()  {
 			this.addStylesheet();
 
+			this.showSelectedUpdates();
+
 			if (!this.options.infinite_scrolling) {
 				this.addPreviousButton();
 				this.addNextButton();
@@ -592,6 +594,37 @@ define(["bootstrap-dialog", "imagesloaded", "database", "jquery.ui"], function (
 					}
 				]
 			});
+		},
+
+		showSelectedUpdates: function () {
+			var versions = this.options.manager.getSelectedUpdates();
+
+			var NUM_VERSIONS = this.options.manager.getNumberOfUpdates();
+
+			var all_revs = "";
+			for (var i = 1; i <= NUM_VERSIONS; i++) {
+				all_revs += ".cup-rev-" + i;
+			}
+
+			for (var i = 1; i <= NUM_VERSIONS; i++) {
+				if (versions.indexOf(String(i)) != -1) {
+					this.iframe.contents().find(".cup-rev-" + i).removeClass("no-badge");
+					if (i == 1) {
+						// special case for first-revision
+						this.iframe.contents().find(".cup-new:not(" + all_revs + ")").removeClass("no-badge");
+						this.iframe.contents().find(".cup-change:not(" + all_revs + ")").removeClass("no-badge");
+						this.iframe.contents().find(".cup-delete:not(" + all_revs + ")").removeClass("no-badge");
+					}
+				} else {
+					this.iframe.contents().find(".cup-rev-" + i).addClass("no-badge");
+					if (i == 1) {
+						// special case for first-revision
+						this.iframe.contents().find(".cup-new:not(" + all_revs + ")").addClass("no-badge");
+						this.iframe.contents().find(".cup-change:not(" + all_revs + ")").addClass("no-badge");
+						this.iframe.contents().find(".cup-delete:not(" + all_revs + ")").addClass("no-badge");
+					}
+				}
+			}
 		}
 	});
 });

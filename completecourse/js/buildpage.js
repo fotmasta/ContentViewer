@@ -172,8 +172,9 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 		$("#video").outerHeight(wh - 50);
 		$("#sidebar").outerHeight(wh - 50);
 
-		// kludge to subtract main menu bar and course progress
-		$("#contents .scroller").height(wh - 50 - 50);
+		// kludge to subtract main menu bar and course progress and version (if applicable)
+		// TODO: only if versions are > 0
+		$("#contents .scroller").height(wh - 50 - 46 - 35);
 
 		$("#main_video").css("max-height", wh - 50);
 

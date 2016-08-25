@@ -105,6 +105,7 @@ div.cup-new, li.cup-new, p.cup-new {
     background-color: #E8DB18;
     border-left: 5px solid #1EC711;
     padding: 1em .5em;
+    margin-top: 2em;
 }
 
 section.cup-new {
@@ -155,7 +156,7 @@ body.cup-new:before, section.cup-new:before, figure.cup-new:before, p.cup-new:be
     font-size: 14pt;
     background-color: #E8DB18;
     color: #9C5110;
-    transform: rotate(-15deg);
+    transform: translate(-3em, -3em) rotate(-15deg);
 }
 
 aside.cup-new:before {

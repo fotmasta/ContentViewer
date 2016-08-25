@@ -81,7 +81,8 @@ body.skin-Microsoft {
     #contents #contents-pane .toc-label:not(.nav-header) {
       font-weight: 400; }
     #contents #contents-pane .toc-label a .desc .badge {
-      display: inline-block !important; }
+      display: inline-block;
+      /* !important;*/ }
     #contents #contents-pane .badge.new {
       background-color: #E8DB18;
       color: #9C5110; }
@@ -1004,6 +1005,16 @@ button#search-close {
 
 .codelink {
   display: none; }
+
+#versions {
+  height: 35px;
+  width: 100%;
+  background-color: lightgrey;
+  padding-top: 7px; }
+  #versions span {
+    margin-left: 1em; }
+  #versions input {
+    margin: 0 5px 0 15px; }
 
 /* CUP styling overrides */
 section.cup-new:before {

@@ -59,6 +59,8 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 	}
 
 	function addChildNodes (options, nodes, children) {
+		var numUpdates = 0;
+
 		for (var i = 0; i < children.length; i++) {
 			var d = children.eq(i);
 
@@ -67,21 +69,39 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 
 			var labelText = label;
 
-			var extra_classes = "";
+			var extra_classes = [];
 
-			if (anchor.hasClass("cup-new")) {
-				//label += " <span class='badge new'>new</span>";
-				extra_classes += "new ";
+			if (anchor.hasClass("cup-new") || anchor.hasClass("cup-new-1")) {
+				extra_classes.push("new-1");
+				extra_classes.push("rev-1");
+				numUpdates = Math.max(numUpdates, 1);
+			}
+			if (anchor.hasClass('cup-new-2')) {
+				extra_classes.push("new-2");
+				extra_classes.push("rev-2");
+				numUpdates = Math.max(numUpdates, 2);
 			}
 
-			if (anchor.hasClass("cup-change")) {
-				//label += " <span class='badge change'>updated</span>";
-				extra_classes += "updated ";
+			if (anchor.hasClass("cup-change") || anchor.hasClass("cup-change-1")) {
+				extra_classes.push("updated-1");
+				extra_classes.push("rev-1");
+				numUpdates = Math.max(numUpdates, 1);
+			}
+			if (anchor.hasClass("cup-change-2")) {
+				extra_classes.push("updated-2");
+				extra_classes.push("rev-2");
+				numUpdates = Math.max(numUpdates, 2);
 			}
 
-			if (anchor.hasClass("cup-delete")) {
-				//label += " <span class='badge delete'>deleted</span>";
-				extra_classes += "deleted ";
+			if (anchor.hasClass("cup-delete") || anchor.hasClass("cup-delete-1")) {
+				extra_classes.push("deleted");
+				extra_classes.push("rev-1");
+				numUpdates = Math.max(numUpdates, 1);
+			}
+			if (anchor.hasClass("cup-delete-2")) {
+				extra_classes.push("deleted");
+				extra_classes.push("rev-2");
+				numUpdates = Math.max(numUpdates, 2);
 			}
 
 			var shortLabel = undefined;
@@ -109,9 +129,16 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 
 			var node = { desc: label, href: anchor.attr("href"), short: shortLabel };
 
-			var obj = { node: node, children: [], extra_classes: extra_classes };
+			var extras = extra_classes.filter(function (item, i , a) {
+				return i == a.indexOf(item);
+			});
+
+			var obj = { node: node, children: [], extra_classes: extras.join(" ") };
 
 			nodes[i] = obj;
+
+			if (options.numberOfUpdates == undefined) options.numberOfUpdates = 0;
+			options.numberOfUpdates = Math.max(options.numberOfUpdates, numUpdates);
 
 			addChildNodes(options, obj.children, d.find("> ol > li"));
 		}
@@ -207,6 +234,8 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 				$(this.options.expander).click($.proxy(this.expandOrCollapse, this));
 
 			this.searchCounter = undefined;
+
+			this.element.find(".highlight-button").click($.proxy(this.onClickHighlight, this));
 		},
 
 		refresh: function () {
@@ -456,6 +485,8 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 			this.nodes = nodes;
 
 			this.addNodes( { counter: 0 }, nodes, this.holder, []);
+
+			this.refreshUpdatePanel();
 		},
 
 		refreshFromMetadata: function () {
@@ -823,6 +854,50 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 			ifrm.attr("src", file);
 
 			ga("send", "event", "interface", "download", file);
+		},
+
+		onClickHighlight: function (event) {
+			var versions = this.getSelectedUpdates();
+
+			var NUM_VERSIONS = this.options.numberOfUpdates;
+
+			for (var i = 1; i <= NUM_VERSIONS; i++) {
+				if (versions.indexOf(String(i)) != -1) {
+					this.element.find(".new-" + i + " .badge.new").show();
+					this.element.find(".updated-" + i + " .badge.change").show();
+					this.element.find(".deleted-" + i + " .badge.deleted").show();
+				} else {
+					this.element.find(".new-" + i + " .badge.new").hide();
+					this.element.find(".updated-" + i + " .badge.change").hide();
+					this.element.find(".deleted-" + i + " .badge.deleted").hide();
+				}
+			}
+
+			this.refreshUpdateBadgesInFrame();
+		},
+
+		getNumberOfUpdates: function () {
+			return this.options.numberOfUpdates;
+		},
+
+		getSelectedUpdates: function () {
+			return $.map(this.element.find(".highlight-button:checked"), function (elem, index) { return $(elem).attr("data-version"); });
+		},
+
+		refreshUpdateBadgesInFrame: function () {
+			this.element.trigger("showSelectedUpdates");
+		},
+
+		refreshUpdatePanel: function () {
+			this.element.find("#versions input + label, input").remove();
+
+			if (this.options.numberOfUpdates > 0) {
+				for (var i = 1; i <= this.options.numberOfUpdates; i++) {
+					// TODO: find a better way to get the human readable version designation
+					var checkbox = $('<input data-version="' + i + '" class="highlight-button" type="checkbox"><label>1.' + i + '</label>');
+					this.element.find("#versions").append(checkbox);
+				}
+			}
 		}
 	});
 });

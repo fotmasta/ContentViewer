@@ -137,7 +137,7 @@ body.skin-Microsoft {
 		// only display the badge for new/updated top-level sections
 		.toc-label a .desc {
 			.badge {
-				display: inline-block !important;
+				display: inline-block;/* !important;*/
 			}
 		}
 
@@ -1467,6 +1467,21 @@ button#search-close {
 // hide the "Click here to view code image" things leftover from codeMantra ePubs
 .codelink {
 	display: none;
+}
+
+#versions {
+	height: 35px;
+	width: 100%;
+	background-color: lightgrey;
+	padding-top: 7px;
+
+	span {
+		margin-left: 1em;
+	}
+
+	input {
+		margin: 0 5px 0 15px;
+	}
 }
 
 /* CUP styling overrides */

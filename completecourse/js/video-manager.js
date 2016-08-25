@@ -200,6 +200,8 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 
 			$(".toc").on("downloadvideo", $.proxy(this.onDownloadVideo, this));
 
+			$(".toc").on("showSelectedUpdates", $.proxy(this.showSelectedUpdates, this));
+
 			window.onpopstate = function (event) {
 				var loc = document.location.search;
 				$("#video").VideoManager("tryToGotoLocationSearch", loc);
@@ -1566,6 +1568,18 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 
 		onDatabaseUpdate: function () {
 			$(".toc").TOCTree("setStatus", Database.getItems());
+		},
+
+		getSelectedUpdates: function () {
+			return $(".toc").TOCTree("getSelectedUpdates");
+		},
+
+		showSelectedUpdates: function () {
+			this.iframe.iFrameHolder("showSelectedUpdates");
+		},
+
+		getNumberOfUpdates: function () {
+			return $(".toc").TOCTree("getNumberOfUpdates");
 		}
 
 	});
