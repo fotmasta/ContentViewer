@@ -1470,10 +1470,11 @@ button#search-close {
 }
 
 #versions {
-	height: 35px;
+	height: auto;
 	width: 100%;
-	background-color: lightgrey;
-	padding-top: 7px;
+	background-color: #e0e0e0;
+	display: flex;
+	align-items: center;
 
 	span {
 		margin-left: 1em;
@@ -1481,6 +1482,15 @@ button#search-close {
 
 	input {
 		margin: 0 5px 0 15px;
+	}
+
+	label {
+		margin-bottom: 0;
+	}
+
+	&.hidden {
+		height: 0;
+		overflow: hidden;
 	}
 }
 

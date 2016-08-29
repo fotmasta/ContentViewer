@@ -172,9 +172,15 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 		$("#video").outerHeight(wh - 50);
 		$("#sidebar").outerHeight(wh - 50);
 
-		// kludge to subtract main menu bar and course progress and version (if applicable)
-		// TODO: only if versions are > 0
-		$("#contents .scroller").height(wh - 50 - 46 - 35);
+		if ($(".toc").TOCTree("instance")) {
+			var numUpdates = $(".toc").TOCTree("getNumberOfUpdates");
+			if (numUpdates == 0) {
+				$("#versions").addClass("hidden");
+			}
+		}
+
+		var hh = $("#header-nav").outerHeight() + $(".course-progress").outerHeight() + $("#versions").outerHeight();
+		$("#contents .scroller").height(wh - hh);
 
 		$("#main_video").css("max-height", wh - 50);
 
@@ -355,7 +361,7 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 
 		addIDsToTOC(metadata);
 
-		$(".toc").TOCTree({ type: "habitat", skin: manifest.skin, data: data, metadata: metadata, expander: "#collapse-button" });
+		$(".toc").TOCTree({ type: "habitat", skin: manifest.skin, data: data, metadata: metadata, expander: "#collapse-button", updateLabels: manifest.updateLabels });
 
 		var settings = { toc: metadata, el: "#video video", player: videojs("main_video"), markers: [], options: manifest };
 		$("#video").VideoManager(settings);
@@ -632,7 +638,7 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 		},
 
 		setSearchIndex: function (data) {
-			// TODO: make sure toc has been initialized; if not, set a callback
+			// make sure toc has been initialized; if not, set a callback
 			var isInitialized = $(".toc").data("que-TOCTree");
 			if (isInitialized) {
 				$(".toc").TOCTree("setSearchIndex", data);

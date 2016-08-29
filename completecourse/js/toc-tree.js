@@ -874,10 +874,14 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 			}
 
 			this.refreshUpdateBadgesInFrame();
+
+			var version = $(event.target).attr("data-version");
+
+			ga("send", "event", "interface", "history_toggle", version);
 		},
 
 		getNumberOfUpdates: function () {
-			return this.options.numberOfUpdates;
+			return this.options.numberOfUpdates === undefined ? 0 : this.options.numberOfUpdates;
 		},
 
 		getSelectedUpdates: function () {
@@ -893,8 +897,12 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 
 			if (this.options.numberOfUpdates > 0) {
 				for (var i = 1; i <= this.options.numberOfUpdates; i++) {
-					// TODO: find a better way to get the human readable version designation
-					var checkbox = $('<input data-version="' + i + '" class="highlight-button" type="checkbox"><label>1.' + i + '</label>');
+					var label = "1." + i;
+					if (this.options.updateLabels && this.options.updateLabels.length == this.options.numberOfUpdates) {
+						// get the human readable version
+						label = this.options.updateLabels[i - 1];
+					}
+					var checkbox = $('<input data-version="' + i + '" class="highlight-button" type="checkbox" checked><label>' + label + '</label>');
 					this.element.find("#versions").append(checkbox);
 				}
 			}
