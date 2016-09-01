@@ -247,3 +247,4 @@
 // DONE: make room for the versions checkboxes in the scrolling sidebar
 // DONE: add no-badge style to cup.css (and Habitat titles)
 // DONE: track version # checkbox clicks
+// DONE: add .cup-new, etc. to section (for tips)
