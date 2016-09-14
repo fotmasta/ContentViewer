@@ -11,6 +11,10 @@ Update History:
     color: black;
 }
 
+.table-b.update-history ul {
+    color: black;
+}
+
 .table-b.update-history td:first-child {
     white-space: nowrap;
     padding: 0 .5em;
