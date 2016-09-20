@@ -42,4 +42,10 @@ aside.cup-delete CUP Delete
 aside.cup-rev-1 CUP Rev 1
 aside.cup-rev-2 CUP Rev 2
 
+h2.cup-new CUP New
+h2.cup-change CUP Change
+h2.cup-delete CUP Delete
+h2.cup-rev-1 CUP Rev 1
+h2.cup-rev-2 CUP Rev 2
+
 /* CUP Flags */

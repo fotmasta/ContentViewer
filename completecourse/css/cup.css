@@ -156,7 +156,7 @@ figure.cup-new:not(.no-badge):before {
     top: -2em;
 }
 
-body.cup-new:not(.no-badge):before, section.cup-new:not(.no-badge):before, figure.cup-new:not(.no-badge):before, p.cup-new:not(.no-badge):before, aside.cup-new:not(.no-badge):before {
+body.cup-new:not(.no-badge):before, section.cup-new:not(.no-badge):before, figure.cup-new:not(.no-badge):before, p.cup-new:not(.no-badge):before, aside.cup-new:not(.no-badge):before, h2.cup-new:not(.no-badge):before {
     content: "New";
     display: block;
     position: absolute;
@@ -172,6 +172,14 @@ body.cup-new:not(.no-badge):before, section.cup-new:not(.no-badge):before, figur
 aside.cup-new:not(.no-badge):before {
     left: -5px;
     transform: translateX(-100%) rotate(-15deg);
+}
+
+h2.cup-new:not(.no-badge) {
+    position: relative;
+}
+
+h2.cup-new:not(.no-badge):before {
+    top: 2em;
 }
 
 ol figure.cup-new:not(.no-badge):before {
