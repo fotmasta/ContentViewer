@@ -106,25 +106,31 @@ span.cup-new:not(.no-badge) {
 }
 
 div.cup-new:not(.no-badge), li.cup-new:not(.no-badge), p.cup-new:not(.no-badge) {
-    background-color: #E8DB18;
-    border-left: 5px solid #1EC711;
-    padding: 1em .5em;
-    margin-top: 2em;
+    border-left: 4px solid #E8DB18;
+    padding-left: 8px;
+    margin-left: -8px;
+    position: relative;
+}
+
+p.cup-new:not(.no-badge):before {
+    left: -.5em;
+    top: 3em;
 }
 
 section.cup-new:not(.no-badge) {
     position: relative;
-    border: 2px dashed #E8DB18;
+    border-left: 4px solid #E8DB18;
+    padding-left: 4px;
+    margin-left: -4px;
 }
 
 section.cup-new:not(.no-badge):before {
-    left: -1.5em;
-    top: 1.5em;
+    left: -.5em;
+    top: 3em;
 }
 
 section.cup-change:not(.no-badge) {
     position: relative;
-    border: 2px dashed #6f8e6e;
 }
 
 body.cup-new:not(.no-badge):before {
@@ -160,7 +166,7 @@ body.cup-new:not(.no-badge):before, section.cup-new:not(.no-badge):before, figur
     content: "New";
     display: block;
     position: absolute;
-    padding: 0 1em;
+    padding: 0 .5em;
     border-radius: 1em;
     font-size: 14pt;
     background-color: #E8DB18;
@@ -169,8 +175,12 @@ body.cup-new:not(.no-badge):before, section.cup-new:not(.no-badge):before, figur
     text-indent: 0;
 }
 
+aside.cup-new:not(.no-badge) {
+    position: relative;
+}
+
 aside.cup-new:not(.no-badge):before {
-    left: -5px;
+    left: 5px;
     transform: translateX(-100%) rotate(-15deg);
 }
 
