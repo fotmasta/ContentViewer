@@ -1,4 +1,4 @@
-define(["database", "common", "jquery.ui", "video-manager", "firebase", "firebase3"], function (Database, Common) {
+define(["database", "common", "jquery.ui", "video-manager"], function (Database, Common) {
 
 	function findParentComment (el) {
 		var this_el = el;
@@ -13,16 +13,6 @@ define(["database", "common", "jquery.ui", "video-manager", "firebase", "firebas
 		}
 
 		return parentComment;
-	}
-
-	function initializeFirebaseApp () {
-		var config = {
-			apiKey: "AIzaSyAZQ32Kl7R85rXw3KDVAjl3oWkqkzlCpz4",
-			authDomain: "ptg-comments.firebaseapp.com",
-			databaseURL: "https://ptg-comments.firebaseio.com",
-			storageBucket: "ptg-comments.appspot.com",
-		};
-		firebase.initializeApp(config);
 	}
 
 	$.widget("que.Comments", {
@@ -46,8 +36,6 @@ define(["database", "common", "jquery.ui", "video-manager", "firebase", "firebas
 			if (this.options.manager) {
 				this.options.manager.on("onNewTOC", $.proxy(this.showCurrentAnchorTitle, this));
 			}
-
-			initializeFirebaseApp();
 		},
 
 		clearComments: function () {

@@ -31,8 +31,7 @@ requirejs.config({
 		"videojs": "video",
 		"videojs-markers": "videojs-markers",
 		"handlebars": "handlebars-v3.0.3",
-		"lunr": "lunr.min",
-		"firebase": "https://cdn.firebase.com/js/client/2.3.2/firebase"
+		"lunr": "lunr.min"
 	},
 	shim: {
 		"jquery": {
@@ -88,9 +87,6 @@ requirejs.config({
 		},
 		"handlebars": {
 			exports: "Handlebars"
-		},
-		"firebase": {
-			export: "Firebase"
 		}
 	},
 	// this fixed the "appending .js" problem I was getting on informit.com

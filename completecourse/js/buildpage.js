@@ -29,8 +29,9 @@ requirejs.config({
 		"videojs-markers": "videojs-markers",
 		"handlebars": "handlebars-v3.0.3",
 		"lunr": "lunr.min",
-		"firebase": "https://cdn.firebase.com/js/client/2.3.2/firebase",
-		"firebase3": "https://www.gstatic.com/firebasejs/live/3.0/firebase"
+		"firebase/app": "https://www.gstatic.com/firebasejs/3.4.0/firebase-app",
+		"firebase/auth": "https://www.gstatic.com/firebasejs/3.4.0/firebase-auth",
+		"firebase/database": "https://www.gstatic.com/firebasejs/3.4.0/firebase-database"
 	},
 	shim: {
 		"jquery": {
@@ -90,10 +91,13 @@ requirejs.config({
 		"handlebars": {
 			exports: "Handlebars"
 		},
-		"firebase": {
-			export: "Firebase"
+		"firebase/app": {
+			export: "firebase"
 		},
-		"firebase3": {
+		"firebase/auth": {
+			export: "firebase"
+		},
+		"firebase/database": {
 			export: "firebase"
 		}
 	},

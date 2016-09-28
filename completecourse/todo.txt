@@ -2,8 +2,6 @@
 // TODO: iOS TOC syncing to TOC is doing some strange scrolling
 // TODO: see if there are extra pages being pushed into the browser history that can be eliminated to make "Back" more streamlined
 // TODO: sometimes the quizzerator doesn't seem to initialize with data
-// TODO: Habitat quizzes do not seem to be loading in Safari (iOS or Mac)
-// TODO: test fallback when Firebase errors out due to max concurrent users
 // TODO: think about security considerations for user data (logged in? using id? more?)
 // TODO: test transcript/captioning [check]/quizzes on iOS
 // TODO: use latest videojs?
@@ -248,3 +246,8 @@
 // DONE: add no-badge style to cup.css (and Habitat titles)
 // DONE: track version # checkbox clicks
 // DONE: add .cup-new, etc. to section (for tips)
+// DONE: Callout Maker "black lines" setting doesn't seem to be set in the UI upon reload
+// DONE: upgrade to Firebase 3.4
+// DONE: use Firebase signOut on Window.close to cut down on # of connections?
+// DONE: test fallback when Firebase errors out due to max concurrent users
+// DONE: Habitat quizzes do not seem to be loading in Safari (iOS or Mac) [.json file extension problem on server; just renamed files to .js]

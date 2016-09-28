@@ -1,4 +1,4 @@
-define(["common", "jquery.json", "firebase"], function (Common) {
+define(["common", "jquery.json", "firebase/app", "firebase/auth", "firebase/database"], function (Common) {
 
 	function shrink (itemsArray) {
 		var s = [];
@@ -27,6 +27,32 @@ define(["common", "jquery.json", "firebase"], function (Common) {
 			itemsArray[i] = obj;
 		}
 		return itemsArray;
+	}
+
+	function initializeFirebaseApp () {
+		var config = {
+			apiKey: "AIzaSyAZQ32Kl7R85rXw3KDVAjl3oWkqkzlCpz4",
+			authDomain: "ptg-comments.firebaseapp.com",
+			databaseURL: "https://ptg-comments.firebaseio.com",
+			storageBucket: "ptg-comments.appspot.com",
+		};
+
+		firebase.initializeApp(config);
+	}
+
+	function signinToFirebase () {
+		firebase.auth().signInAnonymously().catch(function (error) {
+			// Handle Errors here.
+			var errorCode = error.code;
+			var errorMessage = error.message;
+			console.log("error signing in");
+			console.log(error);
+		});
+	}
+
+	function signoutFromFirebase () {
+		console.log("ok");
+		firebase.auth().signOut();
 	}
 
 	var Database = {
@@ -184,22 +210,30 @@ define(["common", "jquery.json", "firebase"], function (Common) {
 		},
 
 		authorize: function () {
-			this.databaseRef = new Firebase("https://ptg-comments.firebaseio.com");
-			this.databaseRef.authAnonymously($.proxy(this.onAuthorizedCallback, this));
+			initializeFirebaseApp();
+
+			signinToFirebase();
+
+			firebase.auth().onAuthStateChanged($.proxy(this.onAuthorizedCallback, this));
+
+			window.onbeforeunload = signoutFromFirebase;
+
+			//this.databaseRef = new Firebase("https://ptg-comments.firebaseio.com");
+			//this.databaseRef.authAnonymously($.proxy(this.onAuthorizedCallback, this));
 		},
 
-		onAuthorizedCallback: function (error, authData) {
-			if (error) {
-				console.log("Login Failed!", error);
-			} else {
-				this.remoteAuthorized = true;
+		onAuthorizedCallback: function (user) {
+			this.databaseRef = firebase.database().ref();
 
-				this.loadFromRemoteStorage();
+			this.remoteAuthorized = true;
 
-				for (var i = 0; i < this.callbacks.length; i++) {
-					this.callbacks[i]();
-				}
+			this.loadFromRemoteStorage();
+
+			for (var i = 0; i < this.callbacks.length; i++) {
+				this.callbacks[i]();
 			}
+
+			this.callbacks = [];
 		},
 
 		onAuthorized: function (callback) {
@@ -208,6 +242,10 @@ define(["common", "jquery.json", "firebase"], function (Common) {
 			} else {
 				this.callbacks.push(callback);
 			}
+		},
+
+		callWhenReady: function (callback) {
+			this.callbacks.push(callback);
 		},
 
 		setCustomerID: function (id) {
@@ -260,24 +298,36 @@ define(["common", "jquery.json", "firebase"], function (Common) {
 		},
 
 		setUserData: function (key, value) {
-			if (this.customerID) {
-				this.databaseRef.child("users/" + this.customerID + "/userdata").child(key).set(value);
+			if (!this.remoteAuthorized) {
+				this.callWhenReady($.proxy(this.setUserData, this, key, value));
+			} else {
+				if (this.customerID) {
+					this.databaseRef.child("users/" + this.customerID + "/userdata").child(key).set(value);
+				}
 			}
 		},
 
 		getUserData: function (key, callback) {
-			if (this.customerID) {
-				this.databaseRef.child("users/" + this.customerID + "/userdata").child(key).once("value", function (snapshot) {
-					var item = snapshot.val();
+			if (!this.remoteAuthorized) {
+				this.callWhenReady($.proxy(this.getUserData, this, key, callback));
+			} else {
+				if (this.customerID) {
+					this.databaseRef.child("users/" + this.customerID + "/userdata").child(key).once("value", function (snapshot) {
+						var item = snapshot.val();
 
-					callback(item);
-				});
+						callback(item);
+					});
+				}
 			}
 		},
 
 		getTitleData: function (callback) {
-			if (this.customerID) {
-				this.databaseRef.child("users/" + this.customerID).once("value", callback);
+			if (!this.remoteAuthorized) {
+				this.callWhenReady($.proxy(this.getTitleData, this, callback));
+			} else {
+				if (this.customerID) {
+					this.databaseRef.child("users/" + this.customerID).once("value", callback);
+				}
 			}
 		},
 
