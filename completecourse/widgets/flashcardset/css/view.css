@@ -100,7 +100,7 @@ body {
   transform-style: preserve-3d;
   -webkit-transform-style: preserve-3d;
   cursor: pointer;
-  backface-visibility: hidden; }
+  /*backface-visibility: hidden;*/ }
   .card.animated {
     transition: transform .5s ease-out;
     -webkit-transition: -webkit-transform .5s ease-out; }
@@ -142,8 +142,7 @@ body {
     .card .cardface.front {
       background-color: #ffead1;
       -webkit-backface-visibility: hidden;
-      -moz-backface-visibility: hidden;
-      z-index: 2; }
+      -moz-backface-visibility: hidden; }
       .card .cardface.front h1 {
         font-size: 64px; }
     .card .cardface.back {

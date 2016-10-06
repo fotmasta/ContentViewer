@@ -84,10 +84,12 @@ define(["textfit", "dots", "jquery"], function (textFit) {
 		for (i = 0; i < _settings.cards.length; i++) {
 			var card = _settings.cards[i];
 			var ch = card.chapters;
-			for (var j = 0; j < ch.length; j++) {
-				var c = ch[j].toString();
-				if (chapters.indexOf(c) === -1) {
-					chapters.push(c);
+			if (ch) {
+				for (var j = 0; j < ch.length; j++) {
+					var c = ch[j].toString();
+					if (chapters.indexOf(c) === -1) {
+						chapters.push(c);
+					}
 				}
 			}
 		}
@@ -111,6 +113,10 @@ define(["textfit", "dots", "jquery"], function (textFit) {
 		_settings.el.find("#chapter-count span.badge").text(chapters.length);
 
 		_settings.selectedChapters = chapters;
+
+		if (chapters.length == 0) {
+			_settings.el.find("#chapter-chooser").css("display", "none");
+		}
 	}
 
 	function seedCardOrder () {
@@ -168,6 +174,8 @@ define(["textfit", "dots", "jquery"], function (textFit) {
 	}
 
 	function initialize (data) {
+		_currentCardIndex = -1;
+
 		_settings = data;
 
 		_settings.cardOrder = [];
@@ -237,10 +245,15 @@ define(["textfit", "dots", "jquery"], function (textFit) {
 	function isValid (card) {
 		var ok = false;
 
-		for (var i = 0; i < card.chapters.length; i++) {
-			var ch = card.chapters[i].toString();
-			if (_settings.selectedChapters.indexOf(ch) != -1)
-				ok = true;
+		if (card.chapters) {
+			for (var i = 0; i < card.chapters.length; i++) {
+				var ch = card.chapters[i].toString();
+				if (_settings.selectedChapters.indexOf(ch) != -1)
+					ok = true;
+			}
+		} else {
+			// not chapter-specific
+			ok = true;
 		}
 
 		if (_settings.hideMastered && card.mastered == true)
