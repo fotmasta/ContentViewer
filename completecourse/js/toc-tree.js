@@ -1,6 +1,4 @@
 define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
-	var tabindex = 0;
-
 	// case-insensitive search (found on web)
 	$.extend($.expr[":"], {
 		"containsNC": function (elem, i, match, array) {
@@ -305,7 +303,7 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 				d.node.depth = depth;
 				d.node.index = params.counter;
 
-				li = $("<li>", { tabindex: tabindex++ });
+				li = $("<li>", { tabindex: 10 });
 				dest.append(li);
 
 				if (d && d.children && d.children.length > 0) {
@@ -457,7 +455,6 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 								event.preventDefault();
 								event.stopPropagation();
 								var index = $(event.target).attr("data-index");
-								console.log(index);
 								me.launchVideo(index, {toggle:false}, event);
 							}
 						});
@@ -556,7 +553,7 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 
 			if (!this.searchIndex) {
 				this.searchByTitles(term);
-				this.element.parent().find(".toc").show("slide");
+				//this.element.parent().find(".toc").show("slide");
 				return;
 			}
 
@@ -583,7 +580,7 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 					var label = MakeAShortLabelForSearchResults(node);
 					var section_label = " <p class='section-label'>" + label + "</p>";
 					var hit_label = "<p class='hit-label'>" + hit.desc + "</p>";
-					var hitResult = $("<div>", {class: "hit", tabindex: 0, html: section_label + hit_label}).data("index", index);
+					var hitResult = $("<div>", {class: "hit", tabindex: 10, html: section_label + hit_label}).data("index", index);
 					var me = this;
 					hitResult.click(function (event) {
 						var index = $(this).data("index");
@@ -605,19 +602,36 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 				this.showSearchPane(results.length);
 			} else {
 				$("#hit-count").text("");
+				$("button#search-previous").addClass("disabled");
+				$("button#search-next").addClass("disabled");
 			}
 		},
 
 		showSearchPane: function (resultCount) {
-			this.element.parent().find(".toc").hide("slide");
+			this.element.parent().find(".search-results").attr("aria-expanded", true);
+
+			//this.element.parent().find(".toc").hide("slide");
 			this.element.parent().find(".search-results").delay(300).show("slide");
 
 			if (resultCount == undefined) {
 				$("#hit-count").text("");
+
+				$("button#search-previous").addClass("disabled");
+				$("button#search-next").addClass("disabled");
 			} else {
 				var lbl = resultCount + " result" + (resultCount != 1 ? "s" : "");
 
 				$("#hit-count").text(lbl);
+
+				if (resultCount > 0) {
+					$("button#search-previous").removeClass("disabled");
+					$("button#search-next").removeClass("disabled");
+				} else {
+					$("button#search-previous").addClass("disabled");
+					$("button#search-next").addClass("disabled");
+
+					$(".search-result-list").append("<p class='blocky text-center'>No results found. Try a different search?</p>");
+				}
 			}
 
 			// NOTE: this is a terrible kludge to try to get the search results to appear (a timeout missing or less than 500 would leave the .search-results with display: none, for some reason)
@@ -632,10 +646,12 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 		},
 
 		closeSearch: function () {
+			this.element.parent().find(".search-results").attr("aria-expanded", false);
+
 			if (!this.searchIndex) {
 				this.searchByTitles("");
 			} else {
-				this.element.parents("#contents").find(".toc").delay(300).show("slide");
+				//this.element.parents("#contents").find(".toc").delay(300).show("slide");
 				this.element.parents("#contents").find(".search-results").hide("slide");
 				this.element.trigger("closesearch");
 			}
@@ -717,7 +733,7 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 			var checked = el.find("> i.checked");
 			checked.remove();
 
-			el.append("<i class='checked fa fa-adjust fa-flip-horizontal' title='Progress started.'></i>");
+			el.append("<i class='checked fa fa-adjust fa-flip-horizontal' title='Progress started.' aria-label='Section started'></i>");
 		},
 
 		markCompleted: function (index) {
@@ -737,12 +753,12 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 			if (el.find("ul li").length) {
 				var childrenComplete = this.checkForAllChildrenComplete(index);
 				if (childrenComplete) {
-					el.append("<i class='checked fa fa-check-circle' title='Progress completed.'></i>");
+					el.append("<i class='checked fa fa-check-circle' title='Progress completed.' aria-label='Section completed'></i>");
 				} else {
-					el.append("<i class='checked fa fa-adjust fa-flip-horizontal' title='Progress started.'></i>");
+					el.append("<i class='checked fa fa-adjust fa-flip-horizontal' title='Progress started.' aria-label='Section started'></i>");
 				}
 			} else {
-				el.append("<i class='checked fa fa-check-circle' title='Progress completed.'></i>");
+				el.append("<i class='checked fa fa-check-circle' title='Progress completed.' aria-label='Section completed'></i>");
 			}
 
 			a.removeClass("completed").addClass("completed");
@@ -773,7 +789,7 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 			var checked = el.find("> i.checked");
 			checked.remove();
 
-			el.append("<i class='checked fa fa-adjust fa-flip-horizontal' title='Progress started.'></i>");
+			el.append("<i class='checked fa fa-adjust fa-flip-horizontal' title='Progress started.' aria-label='Section started'></i>");
 
 			a.removeClass("completed");
 		},

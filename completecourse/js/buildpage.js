@@ -119,6 +119,8 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 
 	var optionsTitle;
 
+	$("body").css("opacity", 0);
+
 	function initialize () {
 		onResize();
 
@@ -232,6 +234,8 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 			}
 
 			contentsPaneDesiredVisible = undefined;
+
+			$("body").css("opacity", 1);
 		});
 		func();
 	}
@@ -342,7 +346,7 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 
 		$(".resource-list").TOCTree();
 
-		var settings = { toc: metadata.toc, el: "#video video", player: videojs("main_video"), markers: metadata.markers, options: manifest };
+		var settings = { toc: metadata.toc, el: "#video video", player: videojs("main_video", { controls: true, playbackRates: [0.5, .75, 1, 1.5, 2] }), markers: metadata.markers, options: manifest };
 		$("#video").VideoManager(settings);
 
 		//VideoManager.initialize(metadata.toc, "#video video", videojs("main_video"), metadata.markers, manifest);
@@ -367,7 +371,7 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 
 		$(".toc").TOCTree({ type: "habitat", skin: manifest.skin, data: data, metadata: metadata, expander: "#collapse-button", updateLabels: manifest.updateLabels });
 
-		var settings = { toc: metadata, el: "#video video", player: videojs("main_video"), markers: [], options: manifest };
+		var settings = { toc: metadata, el: "#video video", player: videojs("main_video", { controls: true, playbackRates: [0.5, .75, 1, 1.5, 2] }), markers: [], options: manifest };
 		$("#video").VideoManager(settings);
 
 		//VideoManager.initialize(metadata, "#video video", videojs("main_video"), [], manifest);
@@ -384,7 +388,7 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 
 		$(".toc").TOCTree({ type: "epub", skin: manifest.skin, data: metadata, metadata: metadata, expander: "#collapse-button" });
 
-		var settings = { toc: metadata, el: "#video video", player: videojs("main_video"), markers: [], options: manifest };
+		var settings = { toc: metadata, el: "#video video", player: videojs("main_video", { controls: true, playbackRates: [0.5, .75, 1, 1.5, 2] }), markers: [], options: manifest };
 		$("#video").VideoManager(settings);
 
 		//VideoManager.initialize(metadata, "#video video", videojs("main_video"), [], manifest);
@@ -483,6 +487,13 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 		$("#toc-toggler").toggleClass("open");
 
 		onResize();
+
+		if (contentsPaneDesiredVisible) {
+			setTimeout(function () {
+				var index = $("#video").VideoManager("getCurrentIndex");
+				$(".toc-holder li").eq(index).focus();
+			}, 0);
+		}
 	}
 
 	function onOpenTOC () {
@@ -497,7 +508,9 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 	}
 
 	function onSearch () {
-		onOpenTOC();
+		//onOpenTOC();
+		resizePanes(true, false);
+		onResize();
 
 		var term = $("#query").val();
 
@@ -520,6 +533,17 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 
 	function onCloseSearch () {
 		$(".toc").TOCTree("closeSearch");
+
+		//$(".toc").show("slide");
+
+		if ($("#toc-toggler").hasClass("open")) {
+			//onOpenTOC();
+			resizePanes(true, false);
+		} else {
+			resizePanes(false, false);
+		}
+
+		onResize();
 	}
 
 	function onClearSearch () {

@@ -46,8 +46,8 @@ ol.list-no-style li.cup-change:not(.no-badge):after, ol.list-no-style li p.cup-c
 }
 
 div.cup-change:not(.no-badge), li.cup-change:not(.no-badge), p.cup-change:not(.no-badge) {
-    background-color: #BEF3BC;
-    padding: 1em .5em;
+    border-left: 4px solid #BEF3BC;
+    padding-left: .5em;
     margin-top: 1.5em;
     position: relative;
 }
