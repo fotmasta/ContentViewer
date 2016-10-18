@@ -1,5 +1,5 @@
-<nav id="header-nav" class="navbar navbar-inverse navbar-fixed-top" role="navigation">
-	<button id="toc-toggler" tabindex=1 data-coach="Show and hide the Table of Contents." data-coach-pos="bottom" title="Show and hide the Table of Contents." class="btn btn-primary pull-left open"><i class="fa fa-bars"></i></button>
+<nav id="header-nav" class="navbar navbar-inverse navbar-fixed-top">
+	<button id="toc-toggler" tabindex=1 aria-controls="contents-pane" aria-expanded="true" data-coach="Show and hide the Table of Contents." data-coach-pos="bottom" title="Show and hide the Table of Contents." class="btn btn-primary pull-left open"><i class="fa fa-bars"></i></button>
 	<div class="navbar-header">
 		<button id="show-menu-button" title="Show the menu." data-coach-pos="bottom" class="navbar-toggle btn btn-info" data-toggle="collapse" data-target="#collapsible-menu">
 			<span class="fa fa-sort-down"></span>
@@ -28,7 +28,7 @@
 <div id="main" class="container-fluid invisible">
 	<div class="row">
 		<div id="contents" class="col-xs-3">
-			<div class="toc" id="contents-pane">
+			<div class="toc" id="contents-pane" role="navigation">
 				<div class="course-progress">
 					<button id="collapse-button" tabindex=3 title="Expand or collapse contents list." class="btn btn-primary btn-xs pull-left"><i class="fa fa-lg fa-caret-up"></i></button>
 					<div class="progress" data-progress="0% Complete">
@@ -38,7 +38,7 @@
 					<div class="clearfix"></div>
 				</div>
 				<div class="scroller">
-					<ul class="nav nav-list toc-holder">
+					<ul class="nav nav-list toc-holder" role="tree">
 					</ul>
 				</div>
 				<div id="versions">

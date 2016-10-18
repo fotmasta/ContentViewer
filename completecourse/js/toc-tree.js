@@ -195,11 +195,13 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 			if (index == 0 && toggle) vis = !vis;
 
 			if (vis) {
-				el.parent("li").find(".dropper.opened").first().show(0);
-				el.parent("li").find(".dropper.closed").first().hide(0);
+				li.find(".dropper.opened").first().show(0);
+				li.find(".dropper.closed").first().hide(0);
+				li.attr("aria-expanded", true);
 			} else {
-				el.parent("li").find(".dropper.opened").first().hide(0);
-				el.parent("li").find(".dropper.closed").first().show(0);
+				li.find(".dropper.opened").first().hide(0);
+				li.find(".dropper.closed").first().show(0);
+				li.attr("aria-expanded", false);
 			}
 		});
 	}
@@ -303,7 +305,7 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 				d.node.depth = depth;
 				d.node.index = params.counter;
 
-				li = $("<li>", { tabindex: 10 });
+				li = $("<li>", { tabindex: 10, role: "treeitem" });
 				dest.append(li);
 
 				if (d && d.children && d.children.length > 0) {
@@ -318,7 +320,7 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 					dropper.click(toggleDropper);
 					linkholder.append(dropper);
 
-					var ul = $("<ul>", {class: "nav nav-list tree"});
+					var ul = $("<ul>", {class: "nav nav-list tree", role: "group"});
 					li.append(ul);
 
 					for (var i = 0; i < d.children.length; i++) {
@@ -396,7 +398,7 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 						}
 					} else if (this.options.type == "epub") {
 						short_label = depth[depth.length - 1];
-						short.html(short_label).addClass("invisible");
+						short.html(short_label);//.addClass("invisible");
 					} else {
 						short.addClass("invisible");
 						/* not using this (was for videos)
@@ -846,6 +848,8 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 			this.holder.find("> li > ul").hide(300);
 			this.holder.find(".dropper.opened").hide(0);
 			this.holder.find(".dropper.closed").show(0);
+
+			this.holder.find("li").attr("aria-expanded", false);
 		},
 
 		expandTOC: function () {
@@ -853,6 +857,8 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 			this.holder.find("li ul").show(300);
 			this.holder.find(".dropper.opened").show(0);
 			this.holder.find(".dropper.closed").hide(0);
+
+			this.holder.find("li").attr("aria-expanded", true);
 		},
 
 		expandOrCollapse: function (event) {
@@ -863,6 +869,10 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 			} else {
 				this.expandTOC();
 			}
+		},
+
+		refreshAllDroppers: function (index) {
+			refreshDropperStatus(this.element, false);
 		},
 
 		onClickDownload: function (file, event) {

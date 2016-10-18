@@ -1335,6 +1335,8 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 
 				if (isNew) {
 					entry.parents("li").find("> ul").show(300);
+
+					$(".toc").TOCTree("refreshAllDroppers", index);
 				}
 
 				var scroller = $("#contents-pane .scroller");

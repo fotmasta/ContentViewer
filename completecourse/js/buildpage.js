@@ -201,9 +201,9 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 
 	function matchToggleButtonToVisibility () {
 		if ($("#contents").hasClass("col-xs-0")) {
-			$("#toc-toggler").removeClass("open");
+			$("#toc-toggler").removeClass("open").attr("aria-expanded", false);
 		} else {
-			$("#toc-toggler").addClass("open");
+			$("#toc-toggler").addClass("open").attr("aria-expanded", true);
 		}
 	}
 
@@ -486,6 +486,8 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 
 		$("#toc-toggler").toggleClass("open");
 
+		$("#toc-toggler").attr("aria-expanded", $("#toc-toggler").hasClass("open"));
+
 		onResize();
 
 		if (contentsPaneDesiredVisible) {
@@ -502,7 +504,7 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 
 		resizePanes(!contentsVisible, resourcesVisible);
 
-		$("#toc-toggler").addClass("open");
+		$("#toc-toggler").addClass("open").attr("aria-expanded", true);
 
 		onResize();
 	}
@@ -596,12 +598,12 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 			$("html").addClass("ui");
 
 			if (options.skin == "Microsoft") {
-				$("#show-comments-button").hide(0).attr("aria-hidden", true);
-				$("#account-button").hide(0).attr("aria-hidden", true);
-				$("#clear-search-button").hide(0).attr("aria-hidden", true);
-				$("#query").hide(0).attr("aria-hidden", true);
-				$("#comments-panel").attr("aria-hidden", true);
-				$("#account-panel").attr("aria-hidden", true);
+				$("#show-comments-button").hide(0).attr( { "aria-hidden": true, "hidden": true  });
+				$("#account-button").hide(0).attr( { "aria-hidden": true, "hidden": true  });
+				$("#clear-search-button").hide(0).attr( { "aria-hidden": true, "hidden": true  });
+				$("#query").hide(0).attr( { "aria-hidden": true, "hidden": true  });
+				$("#comments-panel").attr( { "aria-hidden": true, "hidden": true  });
+				$("#account-panel").attr( { "aria-hidden": true, "hidden": true  });
 
 				$("#query-too").attr("placeholder", "Enter search text");
 			}
