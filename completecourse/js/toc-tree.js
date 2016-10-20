@@ -255,10 +255,14 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 			var p = $("<p>", { id: "query-summary", class: "blocky", text: "" });
 			this.holder.append(p);
 
-			if (this.options.metadata.zipFile) {
-				var b = $('<button id="all-download" class="btn btn-success download-button" title="Download all video."><i class="fa fa-cloud-download"></i></button>');
-				b.click($.proxy(this.onClickDownload, this, this.options.metadata.zipFile));
+			if (this.options.metadata.bannerDownloadLink) {
+				var title = this.options.metadata.bannerDownloadLabel ? this.options.metadata.bannerDownloadLabel : "Download all video.";
+				var lbl = this.options.metadata.bannerDownloadLabel ? " " + this.options.metadata.bannerDownloadLabel : "";
+
+				var b = $('<button id="custom-download" class="btn btn-success download-button" title="' + title + '"><i class="fa fa-cloud-download"></i>' + lbl + '</button>');
+				b.click($.proxy(this.onClickDownload, this, this.options.metadata.bannerDownloadLink));
 				$("#header-nav .navbar-brand").append(b);
+
 			}
 		},
 

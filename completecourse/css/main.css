@@ -300,9 +300,12 @@ body.skin-Microsoft .iframe-holder > div {
   -webkit-perspective: 1000; }
 
 .nav-list {
-  position: relative; }
-  .nav-list li:focus {
-    outline: none; }
+  position: relative;
+  /*
+  li:focus {
+  	outline: none;
+  }
+  */ }
   .nav-list li.active {
     background-color: #f0f0f7; }
   .nav-list .divider {
@@ -444,9 +447,12 @@ ul.toc-holder {
   background-color: lightgrey; }
 
 #toc-toggler {
-  margin: 8px 0 0 8px; }
-  #toc-toggler:focus {
-    outline: none; }
+  margin: 8px 0 0 8px;
+  /*
+  &:focus {
+  	outline: none;
+  }
+  */ }
   #toc-toggler.open {
     background: white !important;
     color: #0078d7 !important; }

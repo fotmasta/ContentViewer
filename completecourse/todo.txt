@@ -255,3 +255,4 @@
 // DONE: Habitat quizzes do not seem to be loading in Safari (iOS or Mac) [.json file extension problem on server; just renamed files to .js]
 // DONE: flashcards widget back side is not clickable (in ContentViewer)
 // DONE: flashcards: don't advance when starting new set of flashcards (localStorage issue?; start over at first card?)
+// DONE: added download link option (from converter) to banner bar

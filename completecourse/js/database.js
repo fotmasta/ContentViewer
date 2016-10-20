@@ -51,7 +51,6 @@ define(["common", "jquery.json", "firebase/app", "firebase/auth", "firebase/data
 	}
 
 	function signoutFromFirebase () {
-		console.log("ok");
 		firebase.auth().signOut();
 	}
 

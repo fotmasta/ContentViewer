@@ -477,9 +477,11 @@ video {
 .nav-list {
 	position: relative;
 
+	/*
 	li:focus {
 		outline: none;
 	}
+	*/
 
 	li.active {
 		background-color: rgb(240, 240, 247);
@@ -701,9 +703,11 @@ ul.toc-holder {
 #toc-toggler {
 	margin: 8px 0 0 8px;
 
+	/*
 	&:focus {
 		outline: none;
 	}
+	*/
 
 	&.open {
 		background: white !important;
