@@ -39,11 +39,6 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 		url = url.replace(/\.xhtml/, ".html");
 
 		if (url) {
-			if (url.lastIndexOf) {
-
-			} else {
-				debugger;
-			}
 			var n = url.lastIndexOf("#");
 			if (n != -1) return url.substr(0, n);
 			else return url;
@@ -146,6 +141,22 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 		return textArea.value;
 	}
 
+	function iOSversion () {
+		if (/iP(hone|od|ad)/.test(navigator.platform)) {
+			// supports iOS 2.0 and later: <http://bit.ly/TJjs1V>
+			var v = (navigator.appVersion).match(/OS (\d+)_(\d+)_?(\d+)?/);
+			return [parseInt(v[1], 10), parseInt(v[2], 10), parseInt(v[3] || 0, 10)];
+		}
+
+		/* worked fine on my Safari 10.0.1, so disable this
+		if (/MacIntel/.test(navigator.platform)) {
+			if ( /10\.0\.1 Safari/.test(navigator.appVersion) ) {
+				return [10];
+			}
+		}
+		*/
+	}
+
 	$.widget("que.VideoManager", {
 		_create: function () {
 			this.initialize(this.options.toc, this.options.el, this.options.player, this.options.markers, this.options.options);
@@ -163,7 +174,7 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 				document.title = options.title;
 
 			Database.initialize(toc, options.title, $.proxy(this.onDatabaseUpdate, this));
-			$(".toc").TOCTree("setStatus", Database.getItems());
+			$(".toc#contents-pane").TOCTree("setStatus", Database.getItems());
 
 			this.updateProgress();
 
@@ -195,12 +206,13 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 			this.player.on("ended", $.proxy(this.onVideoEnded, this));
 			this.player.on("timeupdate", $.proxy(this.onVideoTimeUpdate, this));
 			this.player.on("loadedmetadata", $.proxy(this.onLoadedMetadata, this));
+			this.player.on("error", $.proxy(this.onVideoError, this));
 
-			$(".toc").on("playvideo", onPlayContent).on("closesearch", $.proxy(this.onCloseSearch, this));
+			$(".toc#contents-pane").on("playvideo", onPlayContent).on("closesearch", $.proxy(this.onCloseSearch, this));
 
-			$(".toc").on("downloadvideo", $.proxy(this.onDownloadVideo, this));
+			$(".toc#contents-pane").on("downloadvideo", $.proxy(this.onDownloadVideo, this));
 
-			$(".toc").on("showSelectedUpdates", $.proxy(this.showSelectedUpdates, this));
+			$(".toc#contents-pane").on("showSelectedUpdates", $.proxy(this.showSelectedUpdates, this));
 
 			window.onpopstate = function (event) {
 				var loc = document.location.search;
@@ -426,14 +438,28 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 
 			var src = this.toc[index].video;
 
+			var dontUseiOS10Patch = $("html").hasClass("dontUseiOS10Patch");
+
 			if (src.indexOf(".mov") != -1 || src.indexOf(".mp4") != -1) {
-				this.player.src({type: "video/mp4", src: src});
+				var ver = iOSversion();
+				if (ver && ver[0] >= 10 && !dontUseiOS10Patch) {
+					this.playRedirectedURL(src);
+				} else {
+					this.player.src({type: "video/mp4", src: src});
+				}
 			} else {
-				this.player.src([
-					{type: "video/mp4", src: src + ".mp4"},
-					{type: "video/webm", src: src + ".webm"},
-					{type: "video/ogg", src: src + ".ogv"}
-				]);
+				var ver = iOSversion();
+				console.log("vers: " + ver);
+
+				if (ver && ver[0] >= 10 && !dontUseiOS10Patch) {
+					this.playRedirectedURL(src + ".mp4");
+				} else {
+					this.player.src([
+						{type: "video/mp4", src: src + ".mp4"},
+						{type: "video/webm", src: src + ".webm"},
+						{type: "video/ogg", src: src + ".ogv"}
+					]);
+				}
 			}
 
 			if (options && options.time) {
@@ -765,6 +791,10 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 			this.advanceTOC();
 		},
 
+		onVideoError: function (error) {
+			console.log("Sorry. Video playback error.");
+		},
+
 		onPageScrolledToEnd: function () {
 			this.markItemCompleted(this.currentIndex);
 
@@ -778,7 +808,7 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 			var completed = Database.getItemProperty(index, "completed");
 			if (!completed) {
 				Database.setItemProperty(index, "started", true);
-				$(".toc").TOCTree("markStarted", index);
+				$(".toc#contents-pane").TOCTree("markStarted", index);
 			}
 		},
 
@@ -792,7 +822,7 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 
 		markItemCompleted: function (index) {
 			Database.setItemProperty(index, "completed", true);
-			$(".toc").TOCTree("markCompleted", index);
+			$(".toc#contents-pane").TOCTree("markCompleted", index);
 
 			// for videos, check to see if all of this item's parent's children are complete
 			switch (this.options.type) {
@@ -813,7 +843,7 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 
 		markItemIncomplete: function (index) {
 			Database.setItemProperty(index, "completed", false);
-			$(".toc").TOCTree("markIncomplete", index);
+			$(".toc#contents-pane").TOCTree("markIncomplete", index);
 
 			this.updateProgress();
 		},
@@ -825,7 +855,7 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 
 		updateProgress: function () {
 			var pct = Math.round(Database.getPercentageComplete() * 100);
-			$("#completed-progress").css("width", pct + "%");
+			$("#completed-progress").css("width", pct + "%").attr("aria-valuenow", pct);
 			// this is used by .progress::after (works on all browsers?)
 			$(".progress").attr("data-progress", pct + "% Complete");
 		},
@@ -1328,15 +1358,15 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 					this.element.trigger("onNewTOC");
 				}
 
-				var entry = $(".toc li[data-index=" + index + "]");
+				var entry = $(".toc#contents-pane li[data-index=" + index + "]");
 
-				$(".toc .current").removeClass("current");
+				$(".toc#contents-pane .current").removeClass("current");
 				entry.addClass("current");
 
 				if (isNew) {
 					entry.parents("li").find("> ul").show(300);
 
-					$(".toc").TOCTree("refreshAllDroppers", index);
+					$(".toc#contents-pane").TOCTree("refreshAllDroppers", index);
 				}
 
 				var scroller = $("#contents-pane .scroller");
@@ -1569,11 +1599,11 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 		},
 
 		onDatabaseUpdate: function () {
-			$(".toc").TOCTree("setStatus", Database.getItems());
+			$(".toc#contents-pane").TOCTree("setStatus", Database.getItems());
 		},
 
 		getSelectedUpdates: function () {
-			return $(".toc").TOCTree("getSelectedUpdates");
+			return $(".toc#contents-pane").TOCTree("getSelectedUpdates");
 		},
 
 		showSelectedUpdates: function () {
@@ -1581,9 +1611,29 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 		},
 
 		getNumberOfUpdates: function () {
-			return $(".toc").TOCTree("getNumberOfUpdates");
-		}
+			return $(".toc#contents-pane").TOCTree("getNumberOfUpdates");
+		},
 
+		playRedirectedURL: function (src) {
+			var me = this;
+
+			function onReturnedResponse (resp) {
+				console.log("onReturnedResponse");
+				console.log(oReq.responseURL);
+				console.log("was:");
+				console.log(src);
+				if (src != oReq.responseURL) {
+					console.log("reloading");
+					me.player.src({type: "video/mp4", src: oReq.responseURL});
+					me.player.play();
+				}
+			}
+
+			var oReq = new XMLHttpRequest();
+			oReq.addEventListener("load", onReturnedResponse);
+			oReq.open("GET", src);
+			oReq.send();
+		}
 	});
 
 	var VideoManager = {};

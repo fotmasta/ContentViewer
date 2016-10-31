@@ -155,7 +155,7 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 		 }
 		 */
 
-		$(".toc").on("playvideo", onPlayContent);
+		$(".toc#contents-pane").on("playvideo", onPlayContent);
 	}
 
 	function getEscapedPathFromTitle (title) {
@@ -178,8 +178,8 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 		$("#video").outerHeight(wh - 50);
 		$("#sidebar").outerHeight(wh - 50);
 
-		if ($(".toc").TOCTree("instance")) {
-			var numUpdates = $(".toc").TOCTree("getNumberOfUpdates");
+		if ($(".toc#contents-pane").TOCTree("instance")) {
+			var numUpdates = $(".toc#contents-pane").TOCTree("getNumberOfUpdates");
 			if (numUpdates == 0) {
 				$("#versions").addClass("hidden");
 			}
@@ -193,17 +193,27 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 		$("#video .iframe-holder .the-iframe-holder iframe").css("min-height", wh - 50);
 
 		var c = Math.floor($("#main").width() * .25) + 8;
-		$(".toc").outerWidth(c);
+		var currentSize = ResponsiveBootstrapToolkit.current();
+		if (currentSize == "xs") {
+			c = "100%";
+			$("#collapsible-menu").collapse("hide");
+		}
+		$(".toc#contents-pane").outerWidth(c);
 		$(".search-results").outerWidth(c);
 
 		doResponsiveLogic();
+
+		matchToggleButtonToVisibility();
 	}
 
 	function matchToggleButtonToVisibility () {
-		if ($("#contents").hasClass("col-xs-0")) {
+		if ($("#contents").hasClass("col-xs-0") || $("#contents").attr("visibility") === "hidden") {
+			console.log("here");
 			$("#toc-toggler").removeClass("open").attr("aria-expanded", false);
+			$("#contents").attr("aria-expanded", false);
 		} else {
 			$("#toc-toggler").addClass("open").attr("aria-expanded", true);
+			$("#contents").attr("aria-expanded", true);
 		}
 	}
 
@@ -342,7 +352,7 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 	function onLoadedTOC (metadata) {
 		addIDsToTOC(metadata.toc);
 
-		$(".toc").TOCTree({ type: "video", skin: manifest.skin, data: metadata.toc, metadata: metadata, expander: "#collapse-button" });
+		$(".toc#contents-pane").TOCTree({ type: "video", skin: manifest.skin, data: metadata.toc, metadata: metadata, expander: "#collapse-button" });
 
 		$(".resource-list").TOCTree();
 
@@ -369,7 +379,7 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 
 		addIDsToTOC(metadata);
 
-		$(".toc").TOCTree({ type: "habitat", skin: manifest.skin, data: data, metadata: metadata, expander: "#collapse-button", updateLabels: manifest.updateLabels });
+		$(".toc#contents-pane").TOCTree({ type: "habitat", skin: manifest.skin, data: data, metadata: metadata, expander: "#collapse-button", updateLabels: manifest.updateLabels });
 
 		var settings = { toc: metadata, el: "#video video", player: videojs("main_video", { controls: true, playbackRates: [0.5, .75, 1, 1.5, 2] }), markers: [], options: manifest };
 		$("#video").VideoManager(settings);
@@ -386,7 +396,7 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 
 		addIDsToTOC(metadata);
 
-		$(".toc").TOCTree({ type: "epub", skin: manifest.skin, data: metadata, metadata: metadata, expander: "#collapse-button" });
+		$(".toc#contents-pane").TOCTree({ type: "epub", skin: manifest.skin, data: metadata, metadata: metadata, expander: "#collapse-button" });
 
 		var settings = { toc: metadata, el: "#video video", player: videojs("main_video", { controls: true, playbackRates: [0.5, .75, 1, 1.5, 2] }), markers: [], options: manifest };
 		$("#video").VideoManager(settings);
@@ -453,10 +463,13 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 		}
 
 		if (contentsVisible) {
-			$("#contents").removeClass("col-xs-0").addClass("col-xs-" + contentsSize);
+			$("#contents").removeClass("col-xs-0").addClass("col-xs-" + contentsSize).attr( { display: "block", "aria-hidden": false, visibility: "visible" } );
+			$("#contents .toc-tabstop").attr("tabindex", 10);
 		} else {
-			$("#contents").removeClass("col-xs-3").addClass("col-xs-0");
-			$(".toc").TOCTree("closeSearch");
+			$("#contents").removeClass("col-xs-3").addClass("col-xs-0").attr( { display: "none", "aria-hidden": true, visibility: "hidden" } );
+			$("#contents .toc-tabstop").attr("tabindex", -1);
+
+			$(".toc#contents-pane").TOCTree("closeSearch");
 		}
 
 		if (resourcesVisible) {
@@ -477,10 +490,10 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 	function onToggleTOC () {
 		contentsPaneDesiredVisible = !$("#toc-toggler").hasClass("open");
 
-		var contentsVisible = !$("#contents").hasClass("col-xs-0");
+		//var contentsVisible = !$("#contents").hasClass("col-xs-0");
 		var resourcesVisible = $("#sidebar").is(":visible");
 
-		resizePanes(!contentsVisible, resourcesVisible);
+		resizePanes(contentsPaneDesiredVisible, resourcesVisible);
 
 		//$("#contents .scroller").toggle("slide");
 
@@ -491,6 +504,8 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 		onResize();
 
 		if (contentsPaneDesiredVisible) {
+			$(".toc#contents-pane").TOCTree("closeSearch");
+
 			setTimeout(function () {
 				var index = $("#video").VideoManager("getCurrentIndex");
 				$(".toc-holder li").eq(index).focus();
@@ -504,24 +519,31 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 
 		resizePanes(!contentsVisible, resourcesVisible);
 
-		$("#toc-toggler").addClass("open").attr("aria-expanded", true);
+		//$("#toc-toggler").addClass("open").attr("aria-expanded", true);
+
+		$(".toc#contents-pane").TOCTree("closeSearch");
 
 		onResize();
 	}
 
 	function onSearch () {
-		//onOpenTOC();
+		$("#toc-toggler").removeClass("open").attr("aria-expanded", false);
+
 		resizePanes(true, false);
+
+		$("#contents").attr( { display: "none", "aria-hidden": true, visibility: "hidden" } );
+		$("#contents .toc-tabstop").attr("tabindex", -1);
+
 		onResize();
 
 		var term = $("#query").val();
 
 		$("#query-too").val(term);
 
-		if (term == "" && $(".toc").TOCTree("hasSearchIndex")) {
-			$(".toc").TOCTree("showSearchPane");
+		if (term == "" && $(".toc#contents-pane").TOCTree("hasSearchIndex")) {
+			$(".toc#contents-pane").TOCTree("showSearchPane");
 		} else {
-			$(".toc").TOCTree("search", term);
+			$(".toc#contents-pane").TOCTree("search", term);
 		}
 	}
 
@@ -530,11 +552,11 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 
 		$("#query").val(term);
 
-		$(".toc").TOCTree("search", term);
+		$(".toc#contents-pane").TOCTree("search", term);
 	}
 
 	function onCloseSearch () {
-		$(".toc").TOCTree("closeSearch");
+		$(".toc#contents-pane").TOCTree("closeSearch");
 
 		//$(".toc").show("slide");
 
@@ -550,15 +572,15 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 
 	function onClearSearch () {
 		$("#query").val("");
-		$(".toc").TOCTree("closeSearch", "");
+		$(".toc#contents-pane").TOCTree("closeSearch", "");
 	}
 
 	function onSearchPrevious () {
-		$(".toc").TOCTree("searchNext", -1);
+		$(".toc#contents-pane").TOCTree("searchNext", -1);
 	}
 
 	function onSearchNext () {
-		$(".toc").TOCTree("searchNext", 1);
+		$(".toc#contents-pane").TOCTree("searchNext", 1);
 	}
 
 	function setProjectTitle (title) {
@@ -593,7 +615,7 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 		},
 
 		doBuild: function (options) {
-			$(".navbar-brand").text(options.title);
+			$(".navbar-brand span").text(options.title);
 
 			$("html").addClass("ui");
 
@@ -669,9 +691,9 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 
 		setSearchIndex: function (data) {
 			// make sure toc has been initialized; if not, set a callback
-			var isInitialized = $(".toc").data("que-TOCTree");
+			var isInitialized = $(".toc#contents-pane").data("que-TOCTree");
 			if (isInitialized) {
-				$(".toc").TOCTree("setSearchIndex", data);
+				$(".toc#contents-pane").TOCTree("setSearchIndex", data);
 			} else {
 				console.log("re-trying setSearchIndex");
 				setTimeout($.proxy(this.setSearchIndex, this, data), 500);

@@ -162,7 +162,7 @@ define(["common", "jquery.json", "firebase/app", "firebase/auth", "firebase/data
 
 		saveCurrentTime: function (time) {
 			if (this.currentIndex >= this.items.length) {
-				this.items[index] = {};
+				this.items[this.currentIndex] = {};
 			}
 
 			this.items[this.currentIndex].time = time;

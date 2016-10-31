@@ -1,3 +1,4 @@
+// TODO: is there a resize event when scrolling on iOS and top buttons go away (so we can resize the TOC)?
 // TODO: add aria-hidden to template and remove for non-Microsoft? (if adding aria-hidden after initialization isn't working)
 // TODO: make Microsoft outlines less ugly?
 // TODO: system for bypassing cache or alerting customers to reload (Rhapsody-style)?

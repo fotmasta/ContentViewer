@@ -309,7 +309,7 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 				d.node.depth = depth;
 				d.node.index = params.counter;
 
-				li = $("<li>", { tabindex: 10, role: "treeitem" });
+				li = $("<li>", { class: "toc-tabstop", tabindex: 10, role: "treeitem" });
 				dest.append(li);
 
 				if (d && d.children && d.children.length > 0) {
@@ -608,8 +608,8 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 				this.showSearchPane(results.length);
 			} else {
 				$("#hit-count").text("");
-				$("button#search-previous").addClass("disabled");
-				$("button#search-next").addClass("disabled");
+				$("button#search-previous").addClass("disabled").attr("disabled", true);
+				$("button#search-next").addClass("disabled").attr("disabled", true);
 			}
 		},
 
@@ -622,19 +622,19 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 			if (resultCount == undefined) {
 				$("#hit-count").text("");
 
-				$("button#search-previous").addClass("disabled");
-				$("button#search-next").addClass("disabled");
+				$("button#search-previous").addClass("disabled").attr("disabled", true);
+				$("button#search-next").addClass("disabled").attr("disabled", true);
 			} else {
 				var lbl = resultCount + " result" + (resultCount != 1 ? "s" : "");
 
 				$("#hit-count").text(lbl);
 
 				if (resultCount > 0) {
-					$("button#search-previous").removeClass("disabled");
-					$("button#search-next").removeClass("disabled");
+					$("button#search-previous").removeClass("disabled").attr("disabled", null);
+					$("button#search-next").removeClass("disabled").attr("disabled", null);
 				} else {
-					$("button#search-previous").addClass("disabled");
-					$("button#search-next").addClass("disabled");
+					$("button#search-previous").addClass("disabled").attr("disabled", true);
+					$("button#search-next").addClass("disabled").attr("disabled", true);
 
 					$(".search-result-list").append("<p class='blocky text-center'>No results found. Try a different search?</p>");
 				}
@@ -739,7 +739,7 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 			var checked = el.find("> i.checked");
 			checked.remove();
 
-			el.append("<i class='checked fa fa-adjust fa-flip-horizontal' title='Progress started.' aria-label='Section started'></i>");
+			el.append("<i class='checked fa fa-adjust fa-flip-horizontal' title='Progress started.' aria-label='Section started' aria-role='status'></i>");
 		},
 
 		markCompleted: function (index) {
@@ -759,12 +759,12 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 			if (el.find("ul li").length) {
 				var childrenComplete = this.checkForAllChildrenComplete(index);
 				if (childrenComplete) {
-					el.append("<i class='checked fa fa-check-circle' title='Progress completed.' aria-label='Section completed'></i>");
+					el.append("<i class='checked fa fa-check-circle' title='Progress completed.' aria-label='Section completed' aria-role='status'></i>");
 				} else {
-					el.append("<i class='checked fa fa-adjust fa-flip-horizontal' title='Progress started.' aria-label='Section started'></i>");
+					el.append("<i class='checked fa fa-adjust fa-flip-horizontal' title='Progress started.' aria-label='Section started' aria-role='status'></i>");
 				}
 			} else {
-				el.append("<i class='checked fa fa-check-circle' title='Progress completed.' aria-label='Section completed'></i>");
+				el.append("<i class='checked fa fa-check-circle' title='Progress completed.' aria-label='Section completed' aria-role='status'></i>");
 			}
 
 			a.removeClass("completed").addClass("completed");
@@ -795,7 +795,7 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 			var checked = el.find("> i.checked");
 			checked.remove();
 
-			el.append("<i class='checked fa fa-adjust fa-flip-horizontal' title='Progress started.' aria-label='Section started'></i>");
+			el.append("<i class='checked fa fa-adjust fa-flip-horizontal' title='Progress started.' aria-label='Section started' aria-role='status'></i>");
 
 			a.removeClass("completed");
 		},

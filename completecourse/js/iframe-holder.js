@@ -79,6 +79,33 @@ define(["bootstrap-dialog", "imagesloaded", "database", "jquery.ui"], function (
 		return src.toLowerCase().substr(-3) == "pdf";
 	}
 
+	function iOSversion () {
+		if (/iP(hone|od|ad)/.test(navigator.platform)) {
+			// supports iOS 2.0 and later: <http://bit.ly/TJjs1V>
+			var v = (navigator.appVersion).match(/OS (\d+)_(\d+)_?(\d+)?/);
+			return [parseInt(v[1], 10), parseInt(v[2], 10), parseInt(v[3] || 0, 10)];
+		}
+	}
+
+	function grabRedirectedVideo (video) {
+		var source = $(video).find("source");
+		var src = source.attr("src");
+
+		function onReturnedResponse (video, videoSource, oReq, thisSrc, event) {
+			var newURL = oReq.responseURL;
+			if (thisSrc != newURL) {
+				console.log("reloading video from " + newURL);
+				video.src = newURL;
+			}
+		}
+
+		var oReq = new XMLHttpRequest();
+		//oReq.addEventListener("load", $.proxy(onReturnedResponse, this, video, source, oReq, src));
+		oReq.addEventListener("progress", $.proxy(onReturnedResponse, this, video, source, oReq, src));
+		oReq.open("GET", src);
+		oReq.send();
+	}
+
 	$.widget("que.iFrameHolder", {
 		options: {},
 
@@ -201,7 +228,7 @@ define(["bootstrap-dialog", "imagesloaded", "database", "jquery.ui"], function (
 			*/
 		},
 
-		onLoaded: function ()  {
+		onLoaded: function (event)  {
 			this.addStylesheet();
 
 			this.showSelectedUpdates();
@@ -219,6 +246,15 @@ define(["bootstrap-dialog", "imagesloaded", "database", "jquery.ui"], function (
 			// iOS:
 			$(".the-iframe-holder").scroll($.proxy(this.onScrollIframe, this));
 			*/
+
+			// for iOS 10, for all videos on the page, try grabbing the S3 redirected URLs
+			var ver = iOSversion();
+			if (ver && ver[0] >= 10) {
+				var videos = this.iframe.contents().find("video");
+				videos.each(function (index, video) {
+					grabRedirectedVideo(video);
+				});
+			}
 
 			var me = this;
 

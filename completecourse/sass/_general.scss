@@ -628,18 +628,35 @@ ul.toc-holder {
 	}
 }
 
+.navbar-header {
+}
+
 .navbar-brand {
 	margin: 0;
+
+	span {
+		display: inline-block;
+		max-width: 30em;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
 
 	&:hover {
 		color: #9d9d9d !important;
 	}
 }
 
+@media (max-width: 800px) {
+	.navbar-brand span {
+		max-width: 10em;
+	}
+}
+
 .buy-btn {
 	margin-left: 10px;
 	margin-top: -8px;
-	vertical-align: baseline;
+	vertical-align: top;
 }
 
 #search-bar {
@@ -820,7 +837,7 @@ span.completed {
 
 #collapsible-menu.in {
 	.input-group {
-		padding-bottom: 8px;
+		/*padding-bottom: 8px;*/
 	}
 }
 
@@ -1006,16 +1023,9 @@ span.completed {
 	}
 }
 
-#query-too::-webkit-input-placeholder {
-	color: white;
-}
-
-#query-too::-moz-placeholder {
-	color: white;
-}
-
-#query-too:-ms-input-placeholder {
-	color: white;
+#query-too {
+	background-color: white;
+	color: black;
 }
 
 .search-results {

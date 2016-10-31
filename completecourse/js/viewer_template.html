@@ -4,9 +4,9 @@
 		<button id="show-menu-button" title="Show the menu." data-coach-pos="bottom" class="navbar-toggle btn btn-info" data-toggle="collapse" data-target="#collapsible-menu">
 			<span class="fa fa-sort-down"></span>
 		</button>
-		<h1 class="navbar-brand">{{title}}</h1>
+		<h1 class="navbar-brand"><span>{{title}}</span></h1>
 	</div>
-	<div class="collapse navbar-collapse" id="collapsible-menu">
+	<div class="collapse navbar-collapse collapse in" id="collapsible-menu">
 		<div id="search-bar" class="nav navbar-form navbar-right">
 			<button id="show-comments-button" title="Show comments." data-coach-pos="bottom" class="btn btn-primary">
 				<span class="fa fa-comment"></span>
@@ -28,11 +28,11 @@
 <div id="main" class="container-fluid invisible">
 	<div class="row">
 		<div id="contents" class="col-xs-3">
-			<div class="toc" id="contents-pane" role="navigation">
+			<div class="toc" id="contents-pane" role="navigation" aria-controls="#video">
 				<div class="course-progress">
 					<button id="collapse-button" tabindex=3 title="Expand or collapse contents list." class="btn btn-primary btn-xs pull-left"><i class="fa fa-lg fa-caret-up"></i></button>
 					<div class="progress" data-progress="0% Complete">
-						<div id="completed-progress" class="progress-bar progress-bar-warning" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%">
+						<div id="completed-progress" class="progress-bar progress-bar-warning" role="progressbar" aria-role="status" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%">
 						</div>
 					</div>
 					<div class="clearfix"></div>
@@ -76,12 +76,12 @@
 					</div>
 				</div>
 				<div class="scroller">
-					<ul class="search-result-list">
+					<ul class="search-result-list" aria-live="polite">
 					</ul>
 				</div>
 			</div>
 		</div>
-		<div id="video" class="col-xs-9" role="main">
+		<main id="video" class="col-xs-9" role="main">
 			<div class="video-holder">
 				<div class="video-player">
 					<div class="overlay"></div>
@@ -93,7 +93,7 @@
 			</div>
 			<div class="iframe-holder">
 			</div>
-		</div>
+		</main>
 		<div id="sidebar" class="col-xs-0">
 			<div class="scroller">
 				<ul class="nav nav-list resource-list">
