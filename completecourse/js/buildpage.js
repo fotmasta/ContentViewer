@@ -208,7 +208,6 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 
 	function matchToggleButtonToVisibility () {
 		if ($("#contents").hasClass("col-xs-0") || $("#contents").attr("visibility") === "hidden") {
-			console.log("here");
 			$("#toc-toggler").removeClass("open").attr("aria-expanded", false);
 			$("#contents").attr("aria-expanded", false);
 		} else {
@@ -266,9 +265,16 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 
 			var desc = a.text();
 
+			var src = manifest.folder + "/ops/" + href;
+
+			// allow widgets to be in the TOC (edited from Habitat export)
+			if (href && href.indexOf("[") != -1) {
+				src = href;
+			}
+
 			return {
 				desc: desc,
-				src: manifest.folder + "/ops/" + href,
+				src: src,
 				hash: hash
 			};
 		});
