@@ -99,6 +99,14 @@ requirejs.config({
 	}
 });
 
+function removeMatchColors (el) {
+	var s = "";
+	for (var i = 1; i < 10; i++) {
+		s += "matched-color" + i + " ";
+	}
+	el.removeClass(s);
+}
+
 define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database) {
 	$.widget("que.quizzerator", {
 		options: {},
@@ -160,6 +168,16 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 			this.element.find("#submit-button").click($.proxy(this.onClickSubmit, this));
 
 			this.onLoadedData(this.options.paramData);
+
+			$(window).resize($.proxy(this.onWindowResize, this));
+		},
+
+		onWindowResize: function () {
+			this.redrawLines();
+		},
+
+		onImagesLoaded: function () {
+			this.redrawLines();
 		},
 
 		onLoadedData: function (data) {
@@ -196,9 +214,12 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 
 				var q = {};
 
+				q.index = i;
 				q.q = d_q.text;
 				q.hint = d_q.ref;
 				q.answers = d_q.answers.slice();
+				if (d_q.choices)
+					q.choices = d_q.choices.slice();
 
 				this.addQuestion(q);
 			}
@@ -219,6 +240,8 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 		},
 
 		addQuestion: function (q_params) {
+			var isMatching = false, mq;
+
 			var n = this.element.find(".quiz-holder li.question").length;
 
 			var classes = "question";
@@ -228,6 +251,7 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 			}
 
 			var q = $("<li>", {class: classes, "data-number": (n + 1) + "." });
+			q.attr("data-index", q_params.index);
 
 			var p_question = $("<p>", {html: q_params.q});
 
@@ -245,8 +269,46 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 
 			q.append(p_question);
 
+			var instruct = $("<div>", { class: "instructions" } );
+			q.append(instruct);
+
 			var answers = $("<ol>", {class: "answers-holder"});
 			q.append(answers);
+
+			if (q_params.choices) {
+				isMatching = true;
+
+				q.addClass("matching");
+
+				mq = $("<div>", { class: "matching-container" });
+				q.append(mq);
+
+				var choices = $("<ol>", {class: "choices-holder"});
+				mq.append(choices);
+
+				for (var each in q_params.choices) {
+					var choice = q_params.choices[each];
+
+					var li = $("<li>", { class: "choice" });
+
+					var p = $("<p>", {class: "response", html: choice});
+
+					p.attr("data-index", each);
+
+					var me = this;
+
+					p.find("img").each(function () {
+						var img = $(this);
+						var path = me.options.path + "/" + img.attr("src");
+						img.attr("src", path);
+					});
+
+					p.click($.proxy(this.onClickChoice1, this));
+					li.append(p);
+
+					choices.append(li);
+				}
+			}
 
 			for (var each in q_params.answers) {
 				var answer = q_params.answers[each];
@@ -260,7 +322,12 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 				var li = $("<li>", { class: "answer" });
 
 				var icons = $("<div>", {class: "icons"});
-				li.append(icons);
+				if (isMatching) {
+					var choice_li = mq.find("li.choice").eq(each);
+					choice_li.append(icons);
+				} else {
+					li.append(icons);
+				}
 
 				var icon_correct = $("<i>", {class: "icon correct fa fa-2x fa-check hidden"});
 				icons.append(icon_correct);
@@ -281,14 +348,22 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 					img.attr("src", path);
 				});
 
-				p.click($.proxy(this.onClickAnswer, this));
+				if (isMatching) {
+					p.click($.proxy(this.onClickChoice2, this));
+				} else {
+					p.click($.proxy(this.onClickAnswer, this));
+				}
+
 				li.append(p);
 
 				answers.append(li);
-
 			}
 
-			if (this.options.settings.randomizeResponses) {
+			if (isMatching) {
+				mq.append(answers);
+			}
+
+			if (this.options.settings.randomizeResponses || isMatching) {
 				var responses = answers.find("li.answer");
 
 				answers.children("li.answer").sort(function () {
@@ -330,6 +405,170 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 			ga("send", "event", "interface", "quiz-response", id);
 		},
 
+		onClickChoice1: function (event) {
+			var el = $(event.target);
+
+			this.clickChoice1(el);
+
+			var q = el.parents(".question");
+			this.showInstructions(q);
+		},
+
+		clickChoice1: function (el, alsoCheck) {
+			var selected = !el.hasClass("selected");
+
+			var q = el.parents(".question");
+			if (q.length) {
+				q.find(".choice .response").removeClass("selected");
+				if (selected) el.addClass("selected");
+
+				this.eraseLineConnectedTo({ question: q, left: el });
+			}
+
+			this.checkForTwoChoices(q);
+
+			this.updateAndSave(q, alsoCheck);
+		},
+
+		onClickChoice2: function (event) {
+			var el = $(event.target);
+
+			this.clickChoice2(el);
+
+			var q = el.parents(".question");
+			this.showInstructions(q);
+		},
+
+		clickChoice2: function (el, alsoCheck) {
+			var selected = !el.hasClass("selected");
+
+			var q = el.parents(".question");
+			if (q.length) {
+				q.find(".answer .response").removeClass("selected");
+				if (selected) el.addClass("selected");
+
+				this.eraseLineConnectedTo({ question: q, right: el });
+			}
+
+			this.checkForTwoChoices(q);
+
+			this.updateAndSave(q, alsoCheck);
+		},
+
+		showInstructions: function (question) {
+			var one = question.find(".choice .response.selected");
+			var two = question.find(".answer .response.selected");
+			var matched = question.find(".matching-line");
+			var total = question.find(".choice");
+
+			question.find(".instructions").removeClass("instruct-start instruct-left instruct-right instruct-complete");
+
+			if (matched.length == total.length) {
+				question.find(".instructions").addClass("instruct-complete");
+			} else if ( (!one.length && !two.length) || (one.length && two.length) ) {
+				question.find(".instructions").addClass("instruct-start");
+			} else if (one.length) {
+				question.find(".instructions").addClass("instruct-right");
+			} else if (two.length) {
+				question.find(".instructions").addClass("instruct-left");
+			}
+
+			this.redrawLines();
+		},
+
+		checkForTwoChoices: function (question) {
+			var one = question.find(".choice .response.selected");
+			var two = question.find(".answer .response.selected");
+
+			if (one.length && two.length) {
+				this.drawLineBetween(question, one, two);
+
+				var index = parseInt(one.attr("data-index")) + 1;
+
+				question.find(".choice .response.selected").removeClass("selected").addClass("matched matched-color" + index);
+				question.find(".answer .response.selected").removeClass("selected").addClass("matched matched-color" + index);
+
+				question.find(".response.selected").removeClass("selected");
+
+				if (this.options.settings.reviewableAfterEach)
+					question.find(".checker").removeClass("inactive animated fadeOut").addClass("animated fadeInLeft").find("button").removeClass("btn-danger").addClass("btn-primary").text("Check Answer");
+			}
+		},
+
+		drawLineBetween: function (question, one, two) {
+			var left_index = one.attr("data-index");
+			var right_index = two.attr("data-index");
+			var line = question.find(".matching-line[data-left-index=" + left_index + "]");
+			if (line.length == 0) {
+				line = $("<div>", {class: "matching-line"});
+				line.attr({"data-left-index": left_index, "data-right-index": right_index, "data-question-index": question.attr("data-index")});
+				question.prepend(line);
+			}
+
+			this.doDrawLine(line);
+		},
+
+		doDrawLine: function (line) {
+			var question = this.element.find(".question[data-index=" + line.attr("data-question-index") + "]");
+
+			var one = question.find(".choice .response[data-index=" + line.attr("data-left-index") + "]");
+			var two = question.find(".answer .response[data-index=" + line.attr("data-right-index") + "]");
+
+			var w1 = one.width() + 15, h1 = one.height();
+			var x1 = w1 + one.offset().left - question.offset().left;
+			var y1 = h1 * .5 + one.offset().top - question.offset().top;
+
+			var w2 = two.width(), h2 = two.height();
+			var x2 = two.offset().left - question.offset().left + 5;
+			var y2 = h2 * .5 + two.offset().top - question.offset().top;
+
+			var length = Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
+			var angle = Math.atan2(y2 - y1, x2 - x1) / Math.PI * 180;
+
+			if (line) {
+				line.css({
+					top: y1,
+					left: x1,
+					width: length,
+					height: 10,
+					"transform-origin": "left",
+					transform: "rotateZ(" + angle + "deg)"
+				});
+			}
+		},
+
+		redrawLines: function () {
+			var lines = this.element.find(".matching-line");
+			var me = this;
+			lines.each(function (index, line) {
+				me.doDrawLine($(line));
+			});
+		},
+
+		eraseLineConnectedTo: function (options) {
+			var question = options.question;
+			var line;
+			if (options.left) {
+				line = question.find(".matching-line[data-left-index=" + options.left.attr("data-index") + "]");
+			} else if (options.right) {
+				line = question.find(".matching-line[data-right-index=" + options.right.attr("data-index") + "]");
+			}
+			if (line.length) {
+				var left_index = line.attr("data-left-index");
+				var right_index = line.attr("data-right-index");
+				var left = question.find(".choice .response[data-index=" + left_index + "]");
+				var right = question.find(".answer .response[data-index=" + right_index + "]");
+				left.removeClass("matched");
+				right.removeClass("matched");
+				removeMatchColors(left);
+				removeMatchColors(right);
+				left.css("background-color", "");
+				right.css("background-color", "");
+
+				line.remove();
+			}
+		},
+
 		clickResponse: function (response, alsoCheck) {
 			var me = this;
 
@@ -357,6 +596,12 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 					q.find(".checker").addClass("animated fadeOut").animate({_nothing: 0}, 1000, $.proxy(me.resetButton, me, q));
 			}
 
+			this.updateAndSave(q, alsoCheck);
+		},
+
+		updateAndSave: function (questionElement, alsoCheck) {
+			var q = questionElement;
+
 			if (!alsoCheck && !this.options.settings.reviewableAfterEach) {
 				q.find(".checker button").removeClass("btn-danger").addClass("btn-primary").text("Check Answer");
 			}
@@ -383,7 +628,20 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 		},
 
 		getQuestionsAnswered: function () {
-			return $.unique(this.element.find(".selected").parents(".question"));
+			var questions = this.element.find(".question");
+			var answered = [];
+
+			questions.each(function (index, question) {
+				var q = $(question);
+				if (q.hasClass("matching")) {
+					if (q.find(".matching-line").length == q.find(".choice").length) answered.push(index);
+				} else {
+					if (q.find(".selected").length) answered.push(index);
+				}
+			});
+
+			return answered;
+			//return $.unique(this.element.find(".selected").parents(".question"));
 		},
 
 		allQuestionsAnswered: function () {
@@ -438,44 +696,92 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 		checkQuestion: function (q, animate) {
 			q.find(".icon").addClass("hidden");
 
-			var correctAnswer = q.find(".response[data-correct=true]");
-			var chosenAnswer = q.find(".response.selected");
+			if (q.hasClass("matching")) {
+				var lines = q.find(".matching-line");
+				var totalRight = 0;
+				lines.each(function (index, line) {
+					var left = $(line).attr("data-left-index");
+					var right = $(line).attr("data-right-index");
 
-			if (correctAnswer.not(chosenAnswer).length == 0 && chosenAnswer.not(correctAnswer).length == 0) {
-				// all correct
-				chosenAnswer.parent("li").find(".correct").removeClass("hidden");
-				if (animate != false) {
-					chosenAnswer.parent("li").find(".icons").removeClass("hidden animated").hide(0).addClass("animated rollIn").show(0);
-					q.find(".checker button").text("That's Correct!").removeClass("btn-primary btn-danger").addClass("btn-success animated fadeInLeft");
-				} else {
-					chosenAnswer.parent("li").find(".icons").removeClass("hidden animated").show(0);
-					q.find(".checker button").text("That's Correct!").removeClass("btn-primary btn-danger").addClass("btn-success");
-					q.find(".checker").removeClass("animated");
-				}
+					var choice = q.find(".choice").eq(left);
 
-				q.attr("data-correct", true);
-			} else {
-				// some incorrect
-				chosenAnswer.each(function (index, item) {
-					if ($.inArray(item, correctAnswer) > -1)
-						$(item).parent("li").find(".correct").removeClass("hidden");
-					else
-						$(item).parent("li").find(".incorrect").removeClass("hidden");
+					if (left == right) {
+						totalRight++;
+						choice.find(".correct").removeClass("hidden");
+					} else {
+						choice.find(".incorrect").removeClass("hidden");
+					}
+
+					if (animate != false) {
+						choice.find(".icons").removeClass("hidden animated").hide(0).addClass("animated rollIn").show(0);
+					} else {
+						choice.removeClass("hidden animated").show(0);
+					}
 				});
-				if (animate != false) {
-					chosenAnswer.parent("li").find(".icons").removeClass("hidden animated").hide(0).addClass("animated rollIn").show(0);
-					q.find(".checker button").text("That's Not Correct! Try Again?").removeClass("btn-primary").addClass("btn-danger animated fadeInLeft");
+
+				if (totalRight == q.find(".choice").length) {
+					if (animate != false) {
+						q.find(".checker button").text("That's Correct!").removeClass("btn-primary btn-danger").addClass("btn-success animated fadeInLeft");
+					} else {
+						q.find(".checker button").text("That's Correct!").removeClass("btn-primary btn-danger").addClass("btn-success");
+						q.find(".checker").removeClass("animated");
+					}
+
+					q.attr("data-correct", true);
 				} else {
-					chosenAnswer.parent("li").find(".icons").removeClass("hidden animated").show(0);
-					q.find(".checker button").text("That's Not Correct! Try Again?").removeClass("btn-primary").addClass("btn-danger");
-					q.find(".checker").removeClass("animated");
+					if (animate != false) {
+						q.find(".checker button").text("That's Not Correct! Try Again?").removeClass("btn-primary").addClass("btn-danger animated fadeInLeft");
+					} else {
+						q.find(".checker button").text("That's Not Correct! Try Again?").removeClass("btn-primary").addClass("btn-danger");
+						q.find(".checker").removeClass("animated");
+					}
+
+					q.find(".checker").removeClass("inactive");
+
+					q.attr("data-correct", false);
+
+					q.find(".hint").css("display", "block");
 				}
+			} else {
+				var correctAnswer = q.find(".response[data-correct=true]");
+				var chosenAnswer = q.find(".response.selected");
 
-				q.find(".checker").removeClass("inactive");
+				if (correctAnswer.not(chosenAnswer).length == 0 && chosenAnswer.not(correctAnswer).length == 0) {
+					// all correct
+					chosenAnswer.parent("li").find(".correct").removeClass("hidden");
+					if (animate != false) {
+						chosenAnswer.parent("li").find(".icons").removeClass("hidden animated").hide(0).addClass("animated rollIn").show(0);
+						q.find(".checker button").text("That's Correct!").removeClass("btn-primary btn-danger").addClass("btn-success animated fadeInLeft");
+					} else {
+						chosenAnswer.parent("li").find(".icons").removeClass("hidden animated").show(0);
+						q.find(".checker button").text("That's Correct!").removeClass("btn-primary btn-danger").addClass("btn-success");
+						q.find(".checker").removeClass("animated");
+					}
 
-				q.attr("data-correct", false);
+					q.attr("data-correct", true);
+				} else {
+					// some incorrect
+					chosenAnswer.each(function (index, item) {
+						if ($.inArray(item, correctAnswer) > -1)
+							$(item).parent("li").find(".correct").removeClass("hidden");
+						else
+							$(item).parent("li").find(".incorrect").removeClass("hidden");
+					});
+					if (animate != false) {
+						chosenAnswer.parent("li").find(".icons").removeClass("hidden animated").hide(0).addClass("animated rollIn").show(0);
+						q.find(".checker button").text("That's Not Correct! Try Again?").removeClass("btn-primary").addClass("btn-danger animated fadeInLeft");
+					} else {
+						chosenAnswer.parent("li").find(".icons").removeClass("hidden animated").show(0);
+						q.find(".checker button").text("That's Not Correct! Try Again?").removeClass("btn-primary").addClass("btn-danger");
+						q.find(".checker").removeClass("animated");
+					}
 
-				q.find(".hint").css("display", "block");
+					q.find(".checker").removeClass("inactive");
+
+					q.attr("data-correct", false);
+
+					q.find(".hint").css("display", "block");
+				}
 			}
 
 			this.updateScore();
@@ -562,15 +868,38 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 
 					var alsoCheckAnswers = (this.options.settings.reviewableAfterEach || this.allQuestionsAnswered());
 
-					for (var j = 0; j < resp.length; j++) {
-						var r = resp[j];
-						if (r != -1) {
-							var q = this.element.find(".question").eq(i);
-							if (q.length) {
-								var r_el = q.find(".response[data-index=" + r + "]");
-								if (r_el.length)
-									this.clickResponse(r_el, alsoCheckAnswers);
+					var q = this.element.find(".question").eq(i);
+					if (q.length) {
+						var isMatching = false;
+						var question_params = this.data.questions[i];
+						if (question_params.choices) {
+							isMatching = true;
+						}
+
+						if (!isMatching) {
+							for (var j = 0; j < resp.length; j++) {
+								var r = resp[j];
+								if (r != -1) {
+									var r_el = q.find(".response[data-index=" + r + "]");
+									if (r_el.length)
+										this.clickResponse(r_el, alsoCheckAnswers);
+								}
 							}
+						} else if (isMatching) {
+							for (var j = 0; j < resp.length; j += 2) {
+								var r = resp[j];
+								var r_el = q.find(".choice .response[data-index=" + r + "]");
+								if (r_el.length) {
+									this.clickChoice1(r_el, alsoCheckAnswers);
+								}
+								r = resp[j + 1];
+								r_el = q.find(".answer .response[data-index=" + r + "]");
+								if (r_el.length) {
+									this.clickChoice2(r_el, alsoCheckAnswers);
+								}
+							}
+
+							this.showInstructions(q);
 						}
 					}
 				}
@@ -588,12 +917,27 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 			var questions = this.element.find(".question");
 			for (var i = 0; i < questions.length; i++) {
 				var q = questions.eq(i);
-				var answers = q.find(".response");
-				var chosen = q.find(".response.selected");
-				var indices = $.map(chosen, function (item, index) {
-					return $(item).attr("data-index");
-				});
-				responses.push(indices);
+				var question_params = this.data.questions[i];
+				var isMatching = false;
+				if (question_params.choices) {
+					isMatching = true;
+				}
+				if (!isMatching) {
+					var answers = q.find(".response");
+					var chosen = q.find(".response.selected");
+					var indices = $.map(chosen, function (item, index) {
+						return $(item).attr("data-index");
+					});
+					responses.push(indices);
+				} else {
+					var pairs = q.find(".matching-line");
+					var indices = $.map(pairs, function (item, index) {
+						var left = $(item).attr("data-left-index");
+						var right = $(item).attr("data-right-index");
+						return [left, right];
+					});
+					responses.push(indices);
+				}
 			}
 
 			var obj = {responses: responses, attempts: this.attempts};
@@ -647,6 +991,9 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 		onStartOver: function () {
 			this.element.find(".question").attr( { "data-correct": null  } );
 			this.element.find(".response").removeClass("selected");
+			this.element.find(".matching-line").remove();
+			removeMatchColors(this.element.find(".matched"));
+			this.element.find(".matched").removeClass("matched");
 
 			this.element.find(".icon").addClass("hidden");
 			this.element.find(".checker").addClass("inactive");

@@ -95,10 +95,12 @@ requirejs.config({
 			export: "firebase"
 		},
 		"firebase/auth": {
-			export: "firebase"
+			export: "firebase",
+			deps: ["firebase/app"]
 		},
 		"firebase/database": {
-			export: "firebase"
+			export: "firebase",
+			deps: ["firebase/auth"]
 		}
 	},
 	// this fixed the "appending .js" problem I was getting on informit.com
@@ -178,14 +180,18 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 		$("#video").outerHeight(wh - 50);
 		$("#sidebar").outerHeight(wh - 50);
 
+		var numUpdates = 0;
 		if ($(".toc#contents-pane").TOCTree("instance")) {
-			var numUpdates = $(".toc#contents-pane").TOCTree("getNumberOfUpdates");
+			numUpdates = $(".toc#contents-pane").TOCTree("getNumberOfUpdates");
 			if (numUpdates == 0) {
 				$("#versions").addClass("hidden");
 			}
 		}
 
-		var hh = $("#header-nav").outerHeight() + $(".course-progress").outerHeight() + $("#versions").outerHeight();
+		var hh = $("#header-nav").outerHeight() + $(".course-progress").outerHeight() + $("#contents-pane h2").outerHeight() + 7;
+		if (numUpdates > 0) {
+			hh += $("#versions").outerHeight();
+		}
 		$("#contents .scroller").height(wh - hh);
 
 		$("#main_video").css("max-height", wh - 50);
@@ -207,7 +213,7 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 	}
 
 	function matchToggleButtonToVisibility () {
-		if ($("#contents").hasClass("col-xs-0") || $("#contents").attr("visibility") === "hidden") {
+		if ($("#contents").hasClass("col-xs-0") || $("#contents-pane").css("visibility") === "hidden") {
 			$("#toc-toggler").removeClass("open").attr("aria-expanded", false);
 			$("#contents").attr("aria-expanded", false);
 		} else {
@@ -301,9 +307,15 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 			}
 		}
 
+		// allow widgets
+		var src = manifest.folder + "/oebps/html/" + href;
+		if (href && href.indexOf("[") != -1) {
+			src = href;
+		}
+
 		var node = {
 			desc: desc,
-			src: manifest.folder + "/oebps/html/" + href,
+			src: src,
 			hash: hash,
 			depth: depth,
 			short: shortLabel,
@@ -459,20 +471,24 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 				contentsVisible = true;
 				videoSize = 0;
 				contentsSize = 12;
+				$("main").attr({ "hidden": true, "aria-hidden": "true" });
 				//$("#contents .scroller").show(0);
 			} else {
 				contentsVisible = false;
 				videoSize = 12;
 				contentsSize = 0;
+				$("main").attr({ "hidden": false, "aria-hidden": "false" });
 				//$("#contents .scroller").show(0);
 			}
 		}
 
 		if (contentsVisible) {
-			$("#contents").removeClass("col-xs-0").addClass("col-xs-" + contentsSize).attr( { display: "block", "aria-hidden": false, visibility: "visible" } );
+			$("#contents").removeClass("col-xs-0").addClass("col-xs-" + contentsSize);
+			$("#contents-pane").attr( { "aria-hidden": false }).css( { "visibility": "visible", display: "block",  } );
 			$("#contents .toc-tabstop").attr("tabindex", 10);
 		} else {
-			$("#contents").removeClass("col-xs-3").addClass("col-xs-0").attr( { display: "none", "aria-hidden": true, visibility: "hidden" } );
+			$("#contents").removeClass("col-xs-3").addClass("col-xs-0");
+			$("#contents-pane").attr( { "aria-hidden": true }).css( { visibility: "hidden", display: "none" } );
 			$("#contents .toc-tabstop").attr("tabindex", -1);
 
 			$(".toc#contents-pane").TOCTree("closeSearch");
@@ -537,7 +553,7 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 
 		resizePanes(true, false);
 
-		$("#contents").attr( { display: "none", "aria-hidden": true, visibility: "hidden" } );
+		$("#contents-pane").attr( { "aria-hidden": true }).css( { visibility: "hidden", display: "none" } );
 		$("#contents .toc-tabstop").attr("tabindex", -1);
 
 		onResize();

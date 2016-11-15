@@ -100,8 +100,8 @@ define(["bootstrap-dialog", "imagesloaded", "database", "jquery.ui"], function (
 		}
 
 		var oReq = new XMLHttpRequest();
-		//oReq.addEventListener("load", $.proxy(onReturnedResponse, this, video, source, oReq, src));
-		oReq.addEventListener("progress", $.proxy(onReturnedResponse, this, video, source, oReq, src));
+		oReq.addEventListener("load", $.proxy(onReturnedResponse, this, video, source, oReq, src));
+		//oReq.addEventListener("progress", $.proxy(onReturnedResponse, this, video, source, oReq, src));
 		oReq.open("GET", src);
 		oReq.send();
 	}
@@ -249,7 +249,8 @@ define(["bootstrap-dialog", "imagesloaded", "database", "jquery.ui"], function (
 
 			// for iOS 10, for all videos on the page, try grabbing the S3 redirected URLs
 			var ver = iOSversion();
-			if (ver && ver[0] >= 10) {
+			var alwaysUseRedirect = this.iframe.parent().hasClass("use-redirect");
+			if (alwaysUseRedirect || (ver && ver[0] >= 10)) {
 				var videos = this.iframe.contents().find("video");
 				videos.each(function (index, video) {
 					grabRedirectedVideo(video);
@@ -282,6 +283,13 @@ define(["bootstrap-dialog", "imagesloaded", "database", "jquery.ui"], function (
 								});
 							}
 						}
+					});
+
+					// if there's a widget on this page, let it know when it's done loading
+					var me = this;
+					imagesLoaded(this.iframe.contents().find("body"), function () {
+						var widget = me.getWidget();
+						if (widget && widget.onImagesLoaded) widget.onImagesLoaded();
 					});
 
 					this.options.manager.onIFrameLoaded(me);

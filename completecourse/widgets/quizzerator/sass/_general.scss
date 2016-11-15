@@ -114,6 +114,14 @@ $incorrect-color: #d9534f;
 			display: none;
 		}
 	}
+
+	.matching-line {
+		border-top: 3px dotted #b3b8c1;
+		position: absolute;
+		top: 0;
+		left: 0;
+		z-index: 3;
+	}
 }
 
 ol.quiz-holder {
@@ -142,6 +150,7 @@ ol.quiz-holder {
 }
 
 li.question {
+	position: relative;
 	padding: .5em 0 .5em 0;
 
 	&[data-correct=false] {
@@ -156,7 +165,92 @@ li.question {
 		}
 	}
 
-	ol.answers-holder {
+	&.matching {
+		.matching-container {
+			display: flex;
+			margin-top: 20px;
+		}
+
+		ol.answers-holder {
+			list-style-type: none;
+			flex: 1;
+
+			display: flex;
+			flex-direction: column;
+			justify-content: space-around;
+		}
+
+		ol.choices-holder {
+			list-style-type: none;
+			flex: 1;
+
+			display: flex;
+			flex-direction: column;
+			justify-content: space-around;
+		}
+
+		ol.choices-holder, ol.answers-holder {
+			li p.response {
+				&:hover {
+					background-color: #ffcb69;
+					border-radius: 15px;
+				}
+			}
+		}
+
+		.instructions {
+			font-size: small;
+			margin: 0 0 20px 0;
+			text-align: center;
+			padding-bottom: 5px;
+			border-bottom: 3px solid #44bb22;
+
+			&:before {
+				content: "Start by picking any item to match:";
+				display: block;
+			}
+
+			&.instruct-complete {
+				&:before {
+					content: "";
+					display: block;
+				}
+			}
+
+			&.instruct-left {
+				margin-right: 50%;
+
+				&:before {
+					content: "Now pick the matching item from this column:";
+					display: block;
+				}
+			}
+
+			&.instruct-right {
+				margin-left: 50%;
+
+				&:before {
+					content: "Now pick the matching item from this column:";
+					display: block;
+				}
+			}
+		}
+	}
+
+	&:not(.matching) {
+		ol.answers-holder, ol.choices-holder {
+			li {
+				p.response {
+					&:hover:not(.selected):not(.matched) {
+						background-color: #bcbfff;
+						border-radius: 15px;
+					}
+				}
+			}
+		}
+	}
+
+	ol.answers-holder, ol.choices-holder {
 		list-style-type: lower-alpha;
 		position: relative;
 
@@ -171,19 +265,58 @@ li.question {
 				cursor: pointer;
 				vertical-align: top;
 
-				&:hover:not(.selected) {
-					background-color: #bcbfff;
-					border-radius: 15px;
-				}
-
 				&.selected {
-					background-color: #ffff82;
+					background-color: rgba(255, 255, 100, .5);
 					border-radius: 15px;
 				}
 
 				code {
 					// this was preventing word-wrap of code responses:
 					//white-space: pre;
+				}
+
+				&.matched {
+					border-radius: 15px;
+				}
+
+				&.matched-color1 {
+					background-color: rgba(255, 0, 0, 0.21);
+				}
+
+				&.matched-color2 {
+					background-color: rgba(0, 128, 0, 0.2);
+				}
+
+				&.matched-color3 {
+					background-color: rgba(0, 0, 255, 0.2);
+				}
+
+				&.matched-color4 {
+					background-color: rgba(255, 255, 0, 0.2);
+				}
+
+				&.matched-color5 {
+					background-color: rgba(255, 165, 0, 0.2);
+				}
+
+				&.matched-color6 {
+					background-color: rgba(128, 0, 128, 0.2);
+				}
+
+				&.matched-color7 {
+					background-color: rgba(0, 255, 255, 0.2);
+				}
+
+				&.matched-color8 {
+					background-color: rgba(173, 216, 230, 0.2);
+				}
+
+				&.matched-color9 {
+					background-color: rgba(240, 128, 128, 0.2);
+				}
+
+				&.matched-color10 {
+					background-color: rgba(128, 0, 128, 0.2);
 				}
 			}
 

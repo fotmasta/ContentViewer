@@ -427,6 +427,9 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 				$(".iframe-holder").show();
 				$(".video-holder").hide();
 
+				// set focus to iframe content
+				this.iframe.find("iframe").focus();
+
 				return;
 			}
 
@@ -439,10 +442,11 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 			var src = this.toc[index].video;
 
 			var dontUseiOS10Patch = $("html").hasClass("dontUseiOS10Patch");
+			var alwaysUseRedirect = $("html").hasClass("use-redirect");
 
 			if (src.indexOf(".mov") != -1 || src.indexOf(".mp4") != -1) {
 				var ver = iOSversion();
-				if (ver && ver[0] >= 10 && !dontUseiOS10Patch) {
+				if (alwaysUseRedirect || (ver && ver[0] >= 10 && !dontUseiOS10Patch)) {
 					this.playRedirectedURL(src);
 				} else {
 					this.player.src({type: "video/mp4", src: src});
@@ -451,7 +455,7 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 				var ver = iOSversion();
 				console.log("vers: " + ver);
 
-				if (ver && ver[0] >= 10 && !dontUseiOS10Patch) {
+				if (alwaysUseRedirect || (ver && ver[0] >= 10 && !dontUseiOS10Patch)) {
 					this.playRedirectedURL(src + ".mp4");
 				} else {
 					this.player.src([
@@ -1366,7 +1370,9 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 				if (isNew) {
 					entry.parents("li").find("> ul").show(300);
 
-					$(".toc#contents-pane").TOCTree("refreshAllDroppers", index);
+					setTimeout(function () {
+						$(".toc#contents-pane").TOCTree("refreshAllDroppers", index);
+					}, 0);
 				}
 
 				var scroller = $("#contents-pane .scroller");
@@ -1630,7 +1636,8 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 			}
 
 			var oReq = new XMLHttpRequest();
-			oReq.addEventListener("load", onReturnedResponse);
+			//oReq.addEventListener("load", onReturnedResponse);
+			oReq.addEventListener("progress", onReturnedResponse);
 			oReq.open("GET", src);
 			oReq.send();
 		}

@@ -257,3 +257,14 @@
 // DONE: flashcards widget back side is not clickable (in ContentViewer)
 // DONE: flashcards: don't advance when starting new set of flashcards (localStorage issue?; start over at first card?)
 // DONE: added download link option (from converter) to banner bar
+// DONE: color-code matches
+// DONE: save on matching click
+// DONE: shuffle matching
+// DONE: allow matching questions to be checked
+// DONE: start over needs to clear matching responses too
+// DONE: "answered" counting needs to work with multiple choice too
+// DONE: try adding dependencies to firebase loading so none of them time out
+// DONE: hide instructions when question is complete
+// DONE: check all doesn't mark matching question correct/incorrect
+// DONE: matching questions mark individual incorrect responses with X?
+// DONE: quizzerator with matching-style questions
