@@ -57,7 +57,7 @@ $incorrect-color: #d9534f;
 				display: block;
 			}
 
-			#previous-button, #next-button, #submit-button {
+			#previous-button, #next-button, #submit-button, #clear-button {
 				display: none;
 			}
 		}
@@ -68,6 +68,14 @@ $incorrect-color: #d9534f;
 
 		#controls {
 			margin-bottom: 55px;
+
+			#clear-button {
+				background-color: pink;
+
+				&:hover {
+					background-color: #d09da6;
+				}
+			}
 		}
 
 		.summary {
@@ -206,7 +214,7 @@ li.question {
 			border-bottom: 3px solid #44bb22;
 
 			&:before {
-				content: "Start by picking any item to match:";
+				content: "Start by clicking any item to match:";
 				display: block;
 			}
 
@@ -221,7 +229,7 @@ li.question {
 				margin-right: 50%;
 
 				&:before {
-					content: "Now pick the matching item from this column:";
+					content: "Now click the matching item from this column:";
 					display: block;
 				}
 			}
@@ -230,7 +238,7 @@ li.question {
 				margin-left: 50%;
 
 				&:before {
-					content: "Now pick the matching item from this column:";
+					content: "Now click the matching item from this column:";
 					display: block;
 				}
 			}
@@ -339,6 +347,13 @@ li.question {
 				}
 			}
 		}
+	}
+
+	.checker-label {
+		display: none;
+		margin-left: 1em;
+		font-size: small;
+		font-style: italic;
 	}
 }
 

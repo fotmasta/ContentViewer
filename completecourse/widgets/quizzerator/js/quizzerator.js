@@ -108,6 +108,10 @@ function removeMatchColors (el) {
 }
 
 define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database) {
+
+	var tryAgainText = "That's not correct. Try a different response.";
+	var correctText = "That's correct!";
+
 	$.widget("que.quizzerator", {
 		options: {},
 
@@ -162,7 +166,8 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 			var ol = $("<ol>", {class: "quiz-holder"});
 			this.element.find("#controls").before(ol);
 
-			this.element.find("#clear-button").click($.proxy(this.onClickStartOver, this));
+			this.element.find("#start-over-button").click($.proxy(this.onClickStartOver, this));
+			this.element.find("#clear-button").click($.proxy(this.onClickClear, this));
 			this.element.find("#previous-button").click($.proxy(this.onClickPrevious, this));
 			this.element.find("#next-button").click($.proxy(this.onClickNext, this));
 			this.element.find("#submit-button").click($.proxy(this.onClickSubmit, this));
@@ -372,9 +377,11 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 			}
 
 			var checker = $("<div>", {class: "checker inactive"}).appendTo(q);
-			var btn = $("<button>", {class: "btn btn-primary", text: "Check Answer"});
+			var btn = $("<button>", {class: "btn btn-primary btn-checker", text: "Check Answer"});
 			btn.click($.proxy(this.onClickCheck, this));
 			btn.appendTo(checker);
+			var lbl = $("<span>", { class: "checker-label", text: tryAgainText });
+			lbl.appendTo(checker);
 
 			if (q_params.hint) {
 				if (this.options.settings.usesExplanations) {
@@ -491,7 +498,7 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 				question.find(".response.selected").removeClass("selected");
 
 				if (this.options.settings.reviewableAfterEach)
-					question.find(".checker").removeClass("inactive animated fadeOut").addClass("animated fadeInLeft").find("button").removeClass("btn-danger").addClass("btn-primary").text("Check Answer");
+					question.find(".checker").removeClass("inactive animated fadeOut").addClass("animated fadeInLeft").find("button").removeClass("btn-danger btn-success").addClass("btn-primary").parent().find(".checker-label").css("display", "none");
 			}
 		},
 
@@ -587,10 +594,10 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 			if (!alreadySelected) {
 				response.addClass("selected");
 				if (this.options.settings.reviewableAfterEach)
-					q.find(".checker").removeClass("inactive animated fadeOut").addClass("animated fadeInLeft").find("button").removeClass("btn-danger").addClass("btn-primary").text("Check Answer");
+					q.find(".checker").removeClass("inactive animated fadeOut").addClass("animated fadeInLeft").find("button").removeClass("btn-danger").addClass("btn-primary").parent().find(".checker-label").css("display", "none");
 			} else if (chosenAnswer.length > 1) {
 				if (this.options.settings.reviewableAfterEach)
-					q.find(".checker").removeClass("inactive animated fadeOut").addClass("animated fadeInLeft").find("button").removeClass("btn-danger").addClass("btn-primary").text("Check Answer");
+					q.find(".checker").removeClass("inactive animated fadeOut").addClass("animated fadeInLeft").find("button").removeClass("btn-danger").addClass("btn-primary").parent().find(".checker-label").css("display", "none");
 			} else {
 				if (this.options.settings.reviewableAfterEach)
 					q.find(".checker").addClass("animated fadeOut").animate({_nothing: 0}, 1000, $.proxy(me.resetButton, me, q));
@@ -603,7 +610,7 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 			var q = questionElement;
 
 			if (!alsoCheck && !this.options.settings.reviewableAfterEach) {
-				q.find(".checker button").removeClass("btn-danger").addClass("btn-primary").text("Check Answer");
+				q.find(".checker button").removeClass("btn-danger").addClass("btn-primary");
 			}
 
 			q.find(".icon").addClass("hidden");
@@ -624,7 +631,7 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 
 		resetButton: function (question) {
 			$(question).find(".checker").addClass("inactive");
-			$(question).find(".checker button").text("Check Answer").removeClass("btn-success btn-danger").addClass("btn-primary");
+			$(question).find(".checker button").removeClass("btn-success btn-danger").addClass("btn-primary").parent().find(".checker-label").css("display", "none");
 		},
 
 		getQuestionsAnswered: function () {
@@ -721,18 +728,18 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 
 				if (totalRight == q.find(".choice").length) {
 					if (animate != false) {
-						q.find(".checker button").text("That's Correct!").removeClass("btn-primary btn-danger").addClass("btn-success animated fadeInLeft");
+						q.find(".checker button").removeClass("btn-primary btn-danger").addClass("btn-success animated fadeInLeft").parent().find(".checker-label").text(correctText).css("display", "inline");
 					} else {
-						q.find(".checker button").text("That's Correct!").removeClass("btn-primary btn-danger").addClass("btn-success");
+						q.find(".checker button").removeClass("btn-primary btn-danger").addClass("btn-success").parent().find(".checker-label").text(correctText).css("display", "inline");
 						q.find(".checker").removeClass("animated");
 					}
 
 					q.attr("data-correct", true);
 				} else {
 					if (animate != false) {
-						q.find(".checker button").text("That's Not Correct! Try Again?").removeClass("btn-primary").addClass("btn-danger animated fadeInLeft");
+						q.find(".checker button").removeClass("btn-primary").addClass("btn-danger animated fadeInLeft").parent().find(".checker-label").text(tryAgainText).css("display", "inline");
 					} else {
-						q.find(".checker button").text("That's Not Correct! Try Again?").removeClass("btn-primary").addClass("btn-danger");
+						q.find(".checker button").removeClass("btn-primary").addClass("btn-danger").parent().find(".checker-label").text(tryAgainText).css("display", "inline");
 						q.find(".checker").removeClass("animated");
 					}
 
@@ -751,10 +758,10 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 					chosenAnswer.parent("li").find(".correct").removeClass("hidden");
 					if (animate != false) {
 						chosenAnswer.parent("li").find(".icons").removeClass("hidden animated").hide(0).addClass("animated rollIn").show(0);
-						q.find(".checker button").text("That's Correct!").removeClass("btn-primary btn-danger").addClass("btn-success animated fadeInLeft");
+						q.find(".checker button").removeClass("btn-primary btn-danger").addClass("btn-success animated fadeInLeft").parent().find(".checker-label").text(correctText).css("display", "inline");
 					} else {
 						chosenAnswer.parent("li").find(".icons").removeClass("hidden animated").show(0);
-						q.find(".checker button").text("That's Correct!").removeClass("btn-primary btn-danger").addClass("btn-success");
+						q.find(".checker button").removeClass("btn-primary btn-danger").addClass("btn-success").parent().find(".checker-label").text(correctText).css("display", "inline");
 						q.find(".checker").removeClass("animated");
 					}
 
@@ -769,10 +776,10 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 					});
 					if (animate != false) {
 						chosenAnswer.parent("li").find(".icons").removeClass("hidden animated").hide(0).addClass("animated rollIn").show(0);
-						q.find(".checker button").text("That's Not Correct! Try Again?").removeClass("btn-primary").addClass("btn-danger animated fadeInLeft");
+						q.find(".checker button").removeClass("btn-primary").addClass("btn-danger animated fadeInLeft").parent().find(".checker-label").text(tryAgainText).css("display", "inline");
 					} else {
 						chosenAnswer.parent("li").find(".icons").removeClass("hidden animated").show(0);
-						q.find(".checker button").text("That's Not Correct! Try Again?").removeClass("btn-primary").addClass("btn-danger");
+						q.find(".checker button").removeClass("btn-primary").addClass("btn-danger").parent().find(".checker-label").text(tryAgainText).css("display", "inline");
 						q.find(".checker").removeClass("animated");
 					}
 
@@ -1020,6 +1027,26 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 			this.options.iframe.showAlert("Start Over", "Are you sure you want to clear your quiz responses and start over?", $.proxy(this.onStartOver, this));
 		},
 
+		onClickClear: function () {
+			var thisQ = this.element.find(".question").eq(this.currentQuestion);
+
+			thisQ.attr( { "data-correct": null  } );
+			thisQ.find(".response").removeClass("selected");
+			thisQ.find(".matching-line").remove();
+			removeMatchColors(thisQ.find(".matched"));
+			thisQ.find(".matched").removeClass("matched");
+
+			thisQ.find(".icon").addClass("hidden");
+			thisQ.find(".checker").addClass("inactive");
+			thisQ.find(".hint").css("display", "none");
+
+			this.updateScore();
+
+			this.saveResponses();
+
+			this.adjustSummarySize();
+		},
+
 		onClickPrevious: function () {
 			if (this.currentQuestion > 0) {
 				this.currentQuestion--;
@@ -1042,6 +1069,18 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 
 			var total = this.element.find(".question").length;
 			this.element.find(".position-label").text("Question " + (this.currentQuestion + 1) + " of " + total);
+
+			if (this.currentQuestion >= total - 1) {
+				this.element.find("#next-button").attr("disabled", true);
+			} else {
+				this.element.find("#next-button").attr("disabled", false);
+			}
+
+			if (this.currentQuestion <= 0) {
+				this.element.find("#previous-button").attr("disabled", true);
+			} else {
+				this.element.find("#previous-button").attr("disabled", false);
+			}
 		},
 
 		onClickSubmit: function () {

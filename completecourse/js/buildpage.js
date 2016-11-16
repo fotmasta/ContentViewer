@@ -192,7 +192,10 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 		if (numUpdates > 0) {
 			hh += $("#versions").outerHeight();
 		}
-		$("#contents .scroller").height(wh - hh);
+		$("#contents-pane .scroller").height(wh - hh);
+
+		var hh_search = $("#header-nav").outerHeight() + $("#search-header").outerHeight();
+		$("#search-results-panel .scroller").height(wh - hh_search);
 
 		$("#main_video").css("max-height", wh - 50);
 
@@ -227,17 +230,12 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 		var func = ResponsiveBootstrapToolkit.changed(function () {
 			var currentSize = ResponsiveBootstrapToolkit.current();
 			if (currentSize != lastSize) {
+				var desired = $("#toc-toggler").hasClass("open");
 				if (currentSize == "xs") {
-					var desired = contentsPaneDesiredVisible;
-					if (desired == undefined) desired = false;
-
 					resizePanes(desired, false);
 
 					wasSmall = true;
 				} else {
-					var desired = contentsPaneDesiredVisible;
-					if (desired == undefined) desired = true;
-
 					resizePanes(desired, false);
 
 					wasSmall = false;
@@ -480,6 +478,8 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 				$("main").attr({ "hidden": false, "aria-hidden": "false" });
 				//$("#contents .scroller").show(0);
 			}
+		} else {
+			$("main").attr({ "hidden": false, "aria-hidden": "false" });
 		}
 
 		if (contentsVisible) {
@@ -551,7 +551,9 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 	function onSearch () {
 		$("#toc-toggler").removeClass("open").attr("aria-expanded", false);
 
-		resizePanes(true, false);
+		contentsPaneDesiredVisible = true;
+
+		resizePanes(false, false);
 
 		$("#contents-pane").attr( { "aria-hidden": true }).css( { visibility: "hidden", display: "none" } );
 		$("#contents .toc-tabstop").attr("tabindex", -1);
@@ -567,6 +569,12 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 		} else {
 			$(".toc#contents-pane").TOCTree("search", term);
 		}
+
+		setTimeout(function () {
+			var wh = $(window).outerHeight();
+			var hh_search = $("#header-nav").outerHeight() + $("#search-header").outerHeight();
+			$("#search-results-panel .scroller").height(wh - hh_search);
+		}, 500);
 	}
 
 	function onSearchToo () {

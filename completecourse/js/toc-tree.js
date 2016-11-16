@@ -306,8 +306,10 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 			var li, linkholder;
 
 			if (d && d.node) {
+				var index = params.counter;
+
 				d.node.depth = depth;
-				d.node.index = params.counter;
+				d.node.index = index;
 
 				li = $("<li>", { class: "toc-tabstop", tabindex: 10, role: "treeitem" });
 				dest.append(li);
@@ -335,9 +337,9 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 					linkholder = li;
 				}
 
-				li.attr("data-index", params.counter);
+				li.attr("data-index", index);
 
-				var a = $("<a>").attr( { "href": d.node.href || "javascript: void" });
+				var a = $("<a>").attr( { href: d.node.href, "aria-describedby": "progress" + index });
 
 				var entry_text = d.node.desc;
 
@@ -436,7 +438,7 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 				switch (this.options.type) {
 					case "video": // ie, video
 						if (d.node.video || d.node.src) {
-							a.click($.proxy(this.launchVideo, this, params.counter, {toggle: false}));
+							a.click($.proxy(this.launchVideo, this, index, {toggle: false}));
 							li.keydown(function (event) {
 								if (event.keyCode == 13 || event.keyCode == 32) {
 									//func(event);
@@ -453,8 +455,8 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 						}
 						break;
 					default:
-						a.click($.proxy(this.launchVideo, this, params.counter, {toggle: false}));
-						var func = $.proxy(this.launchVideo, this, params.counter, {toggle: false});
+						a.click($.proxy(this.launchVideo, this, index, {toggle: false}));
+						var func = $.proxy(this.launchVideo, this, index, {toggle: false});
 						var me = this;
 						li.keydown(function (event) {
 							if (event.keyCode == 13 || event.keyCode == 32) {
@@ -586,7 +588,7 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 					var label = MakeAShortLabelForSearchResults(node);
 					var section_label = " <p class='section-label'>" + label + "</p>";
 					var hit_label = "<p class='hit-label'>" + hit.desc + "</p>";
-					var hitResult = $("<a>", {class: "hit", href: "javascript: void", html: section_label + hit_label}).data("index", index);
+					var hitResult = $("<div>", {class: "hit", tabindex: 0, html: section_label + hit_label}).data("index", index);
 					var me = this;
 					hitResult.click(function (event) {
 						var index = $(this).data("index");
@@ -739,7 +741,7 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 			var checked = el.find("> i.checked");
 			checked.remove();
 
-			el.append("<i class='checked fa fa-adjust fa-flip-horizontal' title='Progress started.' aria-label='Section started' role='status'></i>");
+			el.append("<i id='progress" + index + "' class='checked fa fa-adjust fa-flip-horizontal' title='Progress started.' aria-label='Section started' role='status'></i>");
 		},
 
 		markCompleted: function (index) {
@@ -759,12 +761,12 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 			if (el.find("ul li").length) {
 				var childrenComplete = this.checkForAllChildrenComplete(index);
 				if (childrenComplete) {
-					el.append("<i class='checked fa fa-check-circle' title='Progress completed.' aria-label='Section completed' role='status'></i>");
+					el.append("<i id='progress" + index + "' class='checked fa fa-check-circle' title='Progress completed.' aria-label='Section completed' role='status'></i>");
 				} else {
-					el.append("<i class='checked fa fa-adjust fa-flip-horizontal' title='Progress started.' aria-label='Section started' role='status'></i>");
+					el.append("<i id='progress" + index + "' class='checked fa fa-adjust fa-flip-horizontal' title='Progress started.' aria-label='Section started' role='status'></i>");
 				}
 			} else {
-				el.append("<i class='checked fa fa-check-circle' title='Progress completed.' aria-label='Section completed' role='status'></i>");
+				el.append("<i id='progress" + index + "' class='checked fa fa-check-circle' title='Progress completed.' aria-label='Section completed' role='status'></i>");
 			}
 
 			a.removeClass("completed").addClass("completed");
@@ -795,7 +797,7 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 			var checked = el.find("> i.checked");
 			checked.remove();
 
-			el.append("<i class='checked fa fa-adjust fa-flip-horizontal' title='Progress started.' aria-label='Section started' role='status'></i>");
+			el.append("<i id='progress" + index + "' class='checked fa fa-adjust fa-flip-horizontal' title='Progress started.' aria-label='Section started' role='status'></i>");
 
 			a.removeClass("completed");
 		},

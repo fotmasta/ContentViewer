@@ -268,3 +268,6 @@
 // DONE: check all doesn't mark matching question correct/incorrect
 // DONE: matching questions mark individual incorrect responses with X?
 // DONE: quizzerator with matching-style questions
+// DONE: the search results scroller isn't sized correctly (esp when @ 200%)
+// DONE: the search results come back with a weird tab order (search input comes after them)
+// DONE: quizzerator interface changes for Brett

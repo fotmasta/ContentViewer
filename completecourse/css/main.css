@@ -685,6 +685,9 @@ span.completed {
   overflow: hidden;
   z-index: 500;
   background-color: #F7E1D1; }
+  .search-results fieldset legend {
+    position: absolute;
+    left: -5000px; }
   .search-results .row {
     background-color: #e86414; }
   .search-results .input-group {

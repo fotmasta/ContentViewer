@@ -1049,6 +1049,13 @@ span.completed {
 
 	background-color: #F7E1D1;
 
+	fieldset {
+		legend {
+			position: absolute;
+			left: -5000px;
+		}
+	}
+
 	.row {
 		background-color: rgb(232, 100, 20);
 	}

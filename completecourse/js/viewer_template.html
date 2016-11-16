@@ -1,7 +1,7 @@
 <nav id="header-nav" class="navbar navbar-inverse navbar-fixed-top">
 	<button id="toc-toggler" tabindex=1 aria-controls="contents-pane" aria-expanded="true" data-coach="Show and hide the Table of Contents." data-coach-pos="bottom" title="Show and hide the Table of Contents." class="btn btn-primary pull-left open"><i class="fa fa-bars"></i></button>
 	<div class="navbar-header">
-		<button id="show-menu-button" title="Show the menu." data-coach-pos="bottom" class="navbar-toggle btn btn-info" data-toggle="collapse" data-target="#collapsible-menu">
+		<button id="show-menu-button" tabindex=1 title="Show the menu." data-coach-pos="bottom" class="navbar-toggle btn btn-info" data-toggle="collapse" data-target="#collapsible-menu">
 			<span class="fa fa-sort-down"></span>
 		</button>
 		<h1 class="navbar-brand"><span>{{title}}</span></h1>
@@ -28,7 +28,7 @@
 <div id="main" class="container-fluid invisible">
 	<div class="row">
 		<div id="contents" class="col-xs-3">
-			<div class="toc" id="contents-pane" role="navigation" aria-controls="#video">
+			<div class="toc" id="contents-pane" role="navigation" aria-controls="video">
 				<h2>Table of Contents</h2>
 				<div class="course-progress">
 					<button id="collapse-button" tabindex=3 title="Expand or collapse contents list." class="btn btn-primary btn-xs pull-left"><i class="fa fa-lg fa-caret-up"></i></button>
@@ -47,7 +47,9 @@
 				</div>
 			</div>
 			<div id="search-results-panel" class="search-results">
-				<div class="row">
+				<div class="row" id="search-header">
+					<fieldset>
+						<legend>Search This Title</legend>
 					<div class="col-xs-6">
 						<div class="input-group form-control">
 							<input title="Enter text to search for." arial-label="Search within this title." placeholder="Search" id="query-too" type="text" class="form-control" role="search">
@@ -75,6 +77,7 @@
 						</div>
 						</div>
 					</div>
+					</fieldset>
 				</div>
 				<div class="scroller">
 					<ul class="search-result-list" role="alert">
