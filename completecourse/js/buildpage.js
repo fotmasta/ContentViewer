@@ -230,7 +230,12 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 		var func = ResponsiveBootstrapToolkit.changed(function () {
 			var currentSize = ResponsiveBootstrapToolkit.current();
 			if (currentSize != lastSize) {
-				var desired = $("#toc-toggler").hasClass("open");
+				var desired = $("#toc-toggler").hasClass("initial-open");
+				if (!desired)
+					desired = $("#toc-toggler").hasClass("open");
+				else {
+					$("#toc-toggler").removeClass("initial-open");
+				}
 				if (currentSize == "xs") {
 					resizePanes(desired, false);
 
