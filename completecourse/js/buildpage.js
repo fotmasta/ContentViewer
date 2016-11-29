@@ -554,32 +554,50 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 	}
 
 	function onSearch () {
-		$("#toc-toggler").removeClass("open").attr("aria-expanded", false);
+		var useTOCForResults;
 
-		contentsPaneDesiredVisible = true;
-
-		resizePanes(false, false);
-
-		$("#contents-pane").attr( { "aria-hidden": true }).css( { visibility: "hidden", display: "none" } );
-		$("#contents .toc-tabstop").attr("tabindex", -1);
-
-		onResize();
-
-		var term = $("#query").val();
-
-		$("#query-too").val(term);
-
-		if (term == "" && $(".toc#contents-pane").TOCTree("hasSearchIndex")) {
-			$(".toc#contents-pane").TOCTree("showSearchPane");
+		if ($(".toc#contents-pane").TOCTree("hasSearchIndex")) {
+			useTOCForResults = false;
 		} else {
-			$(".toc#contents-pane").TOCTree("search", term);
+			useTOCForResults = true;
 		}
 
-		setTimeout(function () {
-			var wh = $(window).outerHeight();
-			var hh_search = $("#header-nav").outerHeight() + $("#search-header").outerHeight();
-			$("#search-results-panel .scroller").height(wh - hh_search);
-		}, 500);
+		if (useTOCForResults) {
+			contentsPaneDesiredVisible = true;
+
+			resizePanes(true, false);
+
+			onResize();
+
+			var term = $("#query").val();
+
+			$("#query-too").val(term);
+
+			$(".toc#contents-pane").TOCTree("search", term);
+		} else {
+			$("#toc-toggler").removeClass("open").attr("aria-expanded", false);
+
+			contentsPaneDesiredVisible = true;
+
+			resizePanes(false, false);
+
+			$("#contents-pane").attr({"aria-hidden": true}).css({visibility: "hidden", display: "none"});
+			$("#contents .toc-tabstop").attr("tabindex", -1);
+
+			onResize();
+
+			var term = $("#query").val();
+
+			$("#query-too").val(term);
+
+			$(".toc#contents-pane").TOCTree("showSearchPane");
+
+			setTimeout(function () {
+				var wh = $(window).outerHeight();
+				var hh_search = $("#header-nav").outerHeight() + $("#search-header").outerHeight();
+				$("#search-results-panel .scroller").height(wh - hh_search);
+			}, 500);
+		}
 	}
 
 	function onSearchToo () {

@@ -76,7 +76,7 @@ define(["database", "jquery.ui"], function (Database) {
 			var d = new Date(record.firstVisit);
 			this.addFunFact("Your first visit was " + d.toLocaleDateString() + ".");
 
-			this.addFunFact("You've made " + record.visits.length + " total visit" + (record.visits.length > 1 ? "s" : ""));
+			this.addFunFact("You've made " + record.visits.length + " total visit" + (record.visits.length > 1 ? "s." : "."));
 
 			// days since last visit
 			if (record.visits.length > 1) {
@@ -99,7 +99,8 @@ define(["database", "jquery.ui"], function (Database) {
 				this.addFunFact("You've visited " + count + " day" + (count > 1 ? "s" : "") + " in a row.");
 			}
 
-			Database.getTitleData($.proxy(this.onGetTitleData, this));
+			// 11/16: overall title data isn't available via InformIT
+			//Database.getTitleData($.proxy(this.onGetTitleData, this));
 		},
 
 		onGetTitleData: function (snapshot) {

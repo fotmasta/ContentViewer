@@ -1,0 +1,14 @@
+h3 {
+  margin-bottom: 1em;
+  text-align: center; }
+
+.password-form {
+  margin-top: 2em; }
+
+table.comments th:nth-child(8), table.comments th:nth-child(9) {
+  text-align: center; }
+
+.ok-row input {
+  cursor: pointer; }
+
+/*# sourceMappingURL=main.css.map */

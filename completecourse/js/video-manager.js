@@ -235,8 +235,6 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 				}
 			});
 
-			this.getCustomerIdentifier();
-
 			this.currentIndex = undefined;
 
 			this.trackID = 1;
@@ -862,6 +860,7 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 			$("#completed-progress").css("width", pct + "%").attr("aria-valuenow", pct);
 			// this is used by .progress::after (works on all browsers?)
 			$(".progress").attr("data-progress", pct + "% Complete");
+			$("#accessible-progress").text(pct + "% Complete");
 		},
 
 		addTimelineMarkers: function () {
@@ -1562,46 +1561,6 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 
 		getDatabase: function () {
 			return Database;
-		},
-
-		getCustomerIdentifier: function () {
-			var customerID;
-
-			if (window.opener) {
-				try {
-					customerID = $(window.opener.document).find("meta[name='WT.dcsvid']").attr("content");
-					if (customerID != null) {
-						Database.setCustomerID(customerID);
-					}
-				} catch (e) {
-					// no access to the opener page
-				}
-			} else {
-				if (window.location.hostname == "localhost") {
-					customerID = "5566ba59-a786-400e-a3e0-866b6d1244f7"
-					Database.setCustomerID(customerID);
-				}
-			}
-
-			return customerID;
-		},
-
-		hasCustomerIdentifier: function () {
-			if (window.opener) {
-				try {
-					var customerID = $(window.opener.document).find("meta[name='WT.dcsvid']").attr("content");
-					if (customerID != null) {
-						return true;
-					}
-				} catch (e) {
-					// no access
-				}
-			} else {
-				if (window.location.hostname == "localhost") {
-					return true;
-				}
-			}
-			return false;
 		},
 
 		onDatabaseUpdate: function () {

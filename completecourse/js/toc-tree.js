@@ -597,10 +597,12 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 						$(this).addClass("selected");
 					});
 					hitResult.keypress(function (event) {
-						var index = $(this).data("index");
-						me.launchVideo(index, { highlight: term }, event);
-						$(".hit.selected").removeClass("selected");
-						$(this).addClass("selected");
+						if (event.keyCode != 9) {
+							var index = $(this).data("index");
+							me.launchVideo(index, {highlight: term}, event);
+							$(".hit.selected").removeClass("selected");
+							$(this).addClass("selected");
+						}
 					});
 					$(".search-result-list").append(hitResult);
 				}

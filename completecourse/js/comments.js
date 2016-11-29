@@ -31,7 +31,9 @@ define(["database", "common", "jquery.ui", "video-manager"], function (Database,
 			this.comments = [];
 			this.last_iframe = undefined;
 
-			Database.onAuthorized($.proxy(this.loadCommentsFromFirebase, this));
+			Database.loadCommentsFromPersistentDB($.proxy(this.onLoadComments, this));
+
+//			Database.onAuthorized($.proxy(this.loadCommentsFromFirebase, this));
 
 			if (this.options.manager) {
 				this.options.manager.on("onNewTOC", $.proxy(this.showCurrentAnchorTitle, this));
@@ -47,17 +49,10 @@ define(["database", "common", "jquery.ui", "video-manager"], function (Database,
 			this.element.find("#tab-page small").text("(0)");
 		},
 
-		loadCommentsFromFirebase: function () {
-			// use "child_added" or "value"? ("child_added" wasn't triggered for changes; "value" is)
-			var path = Common.makeFirebaseFriendly(this.options.titlePath);
-			var titleRef = Database.getTitlesRef();
-			titleRef.child(path + "/comments").orderByChild("timestamp").on("value", $.proxy(this.onLoadComments, this));
-		},
-
-		onLoadComments: function (snapshot) {
+		onLoadComments: function (data) {
 			this.clearComments();
 
-			var recs = snapshot.val();
+			var recs = data;
 
 			// add non-child comments first
 			for (var each in recs) {
@@ -163,11 +158,6 @@ define(["database", "common", "jquery.ui", "video-manager"], function (Database,
 		},
 
 		onClickSubmit: function () {
-			if (!Database.getTitlesRef()) return;
-
-			var path = Common.makeFirebaseFriendly(this.options.titlePath);
-			var newCommentRef = Database.getTitlesRef().child(path + "/comments").push();
-
 			var name = this.element.find("#commentName").val();
 			name = name ? name : "Anonymous";
 			var email = this.element.find("#commentEmail").val();
@@ -178,9 +168,6 @@ define(["database", "common", "jquery.ui", "video-manager"], function (Database,
 
 			var rec = { "name": name, email: email, "text": text, "timestamp": timestamp, category: category, "ok": false };
 
-			var id = Database.getCustomerID();
-			if (id != undefined) rec.id = id;
-
 			var useAnchor = this.element.find("#commentAnchor").prop("checked");
 			if (useAnchor) {
 				// look up an anchor to use for this entry in the TOC
@@ -188,8 +175,10 @@ define(["database", "common", "jquery.ui", "video-manager"], function (Database,
 				rec.anchor_id = anchor_id;
 			}
 
-			newCommentRef.set(rec);
+			Database.postCommentToPersistentDatabase(rec, $.proxy(this.onCommentPosted, this));
+		},
 
+		onCommentPosted: function () {
 			this.notifyNewComment();
 
 			this.resetDataEntry();
@@ -445,9 +434,6 @@ define(["database", "common", "jquery.ui", "video-manager"], function (Database,
 			var timestamp = Date.now();
 
 			var rec = { "name": name, email: email, "text": text, "timestamp": timestamp, category: category, "ok": false, "parent": parentKey };
-
-			var id = Database.getCustomerID();
-			if (id != undefined) rec.id = id;
 
 			newCommentRef.set(rec);
 

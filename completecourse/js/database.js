@@ -1,4 +1,5 @@
-define(["common", "jquery.json", "firebase/app", "firebase/auth", "firebase/database"], function (Common) {
+define(["common"], function (Common) {
+	var masterURL = "https://memberservices.informit.com/";
 
 	function shrink (itemsArray) {
 		var s = [];
@@ -29,29 +30,91 @@ define(["common", "jquery.json", "firebase/app", "firebase/auth", "firebase/data
 		return itemsArray;
 	}
 
-	function initializeFirebaseApp () {
-		var config = {
-			apiKey: "AIzaSyAZQ32Kl7R85rXw3KDVAjl3oWkqkzlCpz4",
-			authDomain: "ptg-comments.firebaseapp.com",
-			databaseURL: "https://ptg-comments.firebaseio.com",
-			storageBucket: "ptg-comments.appspot.com",
+	function GetCommentsForTitle (isbn, callback) {
+		var url = masterURL + "api/PersistentCustomerData/" + isbn + "/GetAllComments";
+
+		var req = new XMLHttpRequest();
+		req.open("GET", url, true);
+		req.setRequestHeader('Content-type', 'application/json');
+		req.onload = function () {
+			if (callback) {
+				var data = JSON.parse(this.responseText);
+				var comments = [];
+				for (var each in data) {
+					var d = data[each];
+					var rec = JSON.parse(d.Value);
+					rec.isbn = isbn;
+					rec.id = d.Id;
+					comments.push(rec);
+				}
+				callback(comments);
+			}
+		};
+		req.send();
+	}
+
+	function PostCommentForTitle (isbn, commentJSONString, callback) {
+		var url = masterURL + "api/PersistentCustomerData";
+		var obj = { isbn: isbn, key: "comment", value: commentJSONString, isComment: true };
+		var params = JSON.stringify(obj);
+		var req = new XMLHttpRequest();
+		req.open("PUT", url, true);
+		req.setRequestHeader('Content-type', 'application/json');
+		req.onload = function (event) {
+			var data = JSON.parse(this.responseText);
+			if (callback)
+				callback(data);
+		};
+		try {
+			req.send(params);
+		} catch (e) {
+			console.log("PostCommentForTitle error:")
+			console.log(e);
+		}
+	}
+
+	function GetDataForTitle (isbn, key, callback) {
+		var url = masterURL + "api/PersistentCustomerData/" + isbn + "/" + key;
+		var req = new XMLHttpRequest();
+		req.open("GET", url, true);
+		req.setRequestHeader('Content-type', 'application/json');
+		req.onload = function (event) {
+			if (this.status != 404) {
+				var response = JSON.parse(this.responseText);
+				if (callback) {
+					var data = JSON.parse(response.Value);
+					callback(data);
+				}
+			} else {
+				callback(null);
+			}
 		};
 
-		firebase.initializeApp(config);
+		try {
+			req.send();
+		} catch (e) {
+			// probably a 404, no data for this title
+			console.log("GetDataForTitle error:")
+			console.log(e);
+
+			if (callback) {
+				callback(null);
+			}
+		}
 	}
 
-	function signinToFirebase () {
-		firebase.auth().signInAnonymously().catch(function (error) {
-			// Handle Errors here.
-			var errorCode = error.code;
-			var errorMessage = error.message;
-			console.log("error signing in");
-			console.log(error);
-		});
-	}
-
-	function signoutFromFirebase () {
-		firebase.auth().signOut();
+	function SetDataForTitle (isbn, key, value, callback) {
+		var url = masterURL + "api/PersistentCustomerData";
+		var obj = { isbn: isbn, key: key, value: value, isComment: false };
+		var params = JSON.stringify(obj);
+		var req = new XMLHttpRequest();
+		req.open("PUT", url, true);
+		req.setRequestHeader('Content-type', 'application/json');
+		req.onload = function (event) {
+			if (callback)
+				callback(this.responseText);
+		};
+		req.send(params);
 	}
 
 	var Database = {
@@ -60,7 +123,6 @@ define(["common", "jquery.json", "firebase/app", "firebase/auth", "firebase/data
 		items: [],
 		currentIndex: undefined,
 		callbacks: [],
-		remoteAuthorized: false,
 		last_save: undefined,
 		attemptedRemoteLoad: false,
 
@@ -71,16 +133,7 @@ define(["common", "jquery.json", "firebase/app", "firebase/auth", "firebase/data
 		initialize: function (toc, title, updateCallback) {
 			this.databaseRef = undefined;
 
-			this.authorize();
-
-			if (title === undefined) {
-				// NOTE: store our app data in a key named for the folder this content came from (ie, test_my_google_apps)
-
-				var paths = window.location.pathname.split("/");
-				title = paths[paths.length - 2];
-			}
-
-			this.folder = Common.makeFirebaseFriendly(title);
+			this.initialRemoteDataLoad();
 
 			this.items = new Array(toc.length);
 			for (var i = 0; i < this.items.length; i++) {
@@ -93,10 +146,49 @@ define(["common", "jquery.json", "firebase/app", "firebase/auth", "firebase/data
 			this.loadFromLocalStorage();
 		},
 
+		loadCommentsForISBN: function (isbn, callback) {
+			GetCommentsForTitle(isbn, callback);
+		},
+
+		loadCommentsFromPersistentDB: function (callback) {
+			var isbn = Common.getISBNFromLocation();
+			if (!isbn || isbn == "9780134438009") isbn = "9780134382562";
+			if (isbn) {
+				GetCommentsForTitle(isbn, callback);
+			}
+		},
+
+		postCommentToPersistentDatabase: function (commentObject, callback) {
+			var isbn = commentObject.isbn;
+			if (!isbn)
+				isbn = Common.getISBNFromLocation();
+
+			if (isbn) {
+				PostCommentForTitle(isbn, JSON.stringify(commentObject), callback);
+			}
+		},
+
+		deleteComment: function (id, callback) {
+			var url = masterURL + "api/PersistentCustomerData/" + id;
+			var req = new XMLHttpRequest();
+			req.open('DELETE', url, true);
+			req.setRequestHeader('Content-type', 'application/json');
+			req.onload = function (event) {
+				var data;
+				if (this.responseText)
+					data = JSON.parse(this.responseText);
+
+				if (callback)
+					callback(data);
+			};
+			req.send();
+		},
+
 		loadFromLocalStorage: function () {
-			var item = localStorage.getItem(this.folder);
+			var isbn = Common.getISBNFromLocation();
+			var item = localStorage.getItem(isbn);
 			if (item) {
-				var db = $.evalJSON(item);
+				var db = JSON.parse(item);
 
 				if (this.timestamp == undefined || db.timestamp > this.timestamp) {
 					if (typeof db.items == "string") {
@@ -118,16 +210,17 @@ define(["common", "jquery.json", "firebase/app", "firebase/auth", "firebase/data
 
 			var db = { timestamp: time, items: compressedItems, index: this.currentIndex, titleProperty: this.titleProperty };
 
-			var to_json = $.toJSON(db);
+			var to_json = JSON.stringify(db);
 
 			try {
-				localStorage.setItem(this.folder, to_json);
+				var isbn = Common.getISBNFromLocation();
+				localStorage.setItem(isbn, to_json);
 			} catch (e) {
 				// private browsing
 			}
 
 			if (to_json != this.last_save) {
-				this.saveToRemoteStorage(this.folder, to_json);
+				this.saveToRemoteStorage("savedData", to_json);
 				this.last_save = to_json;
 			}
 		},
@@ -208,24 +301,7 @@ define(["common", "jquery.json", "firebase/app", "firebase/auth", "firebase/data
 			this.saveToLocalStorage();
 		},
 
-		authorize: function () {
-			initializeFirebaseApp();
-
-			signinToFirebase();
-
-			firebase.auth().onAuthStateChanged($.proxy(this.onAuthorizedCallback, this));
-
-			window.onbeforeunload = signoutFromFirebase;
-
-			//this.databaseRef = new Firebase("https://ptg-comments.firebaseio.com");
-			//this.databaseRef.authAnonymously($.proxy(this.onAuthorizedCallback, this));
-		},
-
-		onAuthorizedCallback: function (user) {
-			this.databaseRef = firebase.database().ref();
-
-			this.remoteAuthorized = true;
-
+		initialRemoteDataLoad: function (user) {
 			this.loadFromRemoteStorage();
 
 			for (var i = 0; i < this.callbacks.length; i++) {
@@ -235,89 +311,64 @@ define(["common", "jquery.json", "firebase/app", "firebase/auth", "firebase/data
 			this.callbacks = [];
 		},
 
-		onAuthorized: function (callback) {
-			if (this.remoteAuthorized) {
-				callback();
-			} else {
-				this.callbacks.push(callback);
-			}
-		},
-
 		callWhenReady: function (callback) {
 			this.callbacks.push(callback);
 		},
 
-		setCustomerID: function (id) {
-			this.customerID = id;
-			//this.userStorageRef = new Firebase("https://ptg-comments.firebaseio.com/users/" + id);
-		},
-
-		getCustomerID: function () {
-			return this.customerID;
-		},
-
-		saveToRemoteStorage: function (folder, data) {
+		saveToRemoteStorage: function (key, data) {
 			// THEORY: don't save to remote until we've tried loading from the remote
 			if (this.attemptedRemoteLoad) {
-				if (this.customerID) {
-					this.databaseRef.child("users/" + this.customerID + "/" + folder).set(data);
-				}
+				var isbn = Common.getISBNFromLocation();
+				SetDataForTitle(isbn, key, data, $.proxy(this.onSavedToRemoteStorage, this));
 			}
 		},
 
 		loadFromRemoteStorage: function () {
-			if (this.customerID) {
-				this.attemptedRemoteLoad = true;
+			var isbn = Common.getISBNFromLocation();
 
-				var me = this;
+			GetDataForTitle(isbn, "savedData", $.proxy(this.onLoadedFromRemoteStorage, this));
+		},
 
-				this.databaseRef.child("users/" + this.customerID + "/" + this.folder).once("value", function (snapshot) {
-					var item = snapshot.val();
+		onLoadedFromRemoteStorage: function (data) {
+			this.attemptedRemoteLoad = true;
 
-					if (item) {
-						var db = $.evalJSON(item);
-
-						if (this.timestamp == undefined || db.timestamp > me.timestamp) {
-							if (typeof db.items == "string") {
-								me.items = unshrink(db.items);
-							} else {
-								me.items = db.items;
-							}
-							me.currentIndex = db.index;
-							me.titleProperty = db.titleProperty;
-							me.timestamp = db.timestamp;
-
-							if (me.updateCallback) {
-								me.updateCallback();
-							}
-						}
+			if (data) {
+				if (this.timestamp == undefined || data.timestamp > this.timestamp) {
+					if (typeof data.items == "string") {
+						this.items = unshrink(data.items);
+					} else {
+						this.items = data.items;
 					}
-				});
+					this.currentIndex = data.index;
+					this.titleProperty = data.titleProperty;
+					this.timestamp = data.timestamp;
+
+					if (this.updateCallback) {
+						this.updateCallback();
+					}
+
+					this.saveToLocalStorage();
+				}
 			}
+		},
+
+		onSavedToRemoteStorage: function (result) {
+			//console.log("on saved");
+			//console.log(result);
 		},
 
 		setUserData: function (key, value) {
-			if (!this.remoteAuthorized) {
-				this.callWhenReady($.proxy(this.setUserData, this, key, value));
-			} else {
-				if (this.customerID) {
-					this.databaseRef.child("users/" + this.customerID + "/userdata").child(key).set(value);
-				}
-			}
+			var isbn = Common.getISBNFromLocation();
+			var obj = { key: key, value: value };
+			var json_value = JSON.stringify(obj);
+			SetDataForTitle(isbn, "userData", json_value);
 		},
 
 		getUserData: function (key, callback) {
-			if (!this.remoteAuthorized) {
-				this.callWhenReady($.proxy(this.getUserData, this, key, callback));
-			} else {
-				if (this.customerID) {
-					this.databaseRef.child("users/" + this.customerID + "/userdata").child(key).once("value", function (snapshot) {
-						var item = snapshot.val();
-
-						callback(item);
-					});
-				}
-			}
+			var isbn = Common.getISBNFromLocation();
+			GetDataForTitle(isbn, "userData", function (data) {
+				callback(data.value);
+			});
 		},
 
 		getTitleData: function (callback) {
