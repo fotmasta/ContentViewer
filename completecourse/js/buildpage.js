@@ -28,10 +28,7 @@ requirejs.config({
 		"videojs": "video",
 		"videojs-markers": "videojs-markers",
 		"handlebars": "handlebars-v3.0.3",
-		"lunr": "lunr.min",
-		"firebase/app": "https://www.gstatic.com/firebasejs/3.4.0/firebase-app",
-		"firebase/auth": "https://www.gstatic.com/firebasejs/3.4.0/firebase-auth",
-		"firebase/database": "https://www.gstatic.com/firebasejs/3.4.0/firebase-database"
+		"lunr": "lunr.min"
 	},
 	shim: {
 		"jquery": {
@@ -90,17 +87,6 @@ requirejs.config({
 		},
 		"handlebars": {
 			exports: "Handlebars"
-		},
-		"firebase/app": {
-			export: "firebase"
-		},
-		"firebase/auth": {
-			export: "firebase",
-			deps: ["firebase/app"]
-		},
-		"firebase/database": {
-			export: "firebase",
-			deps: ["firebase/auth"]
 		}
 	},
 	// this fixed the "appending .js" problem I was getting on informit.com

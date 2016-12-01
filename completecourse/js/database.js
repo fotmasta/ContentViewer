@@ -367,7 +367,8 @@ define(["common"], function (Common) {
 		getUserData: function (key, callback) {
 			var isbn = Common.getISBNFromLocation();
 			GetDataForTitle(isbn, "userData", function (data) {
-				callback(data.value);
+				if (callback && data)
+					callback(data.value);
 			});
 		},
 
