@@ -42,10 +42,15 @@ define(["common"], function (Common) {
 				var comments = [];
 				for (var each in data) {
 					var d = data[each];
-					var rec = JSON.parse(d.Value);
-					rec.isbn = isbn;
-					rec.id = d.Id;
-					comments.push(rec);
+					try {
+						var rec = JSON.parse(d.Value);
+						rec.isbn = isbn;
+						rec.id = d.Id;
+						comments.push(rec);
+					} catch (e) {
+						console.log("Parse error in:");
+						console.log(d.Value);
+					}
 				}
 				callback(comments);
 			}

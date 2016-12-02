@@ -14,14 +14,20 @@ define(["database", "jquery.ui", "bootstrap-confirmation"], function (Database) 
 		}
 	}
 
-	var isbns = ["9780134382562", "9780134646831"];
+	var isbns = [];
 
 	$.widget("que.CommentModerator", {
 
 		options: {},
 
 		_create: function () {
-			this.reloadComments();
+			var me = this;
+
+			$.get("isbns.txt", function (data) {
+				isbns = data.split("\n");
+
+				me.reloadComments();
+			});
 		},
 
 		reloadComments: function () {
@@ -37,6 +43,7 @@ define(["database", "jquery.ui", "bootstrap-confirmation"], function (Database) 
 
 			for (var i = 0; i < isbns.length; i++) {
 				var isbn = isbns[i];
+				console.log("checking " + isbn);
 				Database.loadCommentsForISBN(isbn, $.proxy(this.addComments, this));
 			}
 		},
