@@ -156,10 +156,12 @@ define(["common"], function (Common) {
 		},
 
 		loadCommentsFromPersistentDB: function (callback) {
-			var isbn = Common.getISBNFromLocation();
-			if (!isbn || isbn == "9780134438009") isbn = "9780134382562";
-			if (isbn) {
-				GetCommentsForTitle(isbn, callback);
+			if (Common.getISBNFromLocation) {
+				var isbn = Common.getISBNFromLocation();
+				if (!isbn || isbn == "9780134438009") isbn = "9780134382562";
+				if (isbn) {
+					GetCommentsForTitle(isbn, callback);
+				}
 			}
 		},
 
@@ -190,20 +192,22 @@ define(["common"], function (Common) {
 		},
 
 		loadFromLocalStorage: function () {
-			var isbn = Common.getISBNFromLocation();
-			var item = localStorage.getItem(isbn);
-			if (item) {
-				var db = JSON.parse(item);
+			if (Common.getISBNFromLocation) {
+				var isbn = Common.getISBNFromLocation();
+				var item = localStorage.getItem(isbn);
+				if (item) {
+					var db = JSON.parse(item);
 
-				if (this.timestamp == undefined || db.timestamp > this.timestamp) {
-					if (typeof db.items == "string") {
-						this.items = unshrink(db.items);
-					} else {
-						this.items = db.items;
+					if (this.timestamp == undefined || db.timestamp > this.timestamp) {
+						if (typeof db.items == "string") {
+							this.items = unshrink(db.items);
+						} else {
+							this.items = db.items;
+						}
+						this.currentIndex = db.index;
+						this.titleProperty = db.titleProperty;
+						this.timestamp = db.timestamp;
 					}
-					this.currentIndex = db.index;
-					this.titleProperty = db.titleProperty;
-					this.timestamp = db.timestamp;
 				}
 			}
 		},
@@ -329,9 +333,11 @@ define(["common"], function (Common) {
 		},
 
 		loadFromRemoteStorage: function () {
-			var isbn = Common.getISBNFromLocation();
+			if (Common.getgetISBNFromLocation) {
+				var isbn = Common.getISBNFromLocation();
 
-			GetDataForTitle(isbn, "savedData", $.proxy(this.onLoadedFromRemoteStorage, this));
+				GetDataForTitle(isbn, "savedData", $.proxy(this.onLoadedFromRemoteStorage, this));
+			}
 		},
 
 		onLoadedFromRemoteStorage: function (data) {
