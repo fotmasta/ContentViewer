@@ -18,3 +18,19 @@ table.comments {
 		cursor: pointer;
 	}
 }
+
+.options {
+	margin: 0 10px 15px 10px;
+
+	input {
+		margin-left: 1em;
+	}
+}
+
+.moderator {
+	#no-unmoderated-comments {
+		display: none;
+		margin-left: 10px;
+		font-style: italic;
+	}
+}

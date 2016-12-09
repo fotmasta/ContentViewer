@@ -11,4 +11,14 @@ table.comments th:nth-child(8), table.comments th:nth-child(9) {
 .ok-row input {
   cursor: pointer; }
 
+.options {
+  margin: 0 10px 15px 10px; }
+  .options input {
+    margin-left: 1em; }
+
+.moderator #no-unmoderated-comments {
+  display: none;
+  margin-left: 10px;
+  font-style: italic; }
+
 /*# sourceMappingURL=main.css.map */

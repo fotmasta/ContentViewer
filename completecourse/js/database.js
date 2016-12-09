@@ -63,7 +63,7 @@ define(["common"], function (Common) {
 		var obj = { isbn: isbn, key: "comment", value: commentJSONString, isComment: true };
 		var params = JSON.stringify(obj);
 		var req = new XMLHttpRequest();
-		req.open("PUT", url, true);
+		req.open("POST", url, true);
 		req.setRequestHeader('Content-type', 'application/json');
 		req.onload = function (event) {
 			var data = JSON.parse(this.responseText);

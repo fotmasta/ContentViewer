@@ -15,6 +15,17 @@ define(["database", "common", "jquery.ui", "video-manager"], function (Database,
 		return parentComment;
 	}
 
+	function getDaysBetween (date1, date2) {
+		var one_day = 1000 * 60 * 60 * 24;
+
+		var date1_ms = date1.getTime();
+		var date2_ms = date2.getTime();
+
+		var difference_ms = date2_ms - date1_ms;
+
+		return difference_ms / one_day;
+	}
+
 	$.widget("que.Comments", {
 
 		options: {},
@@ -76,6 +87,15 @@ define(["database", "common", "jquery.ui", "video-manager"], function (Database,
 		},
 
 		addComment: function (params) {
+			var dateFromTimestamp = new Date(params.timestamp);
+
+			var age = getDaysBetween(new Date(), dateFromTimestamp);
+
+			// don't show old un-moderated comments
+			if (!params.ok && age < -1) {
+				return;
+			}
+
 			var d = $("<div>", { class: "comment" });
 			d.attr("data-key", params.key);
 
@@ -89,7 +109,6 @@ define(["database", "common", "jquery.ui", "video-manager"], function (Database,
 			var h = $("<h5>", { class: "comment-name", text: n });
 			d.append(h);
 
-			var dateFromTimestamp = new Date(params.timestamp);
 			var dateOptions = { year: "numeric", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" };
 			var dateFormatted = dateFromTimestamp.toLocaleTimeString([], dateOptions);
 
