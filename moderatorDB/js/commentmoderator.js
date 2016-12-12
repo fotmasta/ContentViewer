@@ -275,7 +275,9 @@ define(["database", "jquery.ui", "bootstrap-confirmation"], function (Database) 
 		onClickFilter: function (event) {
 			this.options.filter = $(event.target).val();
 
-			this.refreshComments();
+			//this.refreshComments();
+			
+			this.reloadComments();
 		}
 	});
 });
