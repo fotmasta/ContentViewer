@@ -101,6 +101,10 @@ body.skin-Microsoft {
 	.course-progress .progress:after {
 		color: black;
 	}
+
+	.navbar-toggle:focus {
+		outline: auto;
+	}
 }
 
 .col-xs-0 {
@@ -665,6 +669,12 @@ ul.toc-holder {
 	}
 }
 
+@media (max-width: 200px) {
+	i.checked {
+		display: none;
+	}
+}
+
 .buy-btn {
 	margin-left: 10px;
 	margin-top: -8px;
@@ -1179,6 +1189,13 @@ button#search-close {
 	transform: scale(2) translate(-25%, -25%);
 	pointer-events: none;
 	display: none;
+	text-align: center;
+	font-size: 12px;
+
+	p#loading-text {
+		display: none;
+		line-height: 1em;
+	}
 }
 
 .sk-circle {

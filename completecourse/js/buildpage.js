@@ -665,6 +665,7 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 				$("#query").hide(0).attr( { "aria-hidden": true, "hidden": true  });
 				$("#comments-panel").attr( { "aria-hidden": true, "hidden": true  });
 				$("#account-panel").attr( { "aria-hidden": true, "hidden": true  });
+				$("#loading-text").css("display", "inline-block");
 
 				$("#query-too").attr("placeholder", "Enter search text");
 			}

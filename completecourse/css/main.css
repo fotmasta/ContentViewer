@@ -58,6 +58,8 @@ body.skin-Microsoft {
     outline: auto; }
   body.skin-Microsoft .course-progress .progress:after {
     color: black; }
+  body.skin-Microsoft .navbar-toggle:focus {
+    outline: auto; }
 
 .col-xs-0 {
   float: left;
@@ -418,6 +420,9 @@ ul.toc-holder {
 @media (max-width: 800px) {
   .navbar-brand span {
     max-width: 10em; } }
+@media (max-width: 200px) {
+  i.checked {
+    display: none; } }
 .buy-btn {
   margin-left: 10px;
   margin-top: -8px;
@@ -769,7 +774,12 @@ button#search-close {
   left: 50%;
   transform: scale(2) translate(-25%, -25%);
   pointer-events: none;
-  display: none; }
+  display: none;
+  text-align: center;
+  font-size: 12px; }
+  .loading-indicator p#loading-text {
+    display: none;
+    line-height: 1em; }
 
 .sk-circle {
   margin: 100px auto;

@@ -17,7 +17,7 @@
 				</div>
 				<input type="text" class="form-control" placeholder="Search" title="Text to search for." id="query" name="query" value="" accesskey="q" role="search">
 				<div class="input-group-btn">
-					<button class="btn btn-primary search-button" tabindex=2 title="Open the search panel." aria-controls="search-results-panel"><span class="glyphicon glyphicon-search"></span></button>
+					<button class="btn btn-primary search-button" tabindex=2 title="Toggle the search panel." aria-controls="search-results-panel"><span class="glyphicon glyphicon-search"></span></button>
 				</div>
 			</div>
 			<button id="account-button" data-coach="Open the Account panel." title="Open the Account panel." data-coach-pos="bottom" class="btn btn-primary">Account</button>
@@ -81,7 +81,7 @@
 					</fieldset>
 				</div>
 				<div class="scroller">
-					<ul class="search-result-list" role="alert">
+					<ul class="search-result-list">
 					</ul>
 				</div>
 			</div>
@@ -107,7 +107,7 @@
 		</div>
 	</div>
 
-	<div class="loading-indicator">
+	<div class="loading-indicator" role="alert">
 		<div class="sk-circle">
 			<div class="sk-circle1 sk-child"></div>
 			<div class="sk-circle2 sk-child"></div>
@@ -121,6 +121,7 @@
 			<div class="sk-circle10 sk-child"></div>
 			<div class="sk-circle11 sk-child"></div>
 			<div class="sk-circle12 sk-child"></div>
+			<p id="loading-text">Loading New Section</p>
 		</div>
 	</div>
 

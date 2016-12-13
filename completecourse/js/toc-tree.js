@@ -197,11 +197,13 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 			if (vis) {
 				li.find(".dropper.opened").first().show(0);
 				li.find(".dropper.closed").first().hide(0);
-				li.attr("aria-expanded", true);
+				if (li.hasClass("tree-parent"))
+					li.attr("aria-expanded", true);
 			} else {
 				li.find(".dropper.opened").first().hide(0);
 				li.find(".dropper.closed").first().show(0);
-				li.attr("aria-expanded", false);
+				if (li.hasClass("tree-parent"))
+					li.attr("aria-expanded", false);
 			}
 		});
 	}
@@ -333,6 +335,7 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 						if (d.children[i] && d.children[i].node)
 							d.children[i].node.parent = d.node;
 					}
+					li.addClass("tree-parent");
 				} else {
 					linkholder = li;
 				}
@@ -857,7 +860,7 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 			this.holder.find(".dropper.opened").hide(0);
 			this.holder.find(".dropper.closed").show(0);
 
-			this.holder.find("li").attr("aria-expanded", false);
+			this.holder.find("li.tree-parent").attr("aria-expanded", false);
 		},
 
 		expandTOC: function () {
@@ -866,7 +869,7 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 			this.holder.find(".dropper.opened").show(0);
 			this.holder.find(".dropper.closed").hide(0);
 
-			this.holder.find("li").attr("aria-expanded", true);
+			this.holder.find("li.tree-parent").attr("aria-expanded", true);
 		},
 
 		expandOrCollapse: function (event) {

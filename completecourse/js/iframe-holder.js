@@ -382,11 +382,13 @@ define(["bootstrap-dialog", "imagesloaded", "database", "jquery.ui"], function (
 			if (terms) {
 				var allTerms = terms.split(" ");
 				this.iframe.contents().find("body").unhighlight().highlight(allTerms);
+				this.iframe.contents().find("body span.highlight").attr("tabindex", 0);
 			}
 		},
 
 		unhighlight: function () {
 			this.iframe.contents().find("body").unhighlight();
+			this.iframe.contents().find("body span.highlight").attr("tabindex", null);
 		},
 
 		addPreviousButton: function () {

@@ -276,7 +276,7 @@ define(["database", "jquery.ui", "bootstrap-confirmation"], function (Database) 
 			this.options.filter = $(event.target).val();
 
 			//this.refreshComments();
-			
+
 			this.reloadComments();
 		}
 	});
