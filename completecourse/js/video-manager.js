@@ -652,6 +652,8 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 			$(".loading-indicator").hide();
 
 			this.onNewContentShowing(iframe);
+
+			iframe.focus();
 		},
 
 		onNewContentShowing: function (iframe) {
