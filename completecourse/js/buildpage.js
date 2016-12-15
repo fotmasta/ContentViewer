@@ -482,7 +482,7 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 			$("#contents-pane").attr( { "aria-hidden": true }).css( { visibility: "hidden", display: "none" } );
 			$("#contents .toc-tabstop").attr("tabindex", -1);
 
-			$(".toc#contents-pane").TOCTree("closeSearch");
+			//$(".toc#contents-pane").TOCTree("closeSearch");
 		}
 
 		if (resourcesVisible) {
