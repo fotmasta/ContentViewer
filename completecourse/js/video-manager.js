@@ -653,7 +653,8 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 
 			this.onNewContentShowing(iframe);
 
-			iframe.focus();
+			if (iframe.focus)
+				iframe.focus();
 		},
 
 		onNewContentShowing: function (iframe) {

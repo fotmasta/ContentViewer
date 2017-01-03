@@ -434,7 +434,7 @@ define(["bootstrap-dialog", "imagesloaded", "database", "jquery.ui"], function (
 			var href = $(event.currentTarget).attr("href");
 
 			// external link
-			if  (href.indexOf("http:") != -1 || href.indexOf("mailto") != -1) {
+			if  (href.indexOf("http:") != -1 || href.indexOf("mailto") != -1 || href.indexOf("https:") != -1) {
 				window.open(href, "_blank");
 			} else {
 				// find the toc entry with this href and go there (including the link index # in our address bar)
