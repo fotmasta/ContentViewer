@@ -238,6 +238,10 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 			this.searchCounter = undefined;
 
 			this.element.find(".highlight-button").click($.proxy(this.onClickHighlight, this));
+
+			if (this.options.skin && this.options.skin.trim() == "Microsoft") {
+				this.element.find(".scroller").on("mousewheel", $.proxy(this.preventTOCEdgeScrolling, this));
+			}
 		},
 
 		refresh: function () {
@@ -942,6 +946,15 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 					var checkbox = $('<input data-version="' + i + '" class="highlight-button" type="checkbox" checked><label>' + label + '</label>');
 					this.element.find("#versions").append(checkbox);
 				}
+			}
+		},
+
+		preventTOCEdgeScrolling: function (event) {
+			var s = this.element.find(".scroller");
+			var t = s.scrollTop() + s.innerHeight();
+			var h = s[0].scrollHeight;
+			if ( (t >= h && event.originalEvent.deltaY > 0) || (s.scrollTop() <= 0 && event.originalEvent.deltaY < 0) ) {
+				event.preventDefault();
 			}
 		}
 	});

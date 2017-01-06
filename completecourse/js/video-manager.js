@@ -169,6 +169,7 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 			this.player = player;
 			this.name = "Larry";
 			this.options = options;
+			this.keepFocusOnPage = false;
 
 			if (options.title)
 				document.title = options.title;
@@ -408,6 +409,12 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 				history.pushState(null, null, "?link=" + index + staging);
 			}
 
+			if (options && (options.keepFocus)) {
+				this.keepFocusOnPage = true;
+			} else {
+				this.keepFocusOnPage = false;
+			}
+
 			this.syncTOCToContent(index);
 
 			var src = this.toc[index].src;
@@ -426,7 +433,10 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 				$(".video-holder").hide();
 
 				// set focus to iframe content
-				this.iframe.find("iframe").focus();
+				if (this.keepFocusOnPage) {
+					var f = this.iframe.find("iframe");
+					if (f && f.focus) f.focus();
+				}
 
 				return;
 			}
@@ -617,6 +627,8 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 			if (el.length) {
 				var top = el.offset().top;
 				dest = top - 30;
+
+				el.attr("tabindex", -1).focus();
 			}
 
 			/*
@@ -653,7 +665,7 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 
 			this.onNewContentShowing(iframe);
 
-			if (iframe.focus)
+			if (this.keepFocusOnPage && iframe.focus)
 				iframe.focus();
 		},
 
