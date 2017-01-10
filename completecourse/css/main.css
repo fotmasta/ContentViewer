@@ -60,6 +60,10 @@ body.skin-Microsoft {
     color: black; }
   body.skin-Microsoft .navbar-toggle:focus {
     outline: auto; }
+  body.skin-Microsoft h1:focus, body.skin-Microsoft h2:focus, body.skin-Microsoft h3:focus, body.skin-Microsoft h4:focus, body.skin-Microsoft p:focus {
+    outline: none;
+    border: 1px solid #4D90FE;
+    box-shadow: 0px 0px 5px  #4D90FE; }
 
 .col-xs-0 {
   float: left;

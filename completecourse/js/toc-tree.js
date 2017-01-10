@@ -240,7 +240,7 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 			this.element.find(".highlight-button").click($.proxy(this.onClickHighlight, this));
 
 			if (this.options.skin && this.options.skin.trim() == "Microsoft") {
-				this.element.find(".scroller").on("mousewheel", $.proxy(this.preventTOCEdgeScrolling, this));
+				this.element.find(".scroller").on("wheel mousewheel", $.proxy(this.preventTOCEdgeScrolling, this));
 			}
 		},
 

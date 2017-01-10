@@ -421,7 +421,7 @@ define(["bootstrap-dialog", "imagesloaded", "database", "jquery.ui"], function (
 			var next = $(event.currentTarget).data("goto-index");
 			var cur = this.options.manager.getCurrentIndex();
 
-			$(this.element).trigger("jump", { depth: next, options: { markCurrent: cur, replaceAll: true, keepFocus: true } });
+			$(this.element).trigger("jump", { depth: next, options: { markCurrent: cur, replaceAll: true } });
 		},
 
 		overrideLinks: function () {

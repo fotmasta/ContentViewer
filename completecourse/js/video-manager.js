@@ -169,7 +169,7 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 			this.player = player;
 			this.name = "Larry";
 			this.options = options;
-			this.keepFocusOnPage = false;
+			this.initialPageLoad = false;
 
 			if (options.title)
 				document.title = options.title;
@@ -369,6 +369,8 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 
 			var index = Database.getCurrentIndex();
 
+			this.initialPageLoad = true;
+
 			if (index == undefined) {
 				this.loadFirstVideo();
 			} else if (!found) {
@@ -409,12 +411,6 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 				history.pushState(null, null, "?link=" + index + staging);
 			}
 
-			if (options && (options.keepFocus)) {
-				this.keepFocusOnPage = true;
-			} else {
-				this.keepFocusOnPage = false;
-			}
-
 			this.syncTOCToContent(index);
 
 			var src = this.toc[index].src;
@@ -431,12 +427,6 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 
 				$(".iframe-holder").show();
 				$(".video-holder").hide();
-
-				// set focus to iframe content
-				if (this.keepFocusOnPage) {
-					var f = this.iframe.find("iframe");
-					if (f && f.focus) f.focus();
-				}
 
 				return;
 			}
@@ -628,8 +618,11 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 				var top = el.offset().top;
 				dest = top - 30;
 
-				el.attr("tabindex", -1).focus();
+				if (this.initialPageLoad == false)
+					el.attr("tabindex", -1).focus();
 			}
+
+			this.initialPageLoad = false;
 
 			/*
 			// kludge for iOS scrolling (I don't like this one bit)
@@ -664,9 +657,6 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 			$(".loading-indicator").hide();
 
 			this.onNewContentShowing(iframe);
-
-			if (this.keepFocusOnPage && iframe.focus)
-				iframe.focus();
 		},
 
 		onNewContentShowing: function (iframe) {
