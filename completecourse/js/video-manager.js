@@ -423,6 +423,10 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 
 			// if this is iframe content, open it now; otherwise, it's video
 			if (src) {
+				if (this.toc[index].class) {
+					options.class = this.toc[index].class;
+				}
+
 				this.playExtraFromTOC(index, options);
 
 				$(".iframe-holder").show();
@@ -682,7 +686,8 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 					hash: params.hash,
 					highlight: params.highlight,
 					type: params.type,
-					disabledContent: params.disabledContent
+					disabledContent: params.disabledContent,
+					class: params.class
 				});
 
 				iframe.appendTo(".iframe-holder");
@@ -700,7 +705,8 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 					hash: params.hash,
 					highlight: params.highlight,
 					type: params.type,
-					disabledContent: params.disabledContent
+					disabledContent: params.disabledContent,
+					class: params.class
 				};
 
 				this.waitingForIFrameToLoad = true;
@@ -753,7 +759,8 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 						hash: options.hash,
 						highlight: options.highlight,
 						type: this.options.type,
-						disabledContent: this.toc[index].disabled
+						disabledContent: this.toc[index].disabled,
+						class: options.class
 					});
 				}
 
@@ -1469,6 +1476,9 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 			var captions = this.toc[this.currentIndex].captions;
 
 			if (captions) {
+				// try to avoid cross-origin errors b/t s3 and informIT
+				$("video").attr("crossorigin", "anonymous");
+
 				$(this.el).find("track").remove();
 
 				var track = document.createElement("track");

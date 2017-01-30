@@ -1560,6 +1560,22 @@ button#search-close {
 	overflow: hidden;
 }
 
+html.articulate {
+	width: auto !important;
+
+	body.articulate {
+		position: relative;
+		width: auto !important;
+
+		.framewrap {
+			position: relative;
+			top: auto !important;
+			left: auto !important;
+			margin: 0 auto;
+		}
+	}
+}
+
 /* CUP styling overrides */
 
 section.cup-new:before {

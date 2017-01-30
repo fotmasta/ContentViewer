@@ -1066,6 +1066,17 @@ button#search-close {
   height: 1px;
   overflow: hidden; }
 
+html.articulate {
+  width: auto !important; }
+  html.articulate body.articulate {
+    position: relative;
+    width: auto !important; }
+    html.articulate body.articulate .framewrap {
+      position: relative;
+      top: auto !important;
+      left: auto !important;
+      margin: 0 auto; }
+
 /* CUP styling overrides */
 section.cup-new:before {
   left: 0;

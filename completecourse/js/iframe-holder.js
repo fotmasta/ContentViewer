@@ -376,6 +376,11 @@ define(["bootstrap-dialog", "imagesloaded", "database", "jquery.ui"], function (
 
 			var $body = this.iframe.contents().find("body").addClass("habitat-body " + skin);
 			var $html = this.iframe.contents().find("html").addClass("habitat-html");
+
+			if (this.options.class) {
+				$body.addClass(this.options.class);
+				$html.addClass(this.options.class);
+			}
 		},
 
 		highlight: function (terms) {

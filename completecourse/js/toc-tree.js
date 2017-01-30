@@ -821,7 +821,7 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 			var ok = true;
 			for (var i = 0; i < this.options.data.length; i++) {
 				var childNode = this.options.data[i];
-				if (childNode.parent == thisParent) {
+				if (childNode && childNode.parent == thisParent) {
 					var complete = this.options.data[childNode.index].completed;
 					if (!complete) {
 						ok = false;
@@ -829,7 +829,7 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 					} else {
 						// check children
 						for (var j = 0; j < this.options.data.length; j++) {
-							if (this.options.data[j].parent == childNode) {
+							if (this.options.data[j] && this.options.data[j].parent == childNode) {
 								complete = this.checkChildrenComplete(j);
 								if (!complete) {
 									ok = false;
