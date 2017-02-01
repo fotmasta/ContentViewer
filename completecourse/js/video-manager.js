@@ -446,6 +446,8 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 			var dontUseiOS10Patch = $("html").hasClass("dontUseiOS10Patch");
 			var alwaysUseRedirect = $("html").hasClass("use-redirect");
 
+			$("video").attr("crossorigin", null);
+
 			if (src.indexOf(".mov") != -1 || src.indexOf(".mp4") != -1) {
 				var ver = iOSversion();
 				if (alwaysUseRedirect || (ver && ver[0] >= 10 && !dontUseiOS10Patch)) {
