@@ -99,7 +99,7 @@ requirejs.config({
 	}
 });
 
-define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popcorn", "popcorn.timebase", "bootstrap-toolkit", "comments", "account"], function ($, VideoManager) {
+define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popcorn", "popcorn.timebase", "bootstrap-toolkit", "comments", "notes", "account"], function ($, VideoManager) {
 	var manifest;
 
 	var contentsPaneDesiredVisible = undefined;
@@ -121,6 +121,8 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 
 		$("#comments-panel").Comments( { manager: $("#video"), titlePath: getEscapedPathFromTitle(optionsTitle) });
 
+		$("#notes-panel").Notes({ manager: $("#video"), titlePath: getEscapedPathFromTitle(optionsTitle) });
+
 		$("#account-panel").Account();
 
 //		if ($("#video").VideoManager("hasCustomerIdentifier") && manifest.allowComments !== false) {
@@ -129,6 +131,8 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 		} else {
 			$("#show-comments-button").hide(0);
 		}
+
+		$("#show-notes-button").click(onOpenNotes);
 
 		if (manifest.buyButton != undefined) {
 			var buyButton = $("<a>", { class: "buy-btn btn btn-danger", target: "_blank", href: manifest.buyButton, text: " Add to cart"});
@@ -631,6 +635,10 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 		$("#comments-panel").Comments("togglePanel");
 	}
 
+	function onOpenNotes () {
+		$("#notes-panel").Notes("togglePanel");
+	}
+
 	function onOpenAccountPanel () {
 		$("#account-panel").Account("togglePanel");
 	}
@@ -660,10 +668,12 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 
 			if (options.skin == "Microsoft") {
 				$("#show-comments-button").hide(0).attr( { "aria-hidden": true, "hidden": true  });
+				$("#show-notes-button").hide(0).attr( { "aria-hidden": true, "hidden": true  });
 				$("#account-button").hide(0).attr( { "aria-hidden": true, "hidden": true  });
 				$("#clear-search-button").hide(0).attr( { "aria-hidden": true, "hidden": true  });
 				$("#query").hide(0).attr( { "aria-hidden": true, "hidden": true  });
 				$("#comments-panel").attr( { "aria-hidden": true, "hidden": true  });
+				$("#notes-panel").attr( { "aria-hidden": true, "hidden": true  });
 				$("#account-panel").attr( { "aria-hidden": true, "hidden": true  });
 				$("#loading-text").css("display", "inline-block");
 

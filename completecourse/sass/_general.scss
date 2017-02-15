@@ -1494,6 +1494,139 @@ button#search-close {
 	}
 }
 
+#notes-panel {
+	display: none;
+	position: fixed;
+	top: 51px;
+	bottom: 0;
+	right: 0;
+	width: 33vw;
+	background-color: white;
+	border-left: 3px solid #288C32;
+	padding: 10px;
+	overflow: visible;
+	box-shadow: -5px 0 20px black;
+
+	&.searching {
+		.note {
+		}
+
+		.note.hit {
+		}
+
+		.note:not(.hit) {
+		}
+	}
+
+	#notes-all {
+		height: 100%;
+	}
+
+	.note-search {
+	}
+
+	.note.editing {
+		.note-text {
+			padding: 3px;
+			border: 3px solid #a5c3ff;
+			background-color: white;
+		}
+	}
+
+	#notes-content {
+		height: 100%;
+		overflow: hidden;
+	}
+
+	.note-entry {
+		.anchor-title {
+			margin-left: 5px;
+		}
+	}
+
+	.note-footer {
+		margin-top: 10px;
+
+		p {
+			margin-bottom: 0;
+		}
+
+		button {
+			float: right;
+			opacity: 0;
+			transition: opacity .2s linear;
+		}
+
+		button:nth-of-type(1) {
+			margin-left: 10px;
+		}
+	}
+
+	.reference {
+		cursor: pointer;
+	}
+
+	.reference, .anchor-title {
+		&:before {
+			content: "re: ";
+			display: inline;
+			color: black;
+		}
+	}
+
+	.panel-heading {
+		span {
+			font-size: 18px;
+		}
+	}
+
+	.panel-body {
+		padding-left: 0;
+		padding-right: 0;
+		overflow-y: scroll;
+	}
+
+	.form-group {
+		margin-bottom: 15px;
+	}
+
+	#category {
+		label {
+			vertical-align: text-top;
+		}
+
+		label.control-label {
+			margin-right: 15px;
+		}
+	}
+
+	.container-fluid {
+		.form-control {
+			width: 100%;
+		}
+	}
+
+	button#delete-note {
+		margin-right: 15px;
+		display: none;
+	}
+
+	.note.alert {
+		margin: 0 10px 10px 10px;
+		background-color: #f4f2e0;
+
+		transition: background-color .2s linear;
+
+		&:hover {
+			background-color: #fdecb8;
+
+			.note-footer button {
+				opacity: 1;
+			}
+		}
+	}
+}
+
 #account-panel {
 	display: none;
 	position: fixed;

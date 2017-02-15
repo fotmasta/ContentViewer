@@ -8,6 +8,9 @@
 	</div>
 	<div class="collapse navbar-collapse collapse in" id="collapsible-menu">
 		<div id="search-bar" class="nav navbar-form navbar-right">
+			<button id="show-notes-button" title="Show notes." data-coach-pos="bottom" class="btn btn-primary">
+				<span class="fa fa-pencil-square-o"></span>
+			</button>
 			<button id="show-comments-button" title="Show comments." data-coach-pos="bottom" class="btn btn-primary">
 				<span class="fa fa-comment"></span>
 			</button>
@@ -190,6 +193,36 @@
 				</ul>
 
 				<div class="tab-content">
+				</div>
+			</div>
+		</div>
+	</section>
+</div>
+
+<div id="notes-panel" class="slide-panel">
+	<div class="close-button">
+		<i class="fa fa-close"></i>
+	</div>
+	<section id="notes-content">
+		<div id="notes-all" class="panel panel-warning">
+			<div class="panel-heading clearfix"><i class="fa fa-pencil-square-o fa-2x pull-right"></i> <span>Notes</span><input class="note-search pull-right" type="text" placeholder="Search notes ..."/></div>
+			<div class="panel-body">
+				<div class="notes-scroller">
+				</div>
+			</div>
+			<div class="panel-footer">
+				<div class="note-entry">
+					<div class="form-inline">
+						<div class="container-fluid">
+							<div class="row">
+								<textarea class="form-control" rows="3" id="noteText" placeholder="Type your new note here ..."></textarea>
+								<p class="anchor-title text-info small">(Name of page)</p>
+
+								<button id="submit-note" class="btn btn-success pull-right disabled">Save</button>
+								<button id="delete-note" class="btn btn-danger pull-right"><i class="fa fa-trash"></i></button>
+							</div>
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>

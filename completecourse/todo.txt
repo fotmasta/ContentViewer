@@ -1,3 +1,8 @@
+// TODO: saving and loading notes
+// TODO: notes with timecode to jump to video
+// TODO: analytics for notes
+// TODO: ability to delete comments
+// TODO: at narrow widths: notes & comments s/b 100% width
 // TODO: is there a resize event when scrolling on iOS and top buttons go away (so we can resize the TOC)?
 // TODO: add aria-hidden to template and remove for non-Microsoft? (if adding aria-hidden after initialization isn't working)
 // TODO: make Microsoft outlines less ugly?
@@ -271,3 +276,6 @@
 // DONE: the search results scroller isn't sized correctly (esp when @ 200%)
 // DONE: the search results come back with a weird tab order (search input comes after them)
 // DONE: quizzerator interface changes for Brett
+// DONE: notes: links, editable, roll-over edit/delete buttons
+// DONE: ability to delete notes
+// DONE: searchable notes

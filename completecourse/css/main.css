@@ -1022,6 +1022,71 @@ button#search-close {
     #comments-panel .comment.reply {
       background-color: white; }
 
+#notes-panel {
+  display: none;
+  position: fixed;
+  top: 51px;
+  bottom: 0;
+  right: 0;
+  width: 33vw;
+  background-color: white;
+  border-left: 3px solid #288C32;
+  padding: 10px;
+  overflow: visible;
+  box-shadow: -5px 0 20px black; }
+  #notes-panel #notes-all {
+    height: 100%; }
+  #notes-panel .note.editing .note-text {
+    padding: 3px;
+    border: 3px solid #a5c3ff;
+    background-color: white; }
+  #notes-panel #notes-content {
+    height: 100%;
+    overflow: hidden; }
+  #notes-panel .note-entry .anchor-title {
+    margin-left: 5px; }
+  #notes-panel .note-footer {
+    margin-top: 10px; }
+    #notes-panel .note-footer p {
+      margin-bottom: 0; }
+    #notes-panel .note-footer button {
+      float: right;
+      opacity: 0;
+      transition: opacity .2s linear; }
+    #notes-panel .note-footer button:nth-of-type(1) {
+      margin-left: 10px; }
+  #notes-panel .reference {
+    cursor: pointer; }
+  #notes-panel .reference:before, #notes-panel .anchor-title:before {
+    content: "re: ";
+    display: inline;
+    color: black; }
+  #notes-panel .panel-heading span {
+    font-size: 18px; }
+  #notes-panel .panel-body {
+    padding-left: 0;
+    padding-right: 0;
+    overflow-y: scroll; }
+  #notes-panel .form-group {
+    margin-bottom: 15px; }
+  #notes-panel #category label {
+    vertical-align: text-top; }
+  #notes-panel #category label.control-label {
+    margin-right: 15px; }
+  #notes-panel .container-fluid .form-control {
+    width: 100%; }
+  #notes-panel button#delete-note {
+    margin-right: 15px;
+    display: none; }
+  #notes-panel .note.alert {
+    margin: 0 10px 10px 10px;
+    background-color: #f4f2e0;
+    transition: background-color .2s linear; }
+    #notes-panel .note.alert:hover {
+      background-color: #fdecb8; }
+      #notes-panel .note.alert:hover .note-footer button {
+        opacity: 1; }
+
 #account-panel {
   display: none;
   position: fixed;

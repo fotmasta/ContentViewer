@@ -1553,7 +1553,10 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 		},
 
 		getIDForCurrentIndex: function () {
-			return this.toc[this.currentIndex].id;
+			if (this.currentIndex == undefined)
+				return undefined;
+			else
+				return this.toc[this.currentIndex].id;
 		},
 
 		getTOCTitleForID: function (id) {
