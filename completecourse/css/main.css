@@ -661,14 +661,14 @@ span.completed {
     margin-bottom: 1.5em; }
   .habitat-body span.highlight {
     background-color: yellow; }
-  .habitat-body .comment-anchor {
+  .habitat-body .comment-anchor, .habitat-body .note-anchor {
     font-family: "Material Icons";
     display: block;
     position: absolute;
     left: 5px;
     color: #288C32;
     cursor: pointer; }
-    .habitat-body .comment-anchor:hover {
+    .habitat-body .comment-anchor:hover, .habitat-body .note-anchor:hover {
       color: #3acb48; }
   .habitat-body .sidebar-g .title, .habitat-body .sidebar-r .title {
     font-size: 150%;
@@ -1057,6 +1057,8 @@ button#search-close {
       margin-left: 10px; }
   #notes-panel .reference {
     cursor: pointer; }
+    #notes-panel .reference:hover {
+      text-decoration: underline; }
   #notes-panel .reference:before, #notes-panel .anchor-title:before {
     content: "re: ";
     display: inline;
@@ -1086,6 +1088,10 @@ button#search-close {
       background-color: #fdecb8; }
       #notes-panel .note.alert:hover .note-footer button {
         opacity: 1; }
+  #notes-panel #new-note.panel-footer #noteText {
+    color: black;
+    background-color: #d9edf7;
+    resize: none; }
 
 #account-panel {
   display: none;

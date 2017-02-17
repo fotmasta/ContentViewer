@@ -388,6 +388,7 @@ define(["common"], function (Common) {
 		getUserData: function (key, callback) {
 			var isbn = Common.getISBNFromLocation();
 
+			/*
 			if (key === "notes") {
 				callback([
 					{text: "Testing", timestamp: 1487176443652, anchor_id: 3 },
@@ -403,6 +404,7 @@ define(["common"], function (Common) {
 				]);
 				return;
 			}
+			*/
 
 			GetDataForTitle(isbn, "userData", function (data) {
 				if (callback && data)

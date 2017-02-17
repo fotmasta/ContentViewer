@@ -132,7 +132,12 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 			$("#show-comments-button").hide(0);
 		}
 
-		$("#show-notes-button").click(onOpenNotes);
+		// for testing while in staging (with buildpage.js in production)
+		if (manifest.allowNotes === true) {
+			$("#show-notes-button").click(onOpenNotes);
+		} else {
+			$("#show-notes-button").hide(0);
+		}
 
 		if (manifest.buyButton != undefined) {
 			var buyButton = $("<a>", { class: "buy-btn btn btn-danger", target: "_blank", href: manifest.buyButton, text: " Add to cart"});

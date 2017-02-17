@@ -1,4 +1,5 @@
 define(["database", "common", "jquery.ui", "video-manager"], function (Database, Common) {
+	var analytics = false;
 
 	$.widget("que.Notes", {
 
@@ -85,6 +86,7 @@ define(["database", "common", "jquery.ui", "video-manager"], function (Database,
 
 			if (params.anchor_id) {
 				var title = this.options.manager.VideoManager("getTOCTitleForID", params.anchor_id);
+				if (params.time != undefined) title += " (" + String(params.time).toHHMMSS() + ")";
 
 				var t = $("<p>", { class: "text-info small reference", text: title });
 				bottom.prepend(t);
@@ -115,10 +117,18 @@ define(["database", "common", "jquery.ui", "video-manager"], function (Database,
 
 					var index = c.anchor_id;
 
+					if (c.time) {
+						options.time = c.time;
+					}
+
 					this.options.manager.VideoManager("playFromTOC", index, options);
 					break;
 				}
 			}
+		},
+
+		onClickMarker: function (key) {
+			this.gotoNote(key);
 		},
 
 		onClickSubmit: function () {
@@ -127,25 +137,40 @@ define(["database", "common", "jquery.ui", "video-manager"], function (Database,
 
 			var rec = { "text": text, "timestamp": timestamp };
 
-			var anchor_id = this.options.manager.VideoManager("getIDForCurrentIndex");
-			rec.anchor_id = anchor_id;
+			var ref = this.options.manager.VideoManager("getReferenceForCurrentItem");
+			if (ref) {
+				rec.anchor_id = ref.id;
+				if (ref.time != undefined) {
+					rec.time = ref.time;
+				}
+			}
 
-			Database.postNoteToPersistentDatabase(rec, $.proxy(this.onNotePosted, this));
+			var newData = this.options.data.slice();
+			newData.push(rec);
+
+			Database.setUserData("notes", newData, $.proxy(this.onNoteSubmitted, this));
 		},
 
-		onNotePosted: function () {
+		onNoteSubmitted: function () {
 			this.resetDataEntry();
+			this.reloadNotes();
+
+			if (analytics)
+				ga("send", "event", "interface", "note", "save");
 		},
 
 		onChangeNote: function (event) {
 			var el = $(event.target);
-			var form = el.parents(".notes-entry");
+			var form = el.parents(".form-inline");
 
-			var text = form.find("#noteText").val();
+			var text = el.val();
 			if (text)
 				form.find("#submit-note").removeClass("disabled");
 			else
 				form.find("#submit-note").addClass("disabled");
+
+			// refresh anchor with current time, if video
+			this.showCurrentAnchorTitle();
 		},
 
 		resetDataEntry: function () {
@@ -170,6 +195,9 @@ define(["database", "common", "jquery.ui", "video-manager"], function (Database,
 			this.resizeToFit();
 
 			this.showCurrentAnchorTitle();
+
+			if (analytics)
+				ga("send", "event", "interface", "note", "open");
 		},
 
 		closePanel: function () {
@@ -201,7 +229,7 @@ define(["database", "common", "jquery.ui", "video-manager"], function (Database,
 						var hash = this.options.manager.VideoManager("getHashForID", c.anchor_id);
 						var el = iframe.contents().find(hash);
 						if (el.length) {
-							var d = $("<div>", { class: "note-anchor", html: "&#xe0b9" });
+							var d = $("<div>", { class: "note-anchor", html: "&#xe02f" });
 							d.attr("data-key", c.key);
 							el.append(d);
 							c.onPage = true;
@@ -211,35 +239,61 @@ define(["database", "common", "jquery.ui", "video-manager"], function (Database,
 				}
 				this.last_iframe = iframe;
 
-				iframe.contents().find(".note-anchor").off("click").click($.proxy(this.showNoteFromLink, this));
+				iframe.contents().find(".note-anchor").off("click").click($.proxy(this.doClickAnchor, this));
 			} else {
 				for (var i = 0; i < this.notes.length; i++) {
 					var c = this.notes[i];
 					c.onPage = false;
 					if (c.anchor_id) {
-						var id = this.options.manager.VideoManager("getIDForCurrentIndex");
-						if (id == c.anchor_id) {
-							c.onPage = true;
-							count++;
+						var ref = this.options.manager.VideoManager("getReferenceForCurrentItem");
+						if (ref) {
+							var id = ref.id;
+							if (id == c.anchor_id) {
+								c.onPage = true;
+								count++;
+							}
 						}
 					}
 				}
 			}
 
 			this.refreshNoteList();
+
+			this.showAnyTimelineMarkers();
 		},
 
-		showNoteFromLink: function (event) {
+		showAnyTimelineMarkers: function () {
+			var markers = [];
+
+			var ref = this.options.manager.VideoManager("getReferenceForCurrentItem");
+			if (ref) {
+				for (var i = 0; i < this.notes.length; i++) {
+					var c = this.notes[i];
+					if (c.anchor_id == ref.id) {
+						markers.push({ time: c.time, text: "note", onMarkerClick: $.proxy(this.onClickMarker, this, c.key) });
+					}
+				}
+			}
+
+			this.options.manager.VideoManager("addTimelineMarkers", markers);
+		},
+
+		doClickAnchor: function (event) {
 			var el = event.target;
 			var key = $(el).attr("data-key");
 			if (key) {
-				this.refreshNoteList(true);
-
-				var me = this;
-				setTimeout(function () {
-					me.scrollToNote(key);
-				}, 500);
+				this.gotoNote(key);
 			}
+		},
+
+		gotoNote: function (key) {
+			this.refreshNoteList(true);
+
+			var me = this;
+			setTimeout(function () {
+				me.scrollToNote(key);
+			}, 500);
+
 			this.openPanel();
 		},
 
@@ -311,12 +365,16 @@ define(["database", "common", "jquery.ui", "video-manager"], function (Database,
 		},
 
 		showCurrentAnchorTitle: function () {
-			var anchor_id = this.options.manager.VideoManager("getIDForCurrentIndex");
-			var title = this.options.manager.VideoManager("getTOCTitleForID", anchor_id);
-			if (title) {
-				this.element.find(".anchor-title").text(title);
-			} else {
-				this.element.find(".anchor-title").text("");
+			var ref = this.options.manager.VideoManager("getReferenceForCurrentItem");
+			if (ref) {
+				var anchor_id = ref.id;
+				var title = this.options.manager.VideoManager("getTOCTitleForID", anchor_id);
+				if (title) {
+					if (ref.time != undefined) title += " (" + String(ref.time).toHHMMSS() + ")";
+					this.element.find(".anchor-title").text(title);
+				} else {
+					this.element.find(".anchor-title").text("");
+				}
 			}
 		},
 
@@ -334,6 +392,9 @@ define(["database", "common", "jquery.ui", "video-manager"], function (Database,
 				});
 
 				Database.setUserData("notes", newData, $.proxy(this.reloadNotes, this));
+
+				if (analytics)
+					ga("send", "event", "interface", "note", "delete");
 			}
 		},
 
@@ -345,6 +406,9 @@ define(["database", "common", "jquery.ui", "video-manager"], function (Database,
 				this.saveEditing(note);
 			} else {
 				this.setupForEditing(note);
+
+				if (analytics)
+					ga("send", "event", "interface", "note", "edit");
 			}
 		},
 

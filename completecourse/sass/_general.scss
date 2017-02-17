@@ -1011,7 +1011,7 @@ span.completed {
 		background-color: yellow;
 	}
 
-	.comment-anchor {
+	.comment-anchor, .note-anchor {
 		font-family: "Material Icons";
 		display: block;
 		position: absolute;
@@ -1564,6 +1564,10 @@ button#search-close {
 
 	.reference {
 		cursor: pointer;
+
+		&:hover {
+			text-decoration: underline;
+		}
 	}
 
 	.reference, .anchor-title {
@@ -1624,6 +1628,12 @@ button#search-close {
 				opacity: 1;
 			}
 		}
+	}
+
+	#new-note.panel-footer #noteText {
+		color: black;
+		background-color: #d9edf7;
+		resize: none;
 	}
 }
 

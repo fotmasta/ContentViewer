@@ -170,6 +170,18 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 			this.name = "Larry";
 			this.options = options;
 			this.initialPageLoad = false;
+			this.markerOptions = {
+				markerStyle: {
+					"width": "8px",
+					"background-color": "rgb(218, 197, 93)"
+				},
+				markerTip: {
+					display: true,
+					text: function (marker) {
+						return marker.text;
+					}
+				}
+			};
 
 			if (options.title)
 				document.title = options.title;
@@ -222,19 +234,7 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 
 			$(window).scroll($.proxy(this.onScrollContent, this));
 
-			this.player.markers({
-				markerStyle: {
-					"width": "8px",
-					"background-color": "rgb(218, 197, 93)"
-				},
-				markerTip: {
-					display: true,
-					text: function (marker) {
-						console.log(marker.class);
-						return "Marker: " + marker.text;
-					}
-				}
-			});
+			this.player.markers(this.markerOptions);
 
 			this.currentIndex = undefined;
 
@@ -667,6 +667,7 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 
 		onNewContentShowing: function (iframe) {
 			$("#comments-panel").Comments("showCommentIconsInIframe", iframe);
+			$("#notes-panel").Notes("showNoteIconsInIframe", iframe);
 		},
 
 		addIFrame: function (params) {
@@ -877,27 +878,23 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 			$("#accessible-progress").text(pct + "% Complete");
 		},
 
-		addTimelineMarkers: function () {
-			var curDepth = this.toc[this.currentIndex].depth;
+		// [{time,text}]
+		addTimelineMarkers: function (markers) {
+			if (markers === undefined) markers = [];
 
-			var mz = [];
-
-			for (var i = 0; i < this.markers.length; i++) {
-				var m = this.markers[i];
-
-				if (m.depth == curDepth) {
-					var txt = m.type == "epub" ? (m.text ? m.text : "Click here to read more") : m.text;
-
-					var item = {time: m.start, text: txt};
-
-					mz.push(item);
-				}
+			this.markerOptions.markers = markers;
+			/*
+			if (markers !== undefined && markers.length > 0) {
+				this.player.markers.reset(markers);
+			} else {
+				//this.player.markers.reset([]);
 			}
-
-			this.player.markers.reset(mz);
+			*/
 		},
 
 		addMarkers: function (showAllMarkers) {
+			return;
+
 			this.addTimelineMarkers();
 
 			var curDepth = this.toc[this.currentIndex].depth;
@@ -1567,6 +1564,18 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 				}
 			}
 			return undefined;
+		},
+
+		getReferenceForCurrentItem: function () {
+			if (this.currentIndex == undefined)
+				return undefined;
+			else {
+				var obj = { id: this.toc[this.currentIndex].id };
+				if (this.currentItemIsVideo()) {
+					obj.time = this.player.currentTime();
+				}
+				return obj;
+			}
 		},
 
 		getHashForID: function (id) {
