@@ -171,6 +171,7 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 			this.options = options;
 			this.initialPageLoad = false;
 			this.markerOptions = {
+				markers: [],
 				markerStyle: {
 					"width": "8px",
 					"background-color": "rgb(218, 197, 93)"
@@ -180,7 +181,8 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 					text: function (marker) {
 						return marker.text;
 					}
-				}
+				},
+				onMarkerClick: $.proxy(this.onClickTimelineMarker, this)
 			};
 
 			if (options.title)
@@ -211,6 +213,11 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 			transcriptButton.addClass("vjs-transcript-button");
 			transcriptButton.on("click", $.proxy(this.onToggleTranscript, this));
 			this.player.controlBar.addChild(transcriptButton);
+
+			var noteButton = new videojs.Button(this.player);
+			noteButton.addClass("vjs-note-button");
+			noteButton.on("click", $.proxy(this.showNotesPanel, this));
+			this.player.controlBar.addChild(noteButton);
 
 			//  NOTE: Not sure why this stopped working and I had to switch to the straight HTML5 event
 //			this.player.on("play", $.proxy(this.onVideoStarted, this));
@@ -883,13 +890,10 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 			if (markers === undefined) markers = [];
 
 			this.markerOptions.markers = markers;
-			/*
-			if (markers !== undefined && markers.length > 0) {
-				this.player.markers.reset(markers);
-			} else {
-				//this.player.markers.reset([]);
-			}
-			*/
+		},
+
+		onClickTimelineMarker: function (marker) {
+			$("#notes-panel").Notes("gotoNote", marker.noteKey);
 		},
 
 		addMarkers: function (showAllMarkers) {
@@ -1628,6 +1632,10 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 			oReq.addEventListener("progress", onReturnedResponse);
 			oReq.open("GET", src);
 			oReq.send();
+		},
+
+		showNotesPanel: function () {
+			$("#notes-panel").Notes("openPanel");
 		}
 	});
 

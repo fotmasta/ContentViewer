@@ -168,6 +168,23 @@ body.skin-Microsoft {
       content: " "; }
       .video-holder .video-transcript br:after {
         content: " "; }
+  .video-holder .vjs-tip .vjs-tip-inner {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden; }
+  .video-holder .vjs-tip:before {
+    display: block;
+    content: "Note";
+    position: absolute;
+    top: 0;
+    left: 0;
+    transform: translateX(-25%) translateY(-25%);
+    background-color: #faf3cf;
+    border: 1px solid #faebcc;
+    font-size: small;
+    color: #8a6d3b;
+    padding: 2px 4px;
+    border-radius: 5px; }
 
 .video-holder:not(.has-transcript) .video-transcript {
   display: none; }
@@ -581,6 +598,26 @@ span.completed {
   .vjs-transcript-button:before {
     font-family: FontAwesome !important;
     content: "\f02d"; }
+
+.vjs-note-button {
+  cursor: pointer;
+  /*
+  .vjs-control-text {
+  	height: auto;
+  	width: auto;
+  	clip: auto;
+  }
+  */ }
+  .vjs-note-button:before {
+    content: "Add Note";
+    display: block;
+    line-height: 1.0 !important;
+    font-size: 10px !important;
+    font-family: sans-serif !important;
+    border: 1px solid #c3c3c3;
+    max-height: calc(3em - 1px);
+    padding: 2px;
+    border-radius: 3px; }
 
 #main_video .vjs-tip {
   font-size: 14px;

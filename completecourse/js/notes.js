@@ -270,7 +270,7 @@ define(["database", "common", "jquery.ui", "video-manager"], function (Database,
 				for (var i = 0; i < this.notes.length; i++) {
 					var c = this.notes[i];
 					if (c.anchor_id == ref.id) {
-						markers.push({ time: c.time, text: "note", onMarkerClick: $.proxy(this.onClickMarker, this, c.key) });
+						markers.push({ time: c.time, text: c.text, class: "timeline-note", noteKey: c.key });
 					}
 				}
 			}
