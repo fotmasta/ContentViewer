@@ -600,24 +600,12 @@ span.completed {
     content: "\f02d"; }
 
 .vjs-note-button {
-  cursor: pointer;
-  /*
-  .vjs-control-text {
-  	height: auto;
-  	width: auto;
-  	clip: auto;
-  }
-  */ }
+  cursor: pointer; }
+  .vjs-note-button:hover:not(:active) {
+    color: white; }
   .vjs-note-button:before {
-    content: "Add Note";
-    display: block;
-    line-height: 1.0 !important;
-    font-size: 10px !important;
-    font-family: sans-serif !important;
-    border: 1px solid #c3c3c3;
-    max-height: calc(3em - 1px);
-    padding: 2px;
-    border-radius: 3px; }
+    font-family: FontAwesome !important;
+    content: "\f044"; }
 
 #main_video .vjs-tip {
   font-size: 14px;

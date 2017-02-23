@@ -923,25 +923,14 @@ span.completed {
 .vjs-note-button {
 	cursor: pointer;
 
-	&:before {
-		content: "Add Note";
-		display: block;
-		line-height: 1.0 !important;
-		font-size: 10px !important;
-		font-family: sans-serif !important;
-		border: 1px solid #c3c3c3;
-		max-height: calc(3em - 1px);
-		padding: 2px;
-		border-radius: 3px;
+	&:hover:not(:active) {
+		color: white;
 	}
 
-	/*
-	.vjs-control-text {
-		height: auto;
-		width: auto;
-		clip: auto;
+	&:before {
+		font-family: FontAwesome !important;
+		content: "\f044";
 	}
-	*/
 }
 
 #main_video {
