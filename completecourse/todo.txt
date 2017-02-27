@@ -1,6 +1,4 @@
-// TODO: note icons on video timeline, clickable to open & highlight note
 // TODO: at narrow widths: notes & comments s/b 100% width
-// TODO: analytics for notes (open, save, edit, delete)
 // TODO: ability to delete comments
 // TODO: is there a resize event when scrolling on iOS and top buttons go away (so we can resize the TOC)?
 // TODO: add aria-hidden to template and remove for non-Microsoft? (if adding aria-hidden after initialization isn't working)
@@ -283,3 +281,5 @@
 // DONE: notes with timecode to jump to video
 // DONE: notes work with ePub titles?
 // DONE: note icons in margins
+// DONE: note icons on video timeline, clickable to open & highlight note
+// DONE: google analytics events for notes (open, save, edit, delete)

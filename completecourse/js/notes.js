@@ -1,5 +1,5 @@
 define(["database", "common", "jquery.ui", "video-manager"], function (Database, Common) {
-	var analytics = false;
+	var analytics = true;
 
 	$.widget("que.Notes", {
 
