@@ -132,8 +132,7 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 			$("#show-comments-button").hide(0);
 		}
 
-		// for testing while in staging (with buildpage.js in production)
-		if (manifest.allowNotes === true) {
+		if (manifest.allowNotes !== false) {
 			$("#show-notes-button").click(onOpenNotes);
 		} else {
 			$("#show-notes-button").hide(0);
