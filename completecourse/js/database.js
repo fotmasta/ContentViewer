@@ -380,35 +380,16 @@ define(["common"], function (Common) {
 
 		setUserData: function (key, value, callback) {
 			var isbn = Common.getISBNFromLocation();
-			var obj = { key: key, value: value };
-			var json_value = JSON.stringify(obj);
-			SetDataForTitle(isbn, "userData", json_value, callback);
+			var json_value = JSON.stringify(value);
+			SetDataForTitle(isbn, key, json_value, callback);
 		},
 
 		getUserData: function (key, callback) {
 			var isbn = Common.getISBNFromLocation();
 
-			/*
-			if (key === "notes") {
-				callback([
-					{text: "Testing", timestamp: 1487176443652, anchor_id: 3 },
-					{text:"Now is the time for all good men to come to the aid of their party. Now is the time for all good men to come to the aid of their party. Now is the time for all good men to come to the aid of their party. ", timestamp: 1487176543652 },
-					{text:"The quick brown fox jumped over the lazy dogs. The quick brown fox jumped over the lazy dogs. The quickly brownly foxly jumped over the lazily dogsily.", timestamp: 1487176643652 },
-					{text: "Testing", timestamp: 1487176443652 },
-					{text:"Now is the time for all good men to come to the aid of their party. Now is the time for all good men to come to the aid of their party. Now is the time for all good men to come to the aid of their party. ", timestamp: 1487176543652 },
-					{text:"The quick brown fox jumped over the lazy dogs. The quick brown fox jumped over the lazy dogs. The quickly brownly foxly jumped over the lazily dogsily.", timestamp: 1487176643652 },
-					{text: "Testing", timestamp: 1487176443652 },
-					{text:"Now is the time for all good men to come to the aid of their party. Now is the time for all good men to come to the aid of their party. Now is the time for all good men to come to the aid of their party. ", timestamp: 1487176543652 },
-					{text:"The quick brown fox jumped over the lazy dogs. The quick brown fox jumped over the lazy dogs. The quickly brownly foxly jumped over the lazily dogsily.", timestamp: 1487176643652 }
-
-				]);
-				return;
-			}
-			*/
-
-			GetDataForTitle(isbn, "userData", function (data) {
+			GetDataForTitle(isbn, key, function (data) {
 				if (callback && data)
-					callback(data.value);
+					callback(data);
 			});
 		},
 

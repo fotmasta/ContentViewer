@@ -758,6 +758,12 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 						this.iframe.iFrameHolder("highlight", options.highlight);
 					}
 				} else {
+					// external content
+					if (src.substr(0, 4).toLowerCase() === "http") {
+						window.open(src);
+						return;
+					}
+
 					if (!options.hash) {
 						// scroll to top
 						this.scrollToHash(this.iframe, {}, true);
