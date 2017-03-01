@@ -283,3 +283,4 @@
 // DONE: note icons in margins
 // DONE: note icons on video timeline, clickable to open & highlight note
 // DONE: google analytics events for notes (open, save, edit, delete)
+// DONE: TOC sources with "http" at the front will open in a new window
