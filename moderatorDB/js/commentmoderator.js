@@ -92,7 +92,8 @@ define(["database", "jquery.ui", "bootstrap-confirmation"], function (Database) 
 
 			for (var i = 0; i < isbns.length; i++) {
 				var isbn = isbns[i];
-				Database.loadCommentsForISBN(isbn, $.proxy(this.addComments, this));
+				if (isbn.charAt(0) != "*")
+					Database.loadCommentsForISBN(isbn, $.proxy(this.addComments, this));
 			}
 		},
 
