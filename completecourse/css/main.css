@@ -1047,6 +1047,11 @@ button#search-close {
     #comments-panel .comment.reply {
       background-color: white; }
 
+body.is-xs #comments-panel {
+  width: calc(100% - 40px); }
+body.is-xs #notes-panel {
+  width: calc(100% - 40px); }
+
 #notes-panel {
   display: none;
   position: fixed;

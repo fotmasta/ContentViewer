@@ -1530,6 +1530,16 @@ button#search-close {
 	}
 }
 
+body.is-xs {
+	#comments-panel {
+		width: calc(100% - 40px);
+	}
+
+	#notes-panel {
+		width: calc(100% - 40px);
+	}
+}
+
 #notes-panel {
 	display: none;
 	position: fixed;

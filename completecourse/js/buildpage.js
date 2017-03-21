@@ -234,10 +234,14 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 					resizePanes(desired, false);
 
 					wasSmall = true;
+
+					$("body").addClass("is-xs");
 				} else {
 					resizePanes(desired, false);
 
 					wasSmall = false;
+
+					$("body").removeClass("is-xs");
 				}
 
 				matchToggleButtonToVisibility();
