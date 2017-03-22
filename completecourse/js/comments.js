@@ -69,7 +69,6 @@ define(["database", "common", "jquery.ui", "video-manager"], function (Database,
 			for (var each in recs) {
 				var c = recs[each];
 				if (!c.parent) {
-					c.key = each;
 					this.addComment(c);
 				}
 			}
@@ -78,7 +77,6 @@ define(["database", "common", "jquery.ui", "video-manager"], function (Database,
 			for (var each in recs) {
 				var c = recs[each];
 				if (c.parent) {
-					c.key = each;
 					this.addComment(c);
 				}
 			}
@@ -97,7 +95,7 @@ define(["database", "common", "jquery.ui", "video-manager"], function (Database,
 			}
 
 			var d = $("<div>", { class: "comment" });
-			d.attr("data-key", params.key);
+			d.attr("data-id", params.id);
 
 			if (params.ok) {
 				var p = $("<p>", {class: "comment-text", text: params.text});
@@ -147,7 +145,7 @@ define(["database", "common", "jquery.ui", "video-manager"], function (Database,
 			if (params.parent) {
 				// add it to the parent
 				d.addClass("reply");
-				var parentComment = this.element.find(".comment[data-key='" + params.parent + "']");
+				var parentComment = this.element.find(".comment[data-id='" + params.parent + "']");
 				if (parentComment.length) {
 					parentComment.append(d);
 				}
@@ -162,10 +160,10 @@ define(["database", "common", "jquery.ui", "video-manager"], function (Database,
 		},
 
 		onClickComment: function (event) {
-			var key = $(event.currentTarget).attr("data-key");
+			var id = $(event.currentTarget).attr("data-id");
 			for (var i = 0; i < this.comments.length; i++) {
 				var c = this.comments[i];
-				if (c.key == key) {
+				if (c.id == id) {
 					var options = {};
 
 					var index = c.anchor_id;
@@ -291,7 +289,7 @@ define(["database", "common", "jquery.ui", "video-manager"], function (Database,
 						var el = iframe.contents().find(hash);
 						if (el.length) {
 							var d = $("<div>", { class: "comment-anchor", html: "&#xe0b9" });
-							d.attr("data-key", c.key);
+							d.attr("data-id", c.id);
 							el.append(d);
 							c.onPage = true;
 							count++;
@@ -323,29 +321,29 @@ define(["database", "common", "jquery.ui", "video-manager"], function (Database,
 
 		showCommentFromLink: function (event) {
 			var el = event.target;
-			var key = $(el).attr("data-key");
-			if (key) {
+			var id = $(el).attr("data-id");
+			if (id) {
 				// show all comments
 				this.refreshCommentList(true);
 
 				var me = this;
 				setTimeout(function () {
-					me.scrollToComment(key);
+					me.scrollToComment(id);
 				}, 500);
 			}
 			this.openPanel();
 		},
 
-		findComment: function (key) {
+		findComment: function (id) {
 			for (var i = 0; i < this.comments.length; i++) {
 				var c = this.comments[i];
-				if (c.key == key) return c;
+				if (c.id == id) return c;
 			}
 			return undefined;
 		},
 
-		scrollToComment: function (key) {
-			var entry = this.element.find("[data-key='" + key + "']");
+		scrollToComment: function (id) {
+			var entry = this.element.find("[data-id='" + id + "']");
 			var scroller = this.element.find("#comments-content");
 			var t = scroller.scrollTop();
 			var h = scroller.height();
@@ -392,7 +390,7 @@ define(["database", "common", "jquery.ui", "video-manager"], function (Database,
 				for (var i = 0; i < this.comments.length; i++) {
 					var c = this.comments[i];
 					if (c.onPage) {
-						this.element.find("[data-key='" + c.key + "']").show(0);
+						this.element.find("[data-id='" + c.id + "']").show(0);
 					}
 				}
 			}
@@ -437,10 +435,7 @@ define(["database", "common", "jquery.ui", "video-manager"], function (Database,
 
 			var parentComment = findParentComment(el);
 
-			var parentKey = parentComment.attr("data-key");
-
-			var path = Common.makeFirebaseFriendly(this.options.titlePath);
-			var newCommentRef = Database.getTitlesRef().child(path + "/comments").push();
+			var parentID = parentComment.attr("data-id");
 
 			var form = el.parents(".comments-entry");
 
@@ -452,11 +447,9 @@ define(["database", "common", "jquery.ui", "video-manager"], function (Database,
 			var category = categoryEl.length ? categoryEl.val() : null;
 			var timestamp = Date.now();
 
-			var rec = { "name": name, email: email, "text": text, "timestamp": timestamp, category: category, "ok": false, "parent": parentKey };
+			var rec = { "name": name, email: email, "text": text, "timestamp": timestamp, category: category, "ok": false, "parent": parentID };
 
-			newCommentRef.set(rec);
-
-			this.notifyNewComment();
+			Database.postCommentToPersistentDatabase(rec, $.proxy(this.onCommentPosted, this));
 
 			form.remove();
 		},

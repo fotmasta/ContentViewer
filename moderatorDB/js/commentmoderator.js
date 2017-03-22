@@ -7,8 +7,8 @@ define(["database", "jquery.ui", "bootstrap-confirmation"], function (Database) 
 		else if (a.isbn > b.isbn)
 			return 1;
 		else {
-			if (a.ok === false) return -1;
-			else if (b.ok === false) return 1;
+			if (a.ok === false && b.ok === true) return -1;
+			else if (a.ok === true && b.ok === false) return 1;
 			else
 				return (a.timestamp - b.timestamp);
 		}
@@ -127,7 +127,19 @@ define(["database", "jquery.ui", "bootstrap-confirmation"], function (Database) 
 		refreshComments: function () {
 			this.element.find(".comments tr").remove();
 
-			var data = this.sortData(this.data);
+			var filteredData = [];
+
+			for (var i = 0; i < this.data.length; i++) {
+				var rec = this.data[i];
+				if ( (this.options.filter == "moderated" && rec.ok) || (this.options.filter == "unmoderated" && !rec.ok) ) {
+					if (this.findCommentWithSource(rec.id)) {
+					} else {
+						filteredData.push(rec);
+					}
+				}
+			}
+
+			filteredData = this.sortData(filteredData);
 
 			var lastISBN;
 
@@ -135,81 +147,72 @@ define(["database", "jquery.ui", "bootstrap-confirmation"], function (Database) 
 
 			var added = 0;
 
-			for (var i = 0; i < data.length; i++) {
-				var rec = data[i];
+			for (var i = 0; i < filteredData.length; i++) {
+				var rec = filteredData[i];
 
-				if ((this.options.filter == "moderated" && rec.ok) ||
-					(this.options.filter == "unmoderated" && !rec.ok)) {
+				var isbn = rec.isbn;
 
-					// for "unmoderated", check to see if there's a "moderated" with their id as the "source" – in which case, they ARE actually moderated
-					if (this.findCommentWithSource(rec.id)) {
-						continue;
-					}
-
-					var isbn = rec.isbn;
-
-					if (isbn != lastISBN) {
-						var row = $("<tr>");
-						el.append(row);
-
-						var td = $("<td>", {text: isbn});
-						td.attr("colspan", 9);
-						row.append(td);
-						row.addClass("success");
-
-						lastISBN = isbn;
-
-						this.getTitleForISBN(isbn, function (title) {
-							td.text(title + " (" + isbn + ")");
-						});
-					}
-
+				if (isbn != lastISBN) {
 					var row = $("<tr>");
-					row.attr("data-key", rec.id);
-
-					var s = JSON.stringify(rec);
-
-					// not sure where this weird carriage return (\r) is coming from during stringify, but remove it:
-					s = s.replace("\\r", "");
-
-					row.attr("data-data", s);
 					el.append(row);
 
-					var dateFromTimestamp = new Date(rec.timestamp);
-					var dateOptions = {
-						year: "numeric",
-						month: "numeric",
-						day: "numeric",
-						hour: "2-digit",
-						minute: "2-digit"
-					};
-					var dateFormatted = dateFromTimestamp.toLocaleTimeString([], dateOptions);
+					var td = $("<td>", {text: isbn});
+					td.attr("colspan", 9);
+					row.append(td);
+					row.addClass("success");
 
-					var checkbox = $("<input>", {type: "checkbox"});
-					checkbox.click($.proxy(this.onClickOK, this));
-					if (rec.ok)
-						checkbox.prop("checked", "true");
+					lastISBN = isbn;
 
-					var deleteButton = $("<button>", {class: "btn btn-danger"}).append($("<span>", {class: "glyphicon glyphicon-remove"}));
-					deleteButton.attr({"data-toggle": "confirmation", "data-placement": "left"});
-
-					//row.append($("<td>", {text: isbn}))
-					row
-						.append($("<td>", {text: dateFormatted}))
-						.append($("<td>", {text: rec.category}))
-						.append($("<td>", {text: rec.parent ? "yes" : "no"}))
-						.append($("<td>", {text: rec.name}))
-						.append($("<td>", {text: rec.email}))
-						.append($("<td>", {text: rec.text}));
-
-					if (this.options.filter == "unmoderated") {
-						row
-							.append($("<td>", {class: "text-center ok-row"}).append(checkbox))
-							.append($("<td>", {class: "text-center"}).append(deleteButton));
-					}
-
-					added++;
+					this.getTitleForISBN(isbn, function (title) {
+						td.text(title + " (" + isbn + ")");
+					});
 				}
+
+				var row = $("<tr>");
+				row.attr("data-key", rec.id);
+
+				var s = JSON.stringify(rec);
+
+				// not sure where this weird carriage return (\r) is coming from during stringify, but remove it:
+				s = s.replace("\\r", "");
+
+				row.attr("data-data", s);
+				el.append(row);
+
+				var dateFromTimestamp = new Date(rec.timestamp);
+				var dateOptions = {
+					year: "numeric",
+					month: "numeric",
+					day: "numeric",
+					hour: "2-digit",
+					minute: "2-digit"
+				};
+				var dateFormatted = dateFromTimestamp.toLocaleTimeString([], dateOptions);
+
+				var checkbox = $("<input>", {type: "checkbox"});
+				checkbox.click($.proxy(this.onClickOK, this));
+				if (rec.ok)
+					checkbox.prop("checked", "true");
+
+				var deleteButton = $("<button>", {class: "btn btn-danger"}).append($("<span>", {class: "glyphicon glyphicon-remove"}));
+				deleteButton.attr({"data-toggle": "confirmation", "data-placement": "left"});
+
+				//row.append($("<td>", {text: isbn}))
+				row
+					.append($("<td>", {text: dateFormatted}))
+					.append($("<td>", {text: rec.category}))
+					.append($("<td>", {text: rec.parent ? "reply" : "" }))
+					.append($("<td>", {text: rec.name}))
+					.append($("<td>", {text: rec.email}))
+					.append($("<td>", {text: rec.text}));
+
+				if (this.options.filter == "unmoderated") {
+					row.append($("<td>", {class: "text-center ok-row"}).append(checkbox));
+				}
+
+				row.append($("<td>", {class: "text-center"}).append(deleteButton));
+
+				added++;
 			}
 
 			$('[data-toggle="confirmation"]').confirmation( { placement: "left", onConfirm: $.proxy(this.onClickDelete, this) } );
