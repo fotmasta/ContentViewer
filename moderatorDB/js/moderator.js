@@ -27,5 +27,6 @@ requirejs.config({
 
 define(["jquery", "jquery.ui", "commentmoderator"], function ($) {
 	$(".moderator").CommentModerator();
+	$(".progressCircle").ProgressCircle();
 });
 

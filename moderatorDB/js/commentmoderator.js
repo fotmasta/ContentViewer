@@ -51,6 +51,8 @@ define(["database", "jquery.ui", "bootstrap-confirmation"], function (Database) 
 		_create: function () {
 			this.options.filter = "unmoderated";
 
+			this.titleCount = this.titleCountReceived = 0;
+
 			var me = this;
 
 			/* testing:
@@ -90,14 +92,32 @@ define(["database", "jquery.ui", "bootstrap-confirmation"], function (Database) 
 
 			this.data = [];
 
+			this.titleCount = this.titleCountReceived = 0;
+
 			for (var i = 0; i < isbns.length; i++) {
 				var isbn = isbns[i];
-				if (isbn.charAt(0) != "*")
+				if (isbn.charAt(0) != "*") {
+					this.titleCount++;
 					Database.loadCommentsForISBN(isbn, $.proxy(this.addComments, this));
+				}
 			}
 		},
 
 		addComments: function (data) {
+			this.titleCountReceived++;
+
+			var percentDone = this.titleCountReceived / this.titleCount;
+
+			$(".progressCircle").ProgressCircle("setPercent", percentDone);
+
+			var progressVisible = $(".progressCircle").ProgressCircle("isVisible");
+
+			if (percentDone >= 1 && progressVisible) {
+				$(".progressCircle").ProgressCircle("hide");
+			} else if (percentDone < 1 && !progressVisible) {
+				$(".progressCircle").ProgressCircle("show");
+			}
+
 			this.data = this.data.concat(data);
 
 			/* refresh method?
@@ -282,6 +302,79 @@ define(["database", "jquery.ui", "bootstrap-confirmation"], function (Database) 
 			//this.refreshComments();
 
 			this.reloadComments();
+		}
+	});
+
+	$.widget("que.ProgressCircle", {
+
+		options: {},
+
+		_create: function () {
+			this.radius = 30;
+			this.numUnits = 10;
+			this.centerX = 80, this.centerY = 30;
+			this.visible = false;
+
+			for (var i = 0; i < this.numUnits; i++) {
+				var img = $("<img>", { class: "pill back", src: "pill.png" });
+				var degrees = (360 / this.numUnits) * i;
+				var radians = (degrees - 90) / 180 * Math.PI;
+				var scale = 0;
+				var x = this.centerX + Math.floor(Math.cos(radians) * this.radius);
+				var y = this.centerY + Math.floor(Math.sin(radians) * this.radius);
+				var s = "translate(" + x + "px," + y + "px) rotate(" + degrees + "deg) scaleY(" + scale + ")";
+				img.css("transform", s);
+				this.element.append(img);
+
+				var img = $("<img>", { class: "pill front", src: "pill_empty.png" });
+				var s = "translate(" + x + "px," + y + "px) rotate(" + degrees + "deg)";
+				img.css("transform", s);
+				this.element.append(img);
+			}
+		},
+
+		setPercent: function (percent) {
+			var pills = this.element.find(".pill.back");
+
+			var active;
+
+			for (var i = 0; i < this.numUnits; i++) {
+				var fill1 = (i / this.numUnits);
+				var fill2 = ((i + 1) / this.numUnits);
+				var scale = 0;
+				if (percent >= fill2) {
+					scale = 1.0;
+					active = i;
+				} else if (percent > fill1) {
+					active = i;
+					scale = (percent - fill1) / (1 / this.numUnits);
+				}
+
+				var degrees = (360 / this.numUnits) * i;
+				var radians = (degrees - 90) / 180 * Math.PI;
+				var x = this.centerX + Math.floor(Math.cos(radians) * this.radius);
+				var y = this.centerY + Math.floor(Math.sin(radians) * this.radius);
+				var s = "translate(" + x + "px," + y + "px) rotate(" + degrees + "deg) scaleY(" + scale + ")";
+
+				pills.eq(i).css("transform", s);
+			}
+
+			var rotation = -Math.floor(active * (360 / this.numUnits));
+			this.element.css("transform", "rotate(" + rotation + "deg)");
+		},
+
+		hide: function () {
+			this.element.css("opacity", 0);
+			this.visible = false;
+		},
+
+		show: function () {
+			this.element.css("opacity", 1);
+			this.visible = true;
+		},
+
+		isVisible: function () {
+			return this.visible;
 		}
 	});
 });

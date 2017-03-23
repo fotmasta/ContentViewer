@@ -34,3 +34,19 @@ table.comments {
 		font-style: italic;
 	}
 }
+
+.progressCircle {
+	position: fixed;
+	transform-origin: center center;
+	width: 175px;
+	height: 175px;
+	left: calc(50% - 87px);
+	top: calc(50% - 80px);
+	transition: transform .25s ease-in-out, opacity 2s ease-in-out;
+	opacity: 0;
+
+	.pill {
+		transform-origin: center 57px;
+		position: absolute;
+	}
+}
