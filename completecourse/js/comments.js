@@ -293,6 +293,18 @@ define(["database", "common", "jquery.ui", "video-manager"], function (Database,
 							el.append(d);
 							c.onPage = true;
 							count++;
+						} else {
+							var id = this.options.manager.VideoManager("getIDForCurrentIndex");
+							if (id == c.anchor_id) {
+								c.onPage = true;
+								count++;
+							}
+						}
+					} else if (c.parent) {
+						var parent_c = this.findComment(c.parent);
+						if (parent_c.onPage) {
+							c.onPage = true;
+							count++;
 						}
 					}
 				}
@@ -306,6 +318,12 @@ define(["database", "common", "jquery.ui", "video-manager"], function (Database,
 					if (c.anchor_id) {
 						var id = this.options.manager.VideoManager("getIDForCurrentIndex");
 						if (id == c.anchor_id) {
+							c.onPage = true;
+							count++;
+						}
+					} else if (c.parent) {
+						var parent_c = this.findComment(c.parent);
+						if (parent_c.onPage) {
 							c.onPage = true;
 							count++;
 						}

@@ -1017,7 +1017,8 @@ button#search-close {
         margin-left: 1em; }
     #comments-panel .comment .comment-text {
       padding-bottom: 15px;
-      border-bottom: 1px solid #6EE0AF; }
+      border-bottom: 1px solid #6EE0AF;
+      word-break: break-all; }
     #comments-panel .comment.has-anchor {
       cursor: pointer;
       /*
