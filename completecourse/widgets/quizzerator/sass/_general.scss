@@ -172,12 +172,14 @@ li.question {
 	position: relative;
 	padding: .5em 0 .5em 0;
 
-	p.selected[data-correct=true] {
-		background-color: $correct-color !important;
-	}
+	&[data-correct] {
+		p.selected.response[data-correct=true] {
+			background-color: $correct-color !important;
+		}
 
-	p.selected[data-correct=false] {
-		background-color: $incorrect-color !important;
+		p.selected.response[data-correct=false] {
+			background-color: $incorrect-color !important;
+		}
 	}
 
 	&.matching {
