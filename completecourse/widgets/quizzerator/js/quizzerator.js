@@ -110,6 +110,7 @@ function removeMatchColors (el) {
 define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database) {
 
 	var tryAgainText = "That's not correct. Try a different response.";
+	var partialTryAgainText = "That's partially correct. Keep trying.";
 	var correctText = "That's correct!";
 
 	$.widget("que.quizzerator", {
@@ -342,6 +343,7 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 
 				var p = $("<p>", {class: "response", html: answer});
 				if (isCorrect) p.attr("data-correct", true);
+				else p.attr("data-correct", false);
 
 				p.attr("data-index", each);
 
@@ -767,6 +769,8 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 
 					q.attr("data-correct", true);
 				} else {
+					var responseText = correctAnswer.length > 1 ? partialTryAgainText : tryAgainText;
+
 					// some incorrect
 					chosenAnswer.each(function (index, item) {
 						if ($.inArray(item, correctAnswer) > -1)
@@ -776,10 +780,10 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 					});
 					if (animate != false) {
 						chosenAnswer.parent("li").find(".icons").removeClass("hidden animated").hide(0).addClass("animated rollIn").show(0);
-						q.find(".checker button").removeClass("btn-primary").addClass("btn-danger animated fadeInLeft").parent().find(".checker-label").text(tryAgainText).css("display", "inline");
+						q.find(".checker button").removeClass("btn-primary").addClass("btn-danger animated fadeInLeft").parent().find(".checker-label").text(responseText).css("display", "inline");
 					} else {
 						chosenAnswer.parent("li").find(".icons").removeClass("hidden animated").show(0);
-						q.find(".checker button").removeClass("btn-primary").addClass("btn-danger").parent().find(".checker-label").text(tryAgainText).css("display", "inline");
+						q.find(".checker button").removeClass("btn-primary").addClass("btn-danger").parent().find(".checker-label").text(responseText).css("display", "inline");
 						q.find(".checker").removeClass("animated");
 					}
 
