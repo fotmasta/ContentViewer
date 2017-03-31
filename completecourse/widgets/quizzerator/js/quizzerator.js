@@ -174,7 +174,7 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 
 			this.onLoadedData(this.options.paramData);
 
-			$(window).resize($.proxy(this.onWindowResize, this));
+			$(window).on("resize.quizzerator", $.proxy(this.onWindowResize, this));
 		},
 
 		onWindowResize: function () {
@@ -1106,6 +1106,10 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 				var h = $(window).height() * .5;
 				$(window).animate({scrollTop: t - h}, 1000);
 			}, 200);
+		},
+
+		unload: function () {
+			$(window).off("resize.quizzerator");
 		}
 	});
 

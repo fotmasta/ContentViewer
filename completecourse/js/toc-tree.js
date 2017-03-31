@@ -432,7 +432,15 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 					linkholder.addClass("has-download");
 					var dl = $("<button class='btn btn-success download-button' title='Download this section.'><i class='fa fa-cloud-download'></i></button>");
 					dl.attr("title", "Download: " + d.node.desc);
-					dl.click($.proxy(this.onClickDownload, this, d.node.download));
+					// special case for downloadable pdf (because they won't work with the iframe method)
+					if (d.node.download.toLowerCase().substr(-3) == "pdf") {
+						var a_link = $("<a download>").attr( { href: d.node.download }).css("display", "none");
+						dl.append(a_link);
+						dl.click(function (event) { $(event.currentTarget).find("a")[0].click(); });
+					} else {
+						dl.click($.proxy(this.onClickDownload, this, d.node.download));
+					}
+
 					linkholder.append(dl);
 				}
 

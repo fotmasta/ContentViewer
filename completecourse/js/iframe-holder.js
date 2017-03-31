@@ -136,6 +136,8 @@ define(["bootstrap-dialog", "imagesloaded", "database", "jquery.ui"], function (
 		},
 
 		loadNewContent: function (options) {
+			this.unloadWidget();
+
 			this.options = options;
 			this.widgetName = undefined;
 
@@ -144,6 +146,7 @@ define(["bootstrap-dialog", "imagesloaded", "database", "jquery.ui"], function (
 			this.iframe.removeClass("pdf");
 
 			if (IsWidget(src)) {
+
 				// clear out the old content
 				this.iframe.contents().find("html,body").scrollTop(0);
 				this.iframe.attr("src", "index.html").attr("src", "").height("100%");
@@ -161,7 +164,8 @@ define(["bootstrap-dialog", "imagesloaded", "database", "jquery.ui"], function (
 		},
 
 		sizePDFToFit: function () {
-			var b = this.iframe.contents().find("button").outerHeight() * 2 + 20;
+			var n = this.iframe.contents().find("button").length;
+			var b = this.iframe.contents().find("button").outerHeight() * n + 20;
 			var embed = this.iframe.contents().find("embed");
 			var h = this.element.parents("#video").height();
 			var embed_height = h - b;
@@ -303,7 +307,11 @@ define(["bootstrap-dialog", "imagesloaded", "database", "jquery.ui"], function (
 			var src = URLWithoutHash(this.options.src);
 			if (IsPDF(src)) {
 				var s = $("<embed src=\"" + src + "\" width=\"100%\" height=\"100%\" type=\"application/pdf\"></embed>");
-				var f = this.iframe.contents().find(".header-prev-button").after(s);
+				var prev = this.iframe.contents().find(".header-prev-button");
+				if (prev.length)
+					prev.after(s);
+				else
+					this.iframe.contents().find("body").prepend(s);
 				this.sizePDFToFit();
 			}
 
@@ -609,6 +617,14 @@ define(["bootstrap-dialog", "imagesloaded", "database", "jquery.ui"], function (
 				return widget;
 			}
 			return undefined;
+		},
+
+		unloadWidget: function () {
+			var widget = this.getWidget();
+
+			if (widget && widget.unload) {
+				widget.unload();
+			}
 		},
 
 		isCompletable: function () {

@@ -618,7 +618,12 @@ define(["textfit", "dots", "jquery"], function (textFit) {
 		}
 	}
 
+	function unloadWidget () {
+		window.removeEventListener("resize", onWindowResize);
+	}
+
 	return {
-		initialize: initialize
+		initialize: initialize,
+		unloadWidget: unloadWidget
 	}
 });

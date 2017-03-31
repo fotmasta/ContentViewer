@@ -142,7 +142,8 @@ body {
     .card .cardface.front {
       background-color: #ffead1;
       -webkit-backface-visibility: hidden;
-      -moz-backface-visibility: hidden; }
+      -moz-backface-visibility: hidden;
+      z-index: 2; }
       .card .cardface.front h1 {
         font-size: 64px; }
     .card .cardface.back {

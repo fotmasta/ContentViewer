@@ -142,7 +142,7 @@ body {
 
 	cursor: pointer;
 
-	backface-visibility: hidden;
+	/*backface-visibility: hidden;*/
 
 	&.animated {
 		transition: transform .5s ease-out;

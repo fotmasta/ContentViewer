@@ -35,6 +35,10 @@ define(["view"], function (view) {
 				el: this.element,
 				cards: this.options.paramData.cards
 			});
+		},
+
+		unload: function () {
+			view.unloadWidget();
 		}
 	});
 

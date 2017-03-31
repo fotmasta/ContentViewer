@@ -52,7 +52,7 @@ div.cup-change:not(.no-badge), li.cup-change:not(.no-badge), p.cup-change:not(.n
     position: relative;
 }
 
-div.cup-change:not(.no-badge):after, p.cup-change:not(.no-badge):after, li.cup-change:not(.no-badge):after, figure.cup-change:not(.no-badge):after, section.cup-change:not(.no-badge):after {
+div.cup-change:not(.no-badge):after, p.cup-change:not(.no-badge):after, li.cup-change:not(.no-badge):after, figure.cup-change:not(.no-badge):before, section.cup-change:not(.no-badge):after {
     content: "Updated";
     display: block;
     position: absolute;
