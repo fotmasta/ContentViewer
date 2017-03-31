@@ -619,6 +619,7 @@ define(["textfit", "dots", "jquery"], function (textFit) {
 	}
 
 	function unloadWidget () {
+		clearInterval(hintInterval);
 		window.removeEventListener("resize", onWindowResize);
 	}
 

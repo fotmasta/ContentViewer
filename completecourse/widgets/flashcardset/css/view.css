@@ -75,7 +75,8 @@ body {
     margin-bottom: .5em;
     text-align: center;
     width: 100%;
-    color: #337AB7; }
+    color: #337AB7;
+    z-index: 100; }
   .card-holder #mastered-checkbox-holder {
     position: absolute;
     bottom: 10px;
