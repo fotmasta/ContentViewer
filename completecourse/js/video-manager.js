@@ -279,14 +279,15 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 
 		currentItemIsCompletable: function () {
 			if (this.iframe) {
-				return this.iframe.iFrameHolder("isCompletable");
+				return this.iframe.iFrameHolder("instance").isCompletable();
 			}
 			return false;
 		},
 
 		currentItemIsComplete: function () {
 			if (this.iframe) {
-				return this.iframe.iFrameHolder("isComplete");
+				var c = this.iframe.iFrameHolder("instance").isComplete();
+				return c;
 			}
 			return false;
 		},
