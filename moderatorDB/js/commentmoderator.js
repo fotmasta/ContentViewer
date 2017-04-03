@@ -72,6 +72,10 @@ define(["database", "jquery.ui", "bootstrap-confirmation"], function (Database) 
 			options.append(check1);
 			options.append(check2);
 
+			var refresh = $("<button>", { class: "btn btn-info", text: "Refresh" });
+			options.append(refresh);
+			refresh.click($.proxy(this.reloadComments, this));
+
 			$("input[name='moderation']").change($.proxy(this.onClickFilter, this));
 
 			$.get("isbns.txt", function (data) {

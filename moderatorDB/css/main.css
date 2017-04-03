@@ -15,6 +15,8 @@ table.comments th:nth-child(8), table.comments th:nth-child(9) {
   margin: 0 10px 15px 10px; }
   .options input {
     margin-left: 1em; }
+  .options button {
+    margin-left: 2em; }
 
 .moderator #no-unmoderated-comments {
   display: none;
