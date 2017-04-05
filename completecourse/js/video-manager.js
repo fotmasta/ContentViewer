@@ -445,7 +445,8 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 
 			// iframe content exits; video-only from here down:
 
-			this.iframe.iFrameHolder("clearContent");
+			if (this.iframe && this.iframe.iFrameHolder)
+				this.iframe.iFrameHolder("clearContent");
 
 			while (index < this.toc.length && !this.toc[index].video) {
 				index++;
