@@ -448,6 +448,11 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 
 				a.append(sp);
 
+				if (d.node.src && d.node.src.substr(0, 4).toLowerCase() == "http") {
+					var external = $("<i class='external-indicator fa fa-external-link' aria-hidden='true'></i>");
+					a.append(external);
+				}
+
 				a.appendTo(linkholder);
 
 				switch (this.options.type) {

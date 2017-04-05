@@ -163,6 +163,10 @@ define(["bootstrap-dialog", "imagesloaded", "database", "jquery.ui"], function (
 			}
 		},
 
+		clearContent: function () {
+			this.iframe.attr("src", "index.html").attr("src", "");
+		},
+
 		sizePDFToFit: function () {
 			var n = this.iframe.contents().find("button").length;
 			var b = this.iframe.contents().find("button").outerHeight() * n + 20;

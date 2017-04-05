@@ -1180,6 +1180,10 @@ html.articulate {
       left: auto !important;
       margin: 0 auto; }
 
+i.external-indicator {
+  vertical-align: bottom;
+  margin-left: .5em; }
+
 /* CUP styling overrides */
 section.cup-new:before {
   left: 0;

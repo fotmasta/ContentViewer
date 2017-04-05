@@ -443,6 +443,10 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 				return;
 			}
 
+			// iframe content exits; video-only from here down:
+
+			this.iframe.iFrameHolder("clearContent");
+
 			while (index < this.toc.length && !this.toc[index].video) {
 				index++;
 			}
