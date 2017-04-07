@@ -170,9 +170,15 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 	function onResize () {
 		var wh = $(window).outerHeight();
 
-		$("#contents").outerHeight(wh - 50);
-		$("#video").outerHeight(wh - 50);
-		$("#sidebar").outerHeight(wh - 50);
+		var reservedTop = 50;
+
+		if (manifest.navbar == false) {
+			reservedTop = 0;
+		}
+
+		$("#contents").outerHeight(wh - reservedTop);
+		$("#video").outerHeight(wh - reservedTop);
+		$("#sidebar").outerHeight(wh - reservedTop);
 
 		var numUpdates = 0;
 		if ($(".toc#contents-pane").TOCTree("instance")) {
@@ -182,18 +188,18 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 			}
 		}
 
-		var hh = $("#header-nav").outerHeight() + $(".course-progress").outerHeight() + $("#contents-pane h2").outerHeight() + 7;
+		var hh = reservedTop + $(".course-progress").outerHeight() + $("#contents-pane h2").outerHeight() + 7;
 		if (numUpdates > 0) {
 			hh += $("#versions").outerHeight();
 		}
 		$("#contents-pane .scroller").height(wh - hh);
 
-		var hh_search = $("#header-nav").outerHeight() + $("#search-header").outerHeight();
+		var hh_search = reservedTop + $("#search-header").outerHeight();
 		$("#search-results-panel .scroller").height(wh - hh_search);
 
-		$("#main_video").css("max-height", wh - 50);
+		$("#main_video").css("max-height", wh - reservedTop);
 
-		$("#video .iframe-holder .the-iframe-holder iframe").css("min-height", wh - 50);
+		$("#video .iframe-holder .the-iframe-holder iframe").css("min-height", wh - reservedTop);
 
 		var c = Math.floor($("#main").width() * .25) + 8;
 		var currentSize = ResponsiveBootstrapToolkit.current();
@@ -467,7 +473,7 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 
 		var videoSize = 12 - (contentsVisible ? contentsSize : 0) - (resourcesVisible ? resourcesSize : 0);
 
-		if (xs) {
+		if (xs && manifest.navbar != false) {
 			if (contentsPaneDesiredVisible) {
 				contentsVisible = true;
 				videoSize = 0;
@@ -590,9 +596,15 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 
 			$(".toc#contents-pane").TOCTree("showSearchPane");
 
+			var reservedTop = 50;
+
+			if (manifest.navbar == false) {
+				reservedTop = 0;
+			}
+
 			setTimeout(function () {
 				var wh = $(window).outerHeight();
-				var hh_search = $("#header-nav").outerHeight() + $("#search-header").outerHeight();
+				var hh_search = reservedTop + $("#search-header").outerHeight();
 				$("#search-results-panel .scroller").height(wh - hh_search);
 			}, 500);
 		}
@@ -604,6 +616,10 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 		$("#query").val(term);
 
 		$(".toc#contents-pane").TOCTree("search", term);
+	}
+
+	function onSearchFromTOC () {
+		$(".toc#contents-pane").TOCTree("showSearchPane");
 	}
 
 	function onCloseSearch () {
@@ -663,6 +679,18 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 
 	var BuildPage = {
 		build: function (options) {
+			if (window.location.host.indexOf("learnercommunity") != -1) {
+				options.breakout = options.navbar = false;
+				console.log("LearnerCommunity hack: ACTIVATE!");
+			}
+
+			if (options.breakout == false) {
+				// stay in whatever frame we're in
+				console.log("stay here");
+			} else {
+				breakout_of_frame();
+			}
+
 			// will this help with the xhr error we sometimes get on InformIT?
 			var timestamp = Date.now();
 			var url = baseURL + "js/viewer_template.html?time=" + timestamp;
@@ -673,6 +701,10 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 			$(".navbar-brand span").text(options.title);
 
 			$("html").addClass("ui");
+
+			if (options.navbar == false) {
+				$("html").addClass("no-navbar");
+			}
 
 			if (options.skin == "Microsoft") {
 				$("#show-comments-button").hide(0).attr( { "aria-hidden": true, "hidden": true  });
@@ -718,6 +750,8 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 
 			$("#query").on("input", onSearch).on("focus", onSearch);
 			$("#query-too").on("input", onSearchToo);
+			//$(".query-toc").on("input", onSearchFromTOC);
+			$("#toc-search-button").click(onSearchFromTOC);
 			$("#clear-search-button").click(onClearSearch);
 
 			$("#search-previous").click(onSearchPrevious);
@@ -752,6 +786,7 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 			var isInitialized = $(".toc#contents-pane").data("que-TOCTree");
 			if (isInitialized) {
 				$(".toc#contents-pane").TOCTree("setSearchIndex", data);
+				$("#toc-search-button").show(0);
 			} else {
 				console.log("re-trying setSearchIndex");
 				setTimeout($.proxy(this.setSearchIndex, this, data), 500);
@@ -764,8 +799,6 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 			top.location.href = document.location.href;
 		}
 	}
-
-	breakout_of_frame();
 
 	return BuildPage;
 });

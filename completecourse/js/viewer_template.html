@@ -32,7 +32,16 @@
 	<div class="row">
 		<div id="contents" class="col-xs-3">
 			<div class="toc" id="contents-pane" role="navigation" aria-controls="video">
-				<h2>Table of Contents</h2>
+				<div class="toc-header">
+					<div>
+						<h2>Table of Contents</h2>
+					</div>
+					<div id="no-navbar-search">
+						<button id="toc-search-button" title="Search the contents." data-coach-pos="bottom" class="btn btn-primary btn-xs">
+							<span class="glyphicon glyphicon-search"></span>
+						</button>
+					</div>
+				</div>
 				<div class="course-progress">
 					<button id="collapse-button" tabindex=3 title="Expand or collapse contents list." class="btn btn-primary btn-xs pull-left"><i class="fa fa-lg fa-caret-up"></i></button>
 					<div class="progress" data-progress="0% Complete">

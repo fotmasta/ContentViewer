@@ -284,3 +284,7 @@
 // DONE: note icons on video timeline, clickable to open & highlight note
 // DONE: google analytics events for notes (open, save, edit, delete)
 // DONE: TOC sources with "http" at the front will open in a new window
+// DONE: add search (without using navbar) to LearnerCommunity no-navbar version
+// NOTE: in case LC needs a search textbox, we may need to add it this way because every <input> I tried was deleted:
+//          <span class="query-toc single-line" contenteditable="true" placeholder="Search" title="Search the contents." data-coach-pos="bottom"></span>
+// NOTE: I only implemented searching (without a navbar) for titles with search indexes (it'll require a text box in the TOC pane to search by TOC)
