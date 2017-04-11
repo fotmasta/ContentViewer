@@ -229,7 +229,7 @@ body.skin-Microsoft {
     padding: 2px 4px;
     border-radius: 5px; }
 
-.video-holder:not(.has-transcript) .video-transcript {
+.video-holder:not(.has-transcript) .video-transcript, .video-holder:not(.transcript-visible) .video-transcript {
   display: none; }
 
 .iframe-holder {
