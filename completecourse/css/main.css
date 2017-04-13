@@ -1062,7 +1062,9 @@ button#search-close {
     margin-bottom: 15px; }
     #comments-panel .comment .comment-name {
       font-weight: bold;
-      color: #999; }
+      color: #999;
+      position: relative;
+      padding-right: 60px; }
       #comments-panel .comment .comment-name small {
         margin-left: 1em; }
       #comments-panel .comment .comment-name i {
@@ -1070,7 +1072,7 @@ button#search-close {
     #comments-panel .comment .comment-text {
       padding-bottom: 15px;
       border-bottom: 1px solid #6EE0AF;
-      word-break: break-all; }
+      word-break: break-word; }
     #comments-panel .comment.has-anchor {
       cursor: pointer;
       /*
@@ -1099,6 +1101,10 @@ button#search-close {
       margin-top: 3em; }
     #comments-panel .comment.reply {
       background-color: white; }
+    #comments-panel .comment button.reply {
+      position: absolute;
+      top: 0;
+      right: 0; }
 
 body.is-xs #comments-panel {
   width: calc(100% - 40px); }
