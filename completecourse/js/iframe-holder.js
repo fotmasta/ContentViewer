@@ -363,6 +363,11 @@ define(["bootstrap-dialog", "imagesloaded", "database", "jquery.ui"], function (
 						hash = me.options.hash;
 
 					me.options.manager.scrollToHash(me.iframe, { hash: hash }, true);
+
+					// try scrolling after images have loaded too
+					imagesLoaded(this.iframe.contents().find("body"), function () {
+						me.options.manager.scrollToHash(me.iframe, { hash: hash }, true);
+					});
 				}
 
 				me.options.manager.onIFrameLoaded(me.iframe);

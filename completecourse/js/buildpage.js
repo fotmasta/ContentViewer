@@ -205,7 +205,9 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 		var currentSize = ResponsiveBootstrapToolkit.current();
 		if (currentSize == "xs") {
 			c = "100%";
-			$("#collapsible-menu").collapse("hide");
+			if (manifest.skin != "Microsoft") {
+				$("#collapsible-menu").collapse("hide");
+			}
 		}
 		$(".toc#contents-pane").outerWidth(c);
 		$(".search-results").outerWidth(c);
@@ -718,6 +720,8 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 				$("#loading-text").css("display", "inline-block");
 
 				$("#query-too").attr("placeholder", "Enter search text");
+
+				$(".navbar-header").append($(".search-button"));
 			}
 
 			addLinkToCSS(baseURL + "css/bootstrap.min.css");

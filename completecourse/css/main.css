@@ -107,6 +107,14 @@ body.skin-Microsoft {
     outline: none;
     border: 1px solid #4D90FE;
     box-shadow: 0px 0px 5px  #4D90FE; }
+  body.skin-Microsoft #collapsible-menu {
+    display: none !important; }
+  body.skin-Microsoft #show-menu-button {
+    display: none !important; }
+  body.skin-Microsoft .search-button {
+    position: absolute;
+    right: 10px;
+    top: 8px; }
 
 .col-xs-0 {
   float: left;
@@ -861,7 +869,13 @@ button#search-close {
   font-size: 12px; }
   .loading-indicator p#loading-text {
     display: none;
-    line-height: 1em; }
+    line-height: 1em;
+    background-color: rgba(255, 255, 255, 0.25);
+    border-radius: 15px;
+    padding: 15px;
+    transform: translate(-25%, -55%);
+    padding-bottom: 5em;
+    border: 1px solid black; }
 
 .sk-circle {
   margin: 100px auto;

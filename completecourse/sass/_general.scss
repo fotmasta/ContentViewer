@@ -183,6 +183,20 @@ body.skin-Microsoft {
 		border:1px solid #4D90FE;
 		box-shadow: 0px 0px 5px  #4D90FE;
 	}
+
+	#collapsible-menu {
+		display: none !important;
+	}
+
+	#show-menu-button {
+		display: none !important;
+	}
+
+	.search-button {
+		position: absolute;
+		right: 10px;
+		top: 8px;
+	}
 }
 
 .col-xs-0 {
@@ -1323,6 +1337,12 @@ button#search-close {
 	p#loading-text {
 		display: none;
 		line-height: 1em;
+		background-color: rgba(255, 255, 255, .25);
+		border-radius: 15px;
+		padding: 15px;
+		transform: translate(-25%, -55%);
+		padding-bottom: 5em;
+		border: 1px solid black;
 	}
 }
 
