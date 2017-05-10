@@ -1263,8 +1263,14 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 			var curSrc = URLWithoutHash(this.toc[index].src) || this.toc[index].video;
 
 			for (var i = index + 1; i < this.toc.length; i++) {
-				var nextSrc = URLWithoutHash(this.toc[i].src) || this.toc[i].video;
-				if (nextSrc != curSrc) {
+				var nextSrc;
+				if (this.toc[i]) {
+					nextSrc = URLWithoutHash(this.toc[i].src);
+				} else if (this.toc[i] && this.toc[i].video) {
+					nextSrc = this.toc[i].video;
+				}
+
+				if (nextSrc != undefined && nextSrc != curSrc) {
 					return {index: i, title: this.toc[i].desc, src: nextSrc};
 				}
 			}
@@ -1653,6 +1659,10 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 
 		showNotesPanel: function () {
 			$("#notes-panel").Notes("openPanel");
+		},
+
+		clearAllProgress: function () {
+			Database.clearAllProgress();
 		}
 	});
 

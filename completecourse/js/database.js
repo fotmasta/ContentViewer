@@ -132,10 +132,12 @@ define(["common"], function (Common) {
 		attemptedRemoteLoad: false,
 
 		getVersion: function () {
-			return "1.0.5";
+			return "1.0.6";
 		},
 
 		initialize: function (toc, title, updateCallback) {
+			this.title = title;
+
 			this.databaseRef = undefined;
 
 			this.initialRemoteDataLoad();
@@ -260,6 +262,14 @@ define(["common"], function (Common) {
 				return item[property];
 			else
 				return undefined;
+		},
+
+		clearAllProgress: function () {
+			for (var i = 0; i < this.items.length; i++) {
+				this.items[i].completed = this.items[i].started = false;
+			}
+
+			this.saveToLocalStorage();
 		},
 
 		saveCurrentIndex: function (index) {
@@ -406,6 +416,10 @@ define(["common"], function (Common) {
 		getTitlesRef: function () {
 			if (this.databaseRef)
 				return this.databaseRef.child("titles");
+		},
+
+		getTitle: function () {
+			return this.title;
 		}
 	};
 

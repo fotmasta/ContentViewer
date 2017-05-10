@@ -688,7 +688,6 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 
 			if (options.breakout == false) {
 				// stay in whatever frame we're in
-				console.log("stay here");
 			} else {
 				breakout_of_frame();
 			}

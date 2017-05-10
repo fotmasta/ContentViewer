@@ -824,6 +824,15 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 			a.removeClass("completed");
 		},
 
+		markNotStartedOrCompleted: function (index) {
+			var el = this.holder.find("[data-index=" + index + "]");
+			var checked = el.find("> i.checked");
+			checked.remove();
+
+			var a = el.find("> label a span.desc, > a span.desc, a span.desc");
+			a.removeClass("completed");
+		},
+
 		checkForAllChildrenComplete: function (index) {
 			return this.checkChildrenComplete(index);
 		},
@@ -867,6 +876,8 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 						this.markCompleted(i);
 					else if (item.started)
 						this.markStarted(i);
+					else
+						this.markNotStartedOrCompleted(i);
 				}
 			}
 		},

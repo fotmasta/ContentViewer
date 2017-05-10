@@ -20,6 +20,8 @@ define(["database", "jquery.ui"], function (Database) {
 			Database.getUserData("history", $.proxy(this.onHistory, this));
 
 			this.element.find("#version").text("Version " + Database.getVersion());
+
+			this.element.find("button#clear-all-progress").click($.proxy(this.onClickResetProgress, this));
 		},
 
 		closeOtherPanels: function () {
@@ -140,6 +142,14 @@ define(["database", "jquery.ui"], function (Database) {
 
 			var p = $("<p>", { text: s });
 			el.append(p);
+		},
+
+		onClickResetProgress: function (event) {
+			var r = confirm("Are you sure you want to clear all the checkmarks for your reading progress in " + Database.getTitle() + " so far?");
+			if (r == true) {
+				Database.clearAllProgress();
+				$(".toc#contents-pane").TOCTree("setStatus", Database.getItems());
+			}
 		}
 	});
 });
