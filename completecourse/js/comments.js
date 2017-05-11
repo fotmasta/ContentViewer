@@ -26,6 +26,20 @@ define(["database", "common", "jquery.ui", "video-manager"], function (Database,
 		return difference_ms / one_day;
 	}
 
+	// sort by isbn, unmoderated, timestamp
+	function sortComments (a, b) {
+		if (a.isbn < b.isbn)
+			return -1;
+		else if (a.isbn > b.isbn)
+			return 1;
+		else {
+			if (a.ok === false && b.ok === true) return -1;
+			else if (a.ok === true && b.ok === false) return 1;
+			else
+				return (b.timestamp - a.timestamp);
+		}
+	}
+
 	$.widget("que.Comments", {
 
 		options: {},
@@ -63,7 +77,7 @@ define(["database", "common", "jquery.ui", "video-manager"], function (Database,
 		onLoadComments: function (data) {
 			this.clearComments();
 
-			var recs = data;
+			var recs = data.sort(sortComments);
 
 			// add non-child comments first
 			for (var each in recs) {
@@ -442,6 +456,9 @@ define(["database", "common", "jquery.ui", "video-manager"], function (Database,
 			form.find("#commentText").on("input", $.proxy(this.onChangeComment, this));
 			form.find("#submit-comment").click($.proxy(this.onClickReplySubmit, this));
 			form.find("#delete-comment").click($.proxy(this.onClickDeleteComment, this));
+
+			// prevent clicking on the reply from being interpreted as a scroll-to-this-section-of-the-book event
+			form.click(function (event) { event.stopImmediatePropagation(); event.preventDefault(); });
 
 			//var el = $(event.target).parents(".comment");
 			var el = findParentComment($(event.target));
