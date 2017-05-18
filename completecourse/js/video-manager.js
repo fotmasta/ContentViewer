@@ -1549,7 +1549,10 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 						var end = timeStringToSeconds(el.attr("end"));
 						el.attr( { "data-begin": begin, "data-end": end } );
 					});
-				});
+				})
+					.fail(function () {
+						console.log("transcript failed to load");
+					});
 
 				this.element.find(".video-holder").addClass("has-transcript");
 

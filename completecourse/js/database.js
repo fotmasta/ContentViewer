@@ -353,7 +353,7 @@ define(["common"], function (Common) {
 		},
 
 		loadFromRemoteStorage: function () {
-			if (Common.getgetISBNFromLocation) {
+			if (Common.getISBNFromLocation) {
 				var isbn = Common.getISBNFromLocation();
 
 				GetDataForTitle(isbn, "savedData", $.proxy(this.onLoadedFromRemoteStorage, this));
