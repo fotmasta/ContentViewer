@@ -265,6 +265,10 @@ define(["bootstrap-dialog", "imagesloaded", "database", "jquery.ui"], function (
 				});
 			}
 
+			var allVideos = this.iframe.contents().find("video");
+			allVideos.on("play", $.proxy(this.onVideoPlay, this));
+			allVideos.on("ended", $.proxy(this.onVideoEnd, this));
+
 			var me = this;
 
 			switch (this.options.type) {
@@ -701,6 +705,16 @@ define(["bootstrap-dialog", "imagesloaded", "database", "jquery.ui"], function (
 					}
 				}
 			}
+		},
+
+		onVideoPlay: function (event) {
+			var file = event.target.currentSrc;
+			ga("send", "event", "video-embed", "play", file);
+		},
+
+		onVideoEnd: function (event) {
+			var file = event.target.currentSrc;
+			ga("send", "event", "video-embed", "end", file);
 		}
 	});
 });

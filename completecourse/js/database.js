@@ -240,9 +240,14 @@ define(["common"], function (Common) {
 				// private browsing
 			}
 
-			if (to_json != this.last_save) {
+			// compare last_save as json string without timestamp
+			var copy = JSON.parse(to_json);
+			delete copy.timestamp;
+			var to_save = JSON.stringify(copy);
+
+			if (to_save != this.last_save) {
 				this.saveToRemoteStorage("savedData", to_json);
-				this.last_save = to_json;
+				this.last_save = to_save;
 			}
 		},
 

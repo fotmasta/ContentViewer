@@ -1071,8 +1071,10 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 			this.element.find(".question").removeClass("current");
 			thisQ.addClass("current");
 
+			thisQ.find(".checker button").removeClass("btn-success");
+
 			var total = this.element.find(".question").length;
-			this.element.find(".position-label").text("Question " + (this.currentQuestion + 1) + " of " + total);
+			this.element.find(".position-label").text("Question " + (this.currentQuestion + 1) + " of " + total).click($.proxy(this.onClickSecretPosition, this));
 
 			if (this.currentQuestion >= total - 1) {
 				this.element.find("#next-button").attr("disabled", true);
@@ -1114,6 +1116,39 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 
 		unload: function () {
 			$(window).off("resize.quizzerator");
+		},
+
+		onClickSecretPosition: function (event) {
+			this.markAllAnswersCorrectly();
+		},
+
+		markAllAnswersCorrectly: function () {
+			var questions = this.element.find(".question");
+			for (var i = 0; i < questions.length; i++) {
+				var q = questions.eq(i);
+				var correctAnswer = q.find(".response[data-correct=true]");
+				q.find(".response").removeClass("selected");
+				correctAnswer.addClass("selected");
+			}
+
+			this.checkAllQuestions(false);
+
+			this.updateScore();
+
+			// now show correct answers and explanations
+			this.markAllCorrectResponses();
+
+			this.element.toggleClass("grading");
+
+			// this will show the summary pane and scroll to it
+
+			var me = this;
+
+			setTimeout(function () {
+				var t = me.element.find(".summary").offset().top;
+				var h = $(window).height() * .5;
+				$(window).animate({scrollTop: t - h}, 1000);
+			}, 200);
 		}
 	});
 
