@@ -157,6 +157,9 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 		*/
 	}
 
+	var totalVideoTime = undefined;
+	var lastVideoQuartile = undefined;
+
 	$.widget("que.VideoManager", {
 		_create: function () {
 			this.initialize(this.options.toc, this.options.el, this.options.player, this.options.markers, this.options.options);
@@ -334,6 +337,17 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 			// highlight and scroll to current transcript position
 			var t = this.player.currentTime();
 
+			// track video progress via analytics (25%, 50%, 75%)
+			if (totalVideoTime != undefined) {
+				var pct = t / totalVideoTime;
+				var quartile = Math.floor(pct / .25);
+				if (quartile > 0 && quartile < 4 && quartile != lastVideoQuartile) {
+					lastVideoQuartile = quartile;
+					var file = event.target.currentSrc;
+					ga("send", "event", "video", "progress-" + (quartile * 25) + "%", file);
+				}
+			}
+
 			if (this.hasTranscript) {
 				var me = this;
 				var p = this.element.find(".video-transcript p");
@@ -403,6 +417,9 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 		},
 
 		playFromTOC: function (index, options) {
+			totalVideoTime = undefined;
+			lastVideoQuartile = undefined;
+
 			if (options && options.skipToNextSource) {
 				while (index < this.toc.length && URLWithoutHash(this.toc[index].src) == options.previousSource) {
 					index++;
@@ -1505,6 +1522,8 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 
 		// after loading video, add any closed captioning
 		onLoadedMetadata: function (event) {
+			totalVideoTime = event.target.duration;
+
 			var captions = this.toc[this.currentIndex].captions;
 
 			if (captions) {
