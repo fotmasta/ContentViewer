@@ -843,7 +843,9 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 			this.markItemStarted(this.currentIndex);
 
 			var file = event.target.currentSrc;
-			ga("send", "event", "video", "play", file);
+			if (file) {
+				ga("send", "event", "video", "play", file);
+			}
 		},
 
 		onVideoEnded: function () {
