@@ -290,3 +290,4 @@
 // NOTE: I only implemented searching (without a navbar) for titles with search indexes (it'll require a text box in the TOC pane to search by TOC)
 // NOTE: manifest option: navbar: true|false, breakout: true|false
 // DONE: video tracking for full-page and embedded videos
+// DONE: added syntax highlighting to quizzerator (using highlight.js)

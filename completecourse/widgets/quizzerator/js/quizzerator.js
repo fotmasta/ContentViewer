@@ -31,7 +31,8 @@ requirejs.config({
 		"videojs": "video",
 		"videojs-markers": "videojs-markers",
 		"handlebars": "handlebars-v3.0.3",
-		"lunr": "lunr.min"
+		"lunr": "lunr.min",
+		"highlight": "highlight.pack"
 	},
 	shim: {
 		"jquery": {
@@ -107,7 +108,7 @@ function removeMatchColors (el) {
 	el.removeClass(s);
 }
 
-define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database) {
+define(["database", "highlight", "jquery.ui", "bootstrap", "jquery.json"], function (database) {
 
 	var tryAgainText = "That's not correct. Try a different response.";
 	var partialTryAgainText = "That's partially correct. Keep trying.";
@@ -243,6 +244,13 @@ define(["database", "jquery.ui", "bootstrap", "jquery.json"], function (database
 			this.updateScore();
 
 			this.adjustSummarySize();
+
+			//hljs.configure( { languages: ["python"] } );
+
+			this.element.find("code").each(function(i, block) {
+				$(block).addClass("python");
+				hljs.highlightBlock(block);
+			});
 		},
 
 		addQuestion: function (q_params) {
