@@ -216,6 +216,10 @@ define(["database", "highlight", "jquery.ui", "bootstrap", "jquery.json"], funct
 				this.element.addClass("single-view");
 			}
 
+			if (this.data.syntaxHighlighting != undefined && this.data.syntaxHighlighting != "") {
+				this.options.settings.syntaxHighlighting = String(this.data.syntaxHighlighting);
+			}
+
 			for (var i = 0; i < this.data.questions.length; i++) {
 				var d_q = this.data.questions[i];
 
@@ -245,12 +249,14 @@ define(["database", "highlight", "jquery.ui", "bootstrap", "jquery.json"], funct
 
 			this.adjustSummarySize();
 
-			//hljs.configure( { languages: ["python"] } );
+			if (this.options.settings.syntaxHighlighting != undefined) {
+				var language = this.options.settings.syntaxHighlighting;
 
-			this.element.find("code").each(function(i, block) {
-				$(block).addClass("python");
-				hljs.highlightBlock(block);
-			});
+				this.element.find("code").each(function (i, block) {
+					$(block).addClass(language);
+					hljs.highlightBlock(block);
+				});
+			}
 		},
 
 		addQuestion: function (q_params) {
