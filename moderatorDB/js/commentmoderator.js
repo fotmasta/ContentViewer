@@ -99,7 +99,7 @@ define(["database", "jquery.ui", "bootstrap-confirmation"], function (Database) 
 			this.titleCount = this.titleCountReceived = 0;
 
 			for (var i = 0; i < isbns.length; i++) {
-				var isbn = isbns[i];
+				var isbn = isbns[i].replace("\r", "");
 				if (isbn.charAt(0) != "*") {
 					this.titleCount++;
 					Database.loadCommentsForISBN(isbn, $.proxy(this.addComments, this));
@@ -174,7 +174,7 @@ define(["database", "jquery.ui", "bootstrap-confirmation"], function (Database) 
 			for (var i = 0; i < filteredData.length; i++) {
 				var rec = filteredData[i];
 
-				var isbn = rec.isbn;
+				var isbn = rec.isbn.replace("\r", "");
 
 				if (isbn != lastISBN) {
 					var row = $("<tr>");
@@ -283,7 +283,7 @@ define(["database", "jquery.ui", "bootstrap-confirmation"], function (Database) 
 				saveTitleLocally(isbn, "pending");
 				callback("pending");
 
-				var url = "https://persistent-data.herokuapp.com/www.informit.com/search/index.aspx?query=" + isbn;
+				var url = "https://cors-informit.herokuapp.com/www.informit.com/search/index.aspx?query=" + isbn;
 
 				$.get(url, function (data) {
 					var regex = /<h1>([\s\S]+?)<\/h1>/;
