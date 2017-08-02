@@ -297,6 +297,28 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 		return metadata;
 	}
 
+	function convertFrostTOCtoMetadata (data) {
+		var links = $(data).find("a");
+
+		var metadata = links.map(function (index, item) {
+			var a = $(item);
+			var href = a.attr("href");
+			var hash = VideoManager.HashInURL(href);
+
+			var desc = a.text();
+
+			var src = manifest.folder + "/ops/xhtml/" + href;
+
+			return {
+				desc: desc,
+				src: src,
+				hash: hash
+			};
+		});
+
+		return metadata;
+	}
+
 	function NodeFromEPUB (t, depth, parent) {
 		var a = t.find("content");
 		var href = a.attr("src");
@@ -418,6 +440,23 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 		$("#video").VideoManager("loadMostRecentVideo");
 	}
 
+	function onFrostTOCLoaded (data) {
+		var metadata = convertFrostTOCtoMetadata(data);
+
+		addIDsToTOC(metadata);
+
+		$(".toc#contents-pane").TOCTree({ type: "habitat", skin: manifest.skin, data: data, metadata: metadata, expander: "#collapse-button", updateLabels: manifest.updateLabels });
+
+		var settings = { toc: metadata, el: "#video video", player: videojs("main_video", { controls: true, playbackRates: [0.5, .75, 1, 1.5, 2] }), markers: [], options: manifest };
+		$("#video").VideoManager(settings);
+
+		//VideoManager.initialize(metadata, "#video video", videojs("main_video"), [], manifest);
+
+		initialize();
+
+		$("#video").VideoManager("loadMostRecentVideo");
+	}
+
 	function onEPUBTOCLoaded (data) {
 		var metadata = convertEPUBTOCtoMetadata(data);
 
@@ -439,6 +478,9 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 		switch (manifest.type) {
 			case "metadata":
 				require(["toc.js"], onLoadedTOC);
+				break;
+			case "frost":
+				$.get(manifest.folder + "/ops/xhtml/toc.html", onFrostTOCLoaded);
 				break;
 			case "habitat":
 				$.get(manifest.folder + "/ops/toc.html", onHabitatTOCLoaded);
