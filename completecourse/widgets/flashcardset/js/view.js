@@ -94,27 +94,27 @@ define(["textfit", "dots", "jquery"], function (textFit) {
 			}
 		}
 
-		chapters = chapters.sort(function (a, b) {
-			if (a == "Extras") return 1;
-			else if (b == "Extras") return -1;
-			else return a - b;
-		});
+		if (chapters.length) {
+			chapters = chapters.sort(function (a, b) {
+				if (a == "Extras") return 1;
+				else if (b == "Extras") return -1;
+				else return a - b;
+			});
 
-		for (i = 0; i < chapters.length; i++) {
-			var d = $("<div>", { class: "chapter-checkbox selected", "data-index": chapters[i] });
-			var sp = $("<span>", { text: chapters[i] });
-			sp.appendTo(d);
+			for (i = 0; i < chapters.length; i++) {
+				var d = $("<div>", {class: "chapter-checkbox selected", "data-index": chapters[i]});
+				var sp = $("<span>", {text: chapters[i]});
+				sp.appendTo(d);
 
-			_settings.el.find("#chapter-checkboxes").append(d);
+				_settings.el.find("#chapter-checkboxes").append(d);
 
-			d.click(onClickChapter);
-		}
+				d.click(onClickChapter);
+			}
 
-		_settings.el.find("#chapter-count span.badge").text(chapters.length);
+			_settings.el.find("#chapter-count span.badge").text(chapters.length);
 
-		_settings.selectedChapters = chapters;
-
-		if (chapters.length == 0) {
+			_settings.selectedChapters = chapters;
+		} else {
 			_settings.el.find("#chapter-chooser").css("display", "none");
 		}
 	}
@@ -245,7 +245,9 @@ define(["textfit", "dots", "jquery"], function (textFit) {
 	function isValid (card) {
 		var ok = false;
 
-		if (card.chapters) {
+		if (card.chapters === undefined) {
+			ok = true;
+		} else if (card.chapters && card.chapters.length) {
 			for (var i = 0; i < card.chapters.length; i++) {
 				var ch = card.chapters[i].toString();
 				if (_settings.selectedChapters.indexOf(ch) != -1)
