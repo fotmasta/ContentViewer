@@ -747,6 +747,12 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 
 			if (options.navbar == false) {
 				$("html").addClass("no-navbar");
+				
+				$(window).contextmenu(function (event) {
+					event.preventDefault();
+					event.stopImmediatePropagation();
+					return false;
+				});
 			}
 
 			if (options.skin == "Microsoft") {
