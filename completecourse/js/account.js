@@ -22,6 +22,8 @@ define(["database", "jquery.ui"], function (Database) {
 			this.element.find("#version").text("Version " + Database.getVersion());
 
 			this.element.find("button#clear-all-progress").click($.proxy(this.onClickResetProgress, this));
+
+			this.showPageLimitHistory();
 		},
 
 		closeOtherPanels: function () {
@@ -37,6 +39,8 @@ define(["database", "jquery.ui"], function (Database) {
 
 			this.element.show("slide", {direction: "right"}).addClass("showing");
 			this.element.find(".comment.animated").removeClass("animated");
+
+			this.showPageLimitHistory();
 		},
 
 		closePanel: function () {
@@ -149,6 +153,34 @@ define(["database", "jquery.ui"], function (Database) {
 			if (r == true) {
 				Database.clearAllProgress();
 				$(".toc#contents-pane").TOCTree("setStatus", Database.getItems());
+			}
+		},
+
+		showPageLimitHistory: function () {
+			if (Database.isJustVisitingCustomer()) {
+				var allowed = this.options && this.options.manifest && this.options.manifest.pageLimited;
+
+				if (allowed) {
+					// TODO: don't bother showing page limit history if we have "paid" access
+					var el = this.element.find("#page-limit-info");
+
+					el.empty().append("<h3>Pages Limits</h3><h4>Allowed: " + allowed + " total</h4>");
+
+					var pages = Database.getPagesViewed().sort(function (a, b) {
+						return a - b;
+					});
+
+					var viewed = $("<h4>Viewed: </h4>");
+					el.append(viewed);
+
+					for (var i = 0; i < pages.length; i++) {
+						viewed.append("<span>" + pages[i] + "</span>");
+					}
+				}
+			} else {
+				var el = this.element.find("#page-limit-info");
+
+				el.empty();
 			}
 		}
 	});

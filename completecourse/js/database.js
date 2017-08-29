@@ -194,6 +194,9 @@ define(["common"], function (Common) {
 		callbacks: [],
 		last_save: undefined,
 		attemptedRemoteLoad: false,
+		pages: undefined,
+		pageLimit: undefined,
+		_isJustVisitingCustomer: undefined,
 
 		getVersion: function () {
 			return "1.0.6";
@@ -489,6 +492,74 @@ define(["common"], function (Common) {
 
 		getTitle: function () {
 			return this.title;
+		},
+
+		setPageLimit: function (limit) {
+			this.pageLimit = limit;
+		},
+
+		loadPageLimit: function () {
+			if (Common.getISBNFromLocation) {
+				var isbn = Common.getISBNFromLocation();
+				var pages = localStorage.getItem(isbn + "-pages");
+				if (pages) {
+					var db = JSON.parse(pages);
+
+					if (this.pageTimestamp == undefined || db.timestamp > this.pageTimestamp) {
+						this.pages = JSON.parse(lzw_decode(db.pages));
+						this.pageTimestamp = db.timestamp;
+					}
+				} else {
+					this.pages = [];
+				}
+			}
+		},
+
+		trackPageLimit: function (newPage) {
+			newPage = parseInt(newPage);
+
+			if (this.pages === undefined) {
+				this.loadPageLimit();
+			} else if (this.pages.indexOf(newPage) === -1) {
+				this.pages.push(newPage);
+			}
+
+			var compressedPages = lzw_encode(JSON.stringify(this.pages));
+
+			var time = new Date().getTime();
+
+			var db = { timestamp: time, pages: compressedPages };
+
+			var to_json = JSON.stringify(db);
+
+			try {
+				var isbn = Common.getISBNFromLocation();
+				localStorage.setItem(isbn + "-pages", to_json);
+			} catch (e) {
+				// private browsing
+			}
+		},
+
+		getPagesViewed: function () {
+			if (this.pages === undefined) {
+				this.loadPageLimit();
+			}
+
+			return this.pages;
+		},
+
+		getRemainingViews: function () {
+			var pages = this.getPagesViewed();
+
+			return this.pageLimit - pages.length;
+		},
+
+		isJustVisitingCustomer: function () {
+			return this._isJustVisitingCustomer;
+		},
+
+		setIsJustVisitingCustomer: function (visiting) {
+			this._isJustVisitingCustomer = visiting;
 		}
 	};
 

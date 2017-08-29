@@ -192,6 +192,11 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 				document.title = options.title;
 
 			Database.initialize(toc, options.title, $.proxy(this.onDatabaseUpdate, this));
+			Database.setPageLimit(options.pageLimited);
+			this.registeredCustomerCheck(function (registered) {
+				Database.setIsJustVisitingCustomer(!registered);
+			});
+
 			$(".toc#contents-pane").TOCTree("setStatus", Database.getItems());
 
 			this.updateProgress();
@@ -217,10 +222,12 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 			transcriptButton.on("click", $.proxy(this.onToggleTranscript, this));
 			this.player.controlBar.addChild(transcriptButton);
 
-			var noteButton = new videojs.Button(this.player);
-			noteButton.addClass("vjs-note-button");
-			noteButton.on("click", $.proxy(this.showNotesPanel, this));
-			this.player.controlBar.addChild(noteButton);
+			if (this.options && this.options.allowNotes) {
+				var noteButton = new videojs.Button(this.player);
+				noteButton.addClass("vjs-note-button");
+				noteButton.on("click", $.proxy(this.showNotesPanel, this));
+				this.player.controlBar.addChild(noteButton);
+			}
 
 			//  NOTE: Not sure why this stopped working and I had to switch to the straight HTML5 event
 //			this.player.on("play", $.proxy(this.onVideoStarted, this));
@@ -437,6 +444,19 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 			}
 
 			this.syncTOCToContent(index);
+
+			if (Database.isJustVisitingCustomer()) {
+				var limited = this.pageIsLimited(index);
+
+				if (limited) {
+					this.blockPage(true);
+				} else {
+					if (this.pageHasCost(index)) {
+						this.recordPageView(index);
+					}
+					this.blockPage(false);
+				}
+			}
 
 			var src = this.toc[index].src;
 
@@ -1693,6 +1713,70 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 
 		clearAllProgress: function () {
 			Database.clearAllProgress();
+		},
+
+		recordPageView: function (index) {
+			var old_limit = Database.getRemainingViews();
+
+			Database.trackPageLimit(index);
+
+			var cur_limit = Database.getRemainingViews();
+
+			if (old_limit > cur_limit) {
+				$.notify({
+					// options
+					message: 'You have ' + cur_limit + ' page views remaining.',
+				}, {
+					// settings
+					type: 'info',
+					allow_dismiss: true,
+					delay: 3000,
+					z_index: 5000,
+					animate: {
+						enter: 'animated fadeInDown',
+						exit: 'animated fadeOutUp'
+					},
+				});
+			}
+		},
+
+		blockPage: function (block) {
+			if (block) {
+				$("#video").addClass("blocked");
+			} else {
+				$("#video").removeClass("blocked");
+			}
+		},
+
+		pageIsLimited: function (index) {
+			index = parseInt(index);
+
+			var cost = this.toc[index].cost;
+
+			if (cost === undefined || cost > 0) {
+				if (Database.getRemainingViews() <= 0) {
+					var pages = Database.getPagesViewed();
+					if (pages.indexOf(index) !== -1) {
+						return false;
+					}
+					return true;
+				}
+			}
+			return false;
+		},
+
+		pageHasCost: function (index) {
+			var cost = this.toc[index].cost;
+
+			return (cost === undefined) ? true : (cost > 0);
+		},
+
+		registeredCustomerCheck: function (callback) {
+			$.get("../optional_file.html", function (data) {
+				callback(true);
+			}).fail(function (err) {
+				callback(false);
+			});
 		}
 	});
 

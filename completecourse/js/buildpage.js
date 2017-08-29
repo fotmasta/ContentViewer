@@ -123,7 +123,7 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 
 		$("#notes-panel").Notes({ manager: $("#video"), titlePath: getEscapedPathFromTitle(optionsTitle) });
 
-		$("#account-panel").Account();
+		$("#account-panel").Account( { manifest: manifest } );
 
 //		if ($("#video").VideoManager("hasCustomerIdentifier") && manifest.allowComments !== false) {
 		if (manifest.allowComments !== false) {
@@ -323,9 +323,13 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 		var a = t.find("content");
 		var href = a.attr("src");
 		var desc = t.find("navLabel text").html();
+		var cost = t.attr("cost");
+		if (cost) {
+			cost = parseInt(cost);
+		}
 		var hash = VideoManager.HashInURL(href);
 
-		// THEORY: grab Chapter or Part numbers from the ePub section descriptions (also grabbed during conversion
+		// THEORY: grab Chapter or Part numbers from the ePub section descriptions (also grabbed during conversion)
 
 		var shortLabel = null;
 		var match = desc.match(/^(\d+)\./);
@@ -350,6 +354,7 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 			hash: hash,
 			depth: depth,
 			short: shortLabel,
+			cost: cost,
 			parent: parent
 		};
 
@@ -747,7 +752,7 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 
 			if (options.navbar == false) {
 				$("html").addClass("no-navbar");
-				
+
 				$(window).contextmenu(function (event) {
 					event.preventDefault();
 					event.stopImmediatePropagation();

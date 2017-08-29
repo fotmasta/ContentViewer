@@ -374,6 +374,17 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 					text += " <span class='badge free'>(Free)</span>";
 				}
 
+				if (d.node.cost !== undefined) {
+					switch (d.node.cost) {
+						case 0:
+							text += ' <i class="fa fa-ticket cost" aria-hidden="true"></i>';
+							break;
+						case 1:
+							text += ' <i class="fa fa-usd cost" aria-hidden="true"></i>';
+							break;
+					}
+				}
+
 				var sp = $("<span>", {class: classes, html: text});
 
 				// horizontal line to indicate current selection in TOC
@@ -432,13 +443,20 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 					linkholder.addClass("has-download");
 					var dl = $("<button class='btn btn-success download-button' title='Download this section.'><i class='fa fa-cloud-download'></i></button>");
 					dl.attr("title", "Download: " + d.node.desc);
+					var me = this;
 					// special case for downloadable pdf (because they won't work with the iframe method)
 					if (d.node.download.toLowerCase().substr(-3) == "pdf") {
 						var a_link = $("<a download>").attr( { href: d.node.download }).css("display", "none");
 						dl.append(a_link);
-						dl.click(function (event) { $(event.currentTarget).find("a")[0].click(); });
+						dl.click(function (event) {
+							me.markCompleted(d.node.index);
+							$(event.currentTarget).find("a")[0].click();
+						});
 					} else {
-						dl.click($.proxy(this.onClickDownload, this, d.node.download));
+						dl.click(function (event) {
+							me.markCompleted(d.node.index);
+							$.proxy(this.onClickDownload, this, d.node.download)
+						});
 					}
 
 					linkholder.append(dl);

@@ -291,3 +291,16 @@
 // NOTE: manifest option: navbar: true|false, breakout: true|false
 // DONE: video tracking for full-page and embedded videos
 // DONE: added syntax highlighting to quizzerator (using highlight.js)
+// DONE: Page Limiting:
+// DONE: add setting for "page limited" [# of articles]
+// DONE: add setting (per page): "free" [cost = 0], "limited" [cost = 1], "paid" [cost = undefined, default]
+// DONE: track pages (in cookie) for "page limited" titles
+// DONE: show "page limited" history on account page
+// DONE: show # of pages left with notification-style pop-up
+// DONE: limit pages for "page limited" titles with obscuring pop-up
+// DONE: show total pages allowed on Account panel
+// DONE: show overlay message when page is blocked
+// DONE: cost per TOC entry
+// DONE: test links from shortener to title [does not work for memberservices, only s3.amazonaws.com]
+// TODONT: limit only for non-paid customers [check for access to memberservices.informit.com access?; doesn't seem possible without server work]
+// DONE: download clicks count as TOC "complete" progress
