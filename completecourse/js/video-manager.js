@@ -193,9 +193,11 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 
 			Database.initialize(toc, options.title, $.proxy(this.onDatabaseUpdate, this));
 			Database.setPageLimit(options.pageLimited);
-			this.registeredCustomerCheck(function (registered) {
-				Database.setIsJustVisitingCustomer(!registered);
-			});
+			if (options.pageLimited) {
+				this.registeredCustomerCheck(function (registered) {
+					Database.setIsJustVisitingCustomer(!registered);
+				});
+			}
 
 			$(".toc#contents-pane").TOCTree("setStatus", Database.getItems());
 

@@ -297,7 +297,20 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 		return metadata;
 	}
 
+	// uses ncx:
 	function convertFrostTOCtoMetadata (data) {
+		var metadata = [];
+
+		var m = $(data).find("navMap");
+
+		var top = $(data).find("navMap > navPoint");
+
+		addFromEPUB(null, top, metadata, []);
+
+		return metadata;
+	}
+
+	function convertFrostTOCtoMetadata_usingHTML (data) {
 		var links = $(data).find("a");
 
 		var metadata = links.map(function (index, item) {
@@ -450,7 +463,7 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 
 		addIDsToTOC(metadata);
 
-		$(".toc#contents-pane").TOCTree({ type: "habitat", skin: manifest.skin, data: data, metadata: metadata, expander: "#collapse-button", updateLabels: manifest.updateLabels });
+		$(".toc#contents-pane").TOCTree({ type: "frost", skin: manifest.skin, data: metadata, metadata: metadata, expander: "#collapse-button", updateLabels: manifest.updateLabels });
 
 		var settings = { toc: metadata, el: "#video video", player: videojs("main_video", { controls: true, playbackRates: [0.5, .75, 1, 1.5, 2] }), markers: [], options: manifest };
 		$("#video").VideoManager(settings);
@@ -485,7 +498,7 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 				require(["toc.js"], onLoadedTOC);
 				break;
 			case "frost":
-				$.get(manifest.folder + "/ops/xhtml/toc.html", onFrostTOCLoaded);
+				$.get(manifest.folder + "/oebps/html/tocncx.html", onFrostTOCLoaded);
 				break;
 			case "habitat":
 				$.get(manifest.folder + "/ops/toc.html", onHabitatTOCLoaded);

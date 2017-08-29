@@ -254,6 +254,8 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 			} else if (this.options.type == "epub") {
 				this.refreshFromMetadata();
 				this.collapseTOC();
+			} else if (this.options.type == "frost") {
+				this.refreshFromMetadata();
 			} else {
 				this.refreshFromMetadata();
 			}
@@ -420,7 +422,7 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 							short_label = depth[depth.length - 1];
 							short.html(short_label);
 						}
-					} else if (this.options.type == "epub") {
+					} else if (this.options.type == "epub" || this.options.type == "frost") {
 						short_label = depth[depth.length - 1];
 						short.html(short_label);//.addClass("invisible");
 					} else {
