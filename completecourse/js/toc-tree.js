@@ -451,13 +451,13 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 						var a_link = $("<a download>").attr( { href: d.node.download }).css("display", "none");
 						dl.append(a_link);
 						dl.click(function (event) {
-							me.markCompleted(d.node.index);
 							$(event.currentTarget).find("a")[0].click();
+							me.markCompleted(d.node.index);
 						});
 					} else {
 						dl.click(function (event) {
+							me.onClickDownload(d.node.download, event);
 							me.markCompleted(d.node.index);
-							$.proxy(this.onClickDownload, this, d.node.download)
 						});
 					}
 
