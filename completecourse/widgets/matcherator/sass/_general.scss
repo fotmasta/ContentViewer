@@ -1,0 +1,56 @@
+.matcherator {
+	#activity {
+		position: relative;
+
+		&.pairs {
+			display: flex;
+			flex-direction: row;
+			flex-wrap: nowrap;
+
+			div.column {
+				padding: 0;
+				margin: 0;
+				width: 50%;
+
+				display: flex;
+				flex-direction: column;
+
+				z-index: 1;
+
+				.choice {
+					margin: 10px 50px;
+					padding: 10px;
+					border: 2px dashed #acc1e3;
+					cursor: pointer;
+					display: block;
+					color: black;
+					white-space: normal;
+
+					&:focus {
+						background-color: #dce2f2;
+					}
+
+					&.selected {
+						border-color: yellow;
+					}
+				}
+			}
+
+			div.column.right {
+			}
+		}
+	}
+
+	#controls {
+		margin-top: 30px;
+		margin-bottom: 15px;
+	}
+
+	.matching-line {
+		border-top: 3px dotted #b3b8c1;
+		position: absolute;
+		top: 0;
+		left: 0;
+		z-index: 0;
+	}
+}
