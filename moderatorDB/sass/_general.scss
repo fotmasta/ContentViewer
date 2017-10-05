@@ -11,6 +11,10 @@ table.comments {
 	th:nth-child(8), th:nth-child(9) {
 		text-align: center;
 	}
+
+	td.hidden-rec {
+		background-color: lightcoral;
+	}
 }
 
 .ok-row {
@@ -28,6 +32,10 @@ table.comments {
 
 	button {
 		margin-left: 2em;
+	}
+
+	input+label {
+		font-weight: inherit;
 	}
 }
 

@@ -50,8 +50,10 @@ define(["database", "jquery.ui", "bootstrap-confirmation"], function (Database) 
 
 		_create: function () {
 			this.options.filter = "unmoderated";
+			this.options.showHidden = false;
 
 			this.titleCount = this.titleCountReceived = 0;
+			this.hiddenKeys = [];
 
 			var me = this;
 
@@ -72,11 +74,18 @@ define(["database", "jquery.ui", "bootstrap-confirmation"], function (Database) 
 			options.append(check1);
 			options.append(check2);
 
+			var hiddenCheck = $("<input id='checkHidden' type='checkbox'>");
+			var lbl = $("<label for='checkHidden'>&nbsp;Hidden comments</label>");
+			hiddenCheck.change($.proxy(this.onClickHiddenFilter, this));
+
+			options.append(hiddenCheck);
+			options.append(lbl);
+
 			var refresh = $("<button>", { class: "btn btn-info", text: "Refresh" });
 			options.append(refresh);
 			refresh.click($.proxy(this.reloadComments, this));
 
-			$("input[name='moderation']").change($.proxy(this.onClickFilter, this));
+			$("input[name='moderation']").change($.proxy(this.onClickModeratedFilter, this));
 
 			$.get("isbns.txt", function (data) {
 				isbns = data.split("\n");
@@ -97,6 +106,8 @@ define(["database", "jquery.ui", "bootstrap-confirmation"], function (Database) 
 			this.data = [];
 
 			this.titleCount = this.titleCountReceived = 0;
+
+			this.hiddenKeys = JSON.parse(localStorage.getItem("hidden_keys"));
 
 			for (var i = 0; i < isbns.length; i++) {
 				var isbn = isbns[i].replace("\r", "");
@@ -124,7 +135,7 @@ define(["database", "jquery.ui", "bootstrap-confirmation"], function (Database) 
 
 			this.data = this.data.concat(data);
 
-			/* refresh method?
+			//* throttle refresh method?
 			var me = this;
 
 			if (this.delayedRefresh) {
@@ -135,9 +146,9 @@ define(["database", "jquery.ui", "bootstrap-confirmation"], function (Database) 
 			this.delayedRefresh = setTimeout(function () {
 				me.refreshComments();
 			}, 250);
-			*/
+			//*/
 
-			this.refreshComments();
+			// this.refreshComments();
 		},
 
 		findCommentWithSource: function (id) {
@@ -157,6 +168,9 @@ define(["database", "jquery.ui", "bootstrap-confirmation"], function (Database) 
 				var rec = this.data[i];
 				if ( (this.options.filter == "moderated" && rec.ok) || (this.options.filter == "unmoderated" && !rec.ok) ) {
 					if (this.findCommentWithSource(rec.id)) {
+						// moderated (I think)
+					} else if (this.options.showHidden == false && this.isHidden(rec.id)) {
+						// hidden
 					} else {
 						filteredData.push(rec);
 					}
@@ -234,7 +248,12 @@ define(["database", "jquery.ui", "bootstrap-confirmation"], function (Database) 
 					row.append($("<td>", {class: "text-center ok-row"}).append(checkbox));
 				}
 
-				row.append($("<td>", {class: "text-center"}).append(deleteButton));
+				var deleteColumn = $("<td>", {class: "text-center"}).append(deleteButton);
+				if (this.isHidden(rec.id)) {
+					deleteColumn.addClass("hidden-rec");
+				}
+
+				row.append(deleteColumn);
 
 				added++;
 			}
@@ -269,11 +288,34 @@ define(["database", "jquery.ui", "bootstrap-confirmation"], function (Database) 
 			Database.postCommentToPersistentDatabase(obj, $.proxy(this.reloadComments, this));
 		},
 
+		// delete only works for your own comments; so the best can do is hide the comments from the Moderator view
 		onClickDelete: function (event) {
 			var key = $(event.target).parents("tr").attr("data-key");
 			var rec = $(event.target).parents("tr").attr("data-data");
 
-			Database.deleteComment(key, $.proxy(this.reloadComments, this));
+			// Database.deleteComment(key, $.proxy(this.reloadComments, this));
+
+			this.addToHiddenComments(key);
+		},
+
+		addToHiddenComments: function (key) {
+			var hidden = localStorage.getItem("hidden_keys");
+			if (hidden == undefined) {
+				hidden = [];
+			} else {
+				hidden = JSON.parse(hidden);
+			}
+
+			hidden.push(key);
+
+			localStorage.setItem("hidden_keys", JSON.stringify(hidden));
+
+			this.reloadComments();
+		},
+
+		isHidden: function (key) {
+			if (this.hiddenKeys && this.hiddenKeys.indexOf(key) !== -1) return true;
+			else return false;
 		},
 
 		getTitleForISBN: function (isbn, callback) {
@@ -300,10 +342,16 @@ define(["database", "jquery.ui", "bootstrap-confirmation"], function (Database) 
 			}
 		},
 
-		onClickFilter: function (event) {
+		onClickModeratedFilter: function (event) {
 			this.options.filter = $(event.target).val();
 
 			//this.refreshComments();
+
+			this.reloadComments();
+		},
+
+		onClickHiddenFilter: function (event) {
+			this.options.showHidden = $(event.target).prop("checked");
 
 			this.reloadComments();
 		}
