@@ -1,5 +1,8 @@
+// TODO: quizzerator: reveal answers after 2 attempts
+// TODO: quizzerator: markAllCorrectResponses needs to work for all question types
+// TODO: quizzerator: analytics for matrix UI
+// TODO: compress quizzerator responses' saved data?
 // TODO: at narrow widths: notes & comments s/b 100% width
-// TODO: ability to delete comments
 // TODO: is there a resize event when scrolling on iOS and top buttons go away (so we can resize the TOC)?
 // TODO: add aria-hidden to template and remove for non-Microsoft? (if adding aria-hidden after initialization isn't working)
 // TODO: make Microsoft outlines less ugly?
@@ -304,3 +307,11 @@
 // DONE: test links from shortener to title [does not work for memberservices, only s3.amazonaws.com]
 // TODONT: limit only for non-paid customers [check for access to memberservices.informit.com access?; doesn't seem possible without server work]
 // DONE: download clicks count as TOC "complete" progress
+// DONE: ability to delete comments [hiding]
+// DONE: quizzerator: "correct" text should show up when reloading answered questions
+// DONE: quizzerator: "grade all answers" needs to work for matrix questions too
+// DONE: make quizzerator (matrix) keyboard accessible
+// DONE: make quizzerator (multiple choice) keyboard accessible
+// DONE: make quizzerator (matching) keyboard accessible
+// DONE: quizzerator matching doesn't show existing lines upon reloading [they were off-screen]
+// DONE: quizzerator: start over a single question

@@ -23,6 +23,8 @@ $incorrect-color: #d9534f;
 
 			list-style-type: none;
 
+			padding-right: 20px;
+
 			li.question {
 				margin-bottom: 10px;
 				position: relative;
@@ -141,11 +143,93 @@ $incorrect-color: #d9534f;
 		left: 0;
 		z-index: 3;
 	}
+
+	table.matrix-table {
+		width: 100%;
+		margin-right: 15px;
+		margin-bottom: 20px;
+
+		& th {
+			text-align: center;
+		}
+
+		tr {
+			position: relative;
+		}
+
+		& td.user-entry {
+			position: relative;
+			text-align: center;
+
+			&.empty:after {
+				border: 2px dashed orange;
+			}
+
+			&:after {
+				z-index: -1;
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				display: inline-block;
+				content: "";
+				width: 50px;
+				height: 1.4em;
+				transform: translate(-50%, -50%);
+			}
+
+			&.over {
+				&:after {
+					background: yellow;
+				}
+			}
+		}
+
+		& th, & td {
+			line-height: 1em;
+			padding: 10px 0;
+		}
+
+		& tfoot td {
+			text-align: center;
+		}
+
+		.icons {
+			position: absolute;
+			left: -45px;
+			height: 100%;
+		}
+
+		i.icon {
+			transform: translateY(-50%);
+
+			&.correct {
+				color: $correct-color;
+			}
+
+			&.incorrect {
+				color: $incorrect-color;
+			}
+		}
+	}
+
+	button.matrix-choice {
+		display: inline-block;
+		margin-right: 15px;
+	}
 }
 
 ol.quiz-holder {
 	li {
 		font-size: 1.5em;
+
+		// don't number quizzes with only 1 question
+		&:only-child {
+			list-style-type: none;
+
+			p {
+				margin-left: -40px;
+			}
+		}
 	}
 
 	.checker {
@@ -165,6 +249,11 @@ ol.quiz-holder {
 		p.explanation {
 			text-indent: -8px;
 		}
+
+		.btn-reveal, .btn-reset {
+			margin-top: 10px;
+			margin-left: 10px;
+		}
 	}
 }
 
@@ -173,11 +262,11 @@ li.question {
 	padding: .5em 0 .5em 0;
 
 	&[data-correct] {
-		p.selected.response[data-correct=true] {
+		.selected.response[data-correct=true] {
 			background-color: $correct-color !important;
 		}
 
-		p.selected.response[data-correct=false] {
+		.selected.response[data-correct=false] {
 			background-color: $incorrect-color !important;
 		}
 	}
@@ -207,7 +296,9 @@ li.question {
 		}
 
 		ol.choices-holder, ol.answers-holder {
-			li p.response {
+			li .response {
+				text-align: left;
+
 				&:hover {
 					background-color: #ffcb69;
 					border-radius: 15px;
@@ -257,7 +348,7 @@ li.question {
 	&:not(.matching) {
 		ol.answers-holder, ol.choices-holder {
 			li {
-				p.response {
+				.response {
 					&:hover:not(.selected):not(.matched) {
 						background-color: #bcbfff;
 						border-radius: 15px;
@@ -275,12 +366,19 @@ li.question {
 			font-size: .75em;
 			position: relative;
 
-			p.response {
+			.response {
 				display: inline-block;
 				margin: -5px 0 5px 0;
 				padding: 5px 10px;
 				cursor: pointer;
 				vertical-align: top;
+				color: black;
+				border: 1px solid black;
+
+				&:not(:hover):not(.selected) {
+					background: none;
+					border: 1px solid transparent;
+				}
 
 				&.selected {
 					background-color: rgba(255, 255, 100, .5);

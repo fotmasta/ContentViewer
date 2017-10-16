@@ -258,6 +258,8 @@ define(["bootstrap-dialog", "imagesloaded", "database", "jquery.ui"], function (
 			*/
 
 			// for iOS 10, for all videos on the page, try grabbing the S3 redirected URLs
+			// commenting this out; it broke in iOS 11 (10/5/2017)
+			/*
 			var ver = iOSversion();
 			var alwaysUseRedirect = this.iframe.parent().hasClass("use-redirect");
 			if (alwaysUseRedirect || (ver && ver[0] >= 10)) {
@@ -266,6 +268,7 @@ define(["bootstrap-dialog", "imagesloaded", "database", "jquery.ui"], function (
 					grabRedirectedVideo(video);
 				});
 			}
+			*/
 
 			var allVideos = this.iframe.contents().find("video");
 			allVideos.attr("crossorigin", "anonymous");

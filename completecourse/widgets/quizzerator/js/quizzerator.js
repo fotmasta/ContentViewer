@@ -231,6 +231,7 @@ define(["database", "highlight", "jquery.ui", "bootstrap", "jquery.json"], funct
 				q.answers = d_q.answers.slice();
 				if (d_q.choices)
 					q.choices = d_q.choices.slice();
+				q.headings = d_q.headings;
 
 				this.addQuestion(q);
 			}
@@ -259,9 +260,15 @@ define(["database", "highlight", "jquery.ui", "bootstrap", "jquery.json"], funct
 			}
 		},
 
-		addQuestion: function (q_params) {
-			var isMatching = false, mq;
+		getQuestionType: function (questionData) {
+			var questionType = "multiple choice";
+			if (questionData.headings) questionType = "matrix";
+			else if (questionData.choices) questionType = "matching";
 
+			return questionType;
+		},
+
+		addQuestion: function (q_params) {
 			var n = this.element.find(".quiz-holder li.question").length;
 
 			var classes = "question";
@@ -295,101 +302,18 @@ define(["database", "highlight", "jquery.ui", "bootstrap", "jquery.json"], funct
 			var answers = $("<ol>", {class: "answers-holder"});
 			q.append(answers);
 
-			if (q_params.choices) {
-				isMatching = true;
+			var params = { questionEl: q, questionData: q_params, answersEl: answers };
 
-				q.addClass("matching");
-
-				mq = $("<div>", { class: "matching-container" });
-				q.append(mq);
-
-				var choices = $("<ol>", {class: "choices-holder"});
-				mq.append(choices);
-
-				for (var each in q_params.choices) {
-					var choice = q_params.choices[each];
-
-					var li = $("<li>", { class: "choice" });
-
-					var p = $("<p>", {class: "response", html: choice});
-
-					p.attr("data-index", each);
-
-					var me = this;
-
-					p.find("img").each(function () {
-						var img = $(this);
-						var path = me.options.path + "/" + img.attr("src");
-						img.attr("src", path);
-					});
-
-					p.click($.proxy(this.onClickChoice1, this));
-					li.append(p);
-
-					choices.append(li);
-				}
-			}
-
-			for (var each in q_params.answers) {
-				var answer = q_params.answers[each];
-
-				var isCorrect = false;
-				if (answer.substr(0, 1) == "*") {
-					isCorrect = true;
-					answer = answer.substr(1);
-				}
-
-				var li = $("<li>", { class: "answer" });
-
-				var icons = $("<div>", {class: "icons"});
-				if (isMatching) {
-					var choice_li = mq.find("li.choice").eq(each);
-					choice_li.append(icons);
-				} else {
-					li.append(icons);
-				}
-
-				var icon_correct = $("<i>", {class: "icon correct fa fa-2x fa-check hidden"});
-				icons.append(icon_correct);
-
-				var icon_incorrect = $("<i>", {class: "icon incorrect fa fa-2x fa-times hidden"});
-				icons.append(icon_incorrect);
-
-				var p = $("<p>", {class: "response", html: answer});
-				if (isCorrect) p.attr("data-correct", true);
-				else p.attr("data-correct", false);
-
-				p.attr("data-index", each);
-
-				var me = this;
-
-				p.find("img").each(function () {
-					var img = $(this);
-					var path = me.options.path + "/" + img.attr("src");
-					img.attr("src", path);
-				});
-
-				if (isMatching) {
-					p.click($.proxy(this.onClickChoice2, this));
-				} else {
-					p.click($.proxy(this.onClickAnswer, this));
-				}
-
-				li.append(p);
-
-				answers.append(li);
-			}
-
-			if (isMatching) {
-				mq.append(answers);
-			}
-
-			if (this.options.settings.randomizeResponses || isMatching) {
-				var responses = answers.find("li.answer");
-
-				answers.children("li.answer").sort(function () {
-					return Math.round(Math.random()) - 0.5;
-				}).detach().appendTo(answers);
+			switch (this.getQuestionType(q_params)) {
+				case "multiple choice":
+					this.setupForMultipleChoice(params);
+					break;
+				case "matching":
+					this.setupForMatching(params);
+					break;
+				case "matrix":
+					this.setupForMatrix(params);
+					break;
 			}
 
 			var checker = $("<div>", {class: "checker inactive"}).appendTo(q);
@@ -398,6 +322,22 @@ define(["database", "highlight", "jquery.ui", "bootstrap", "jquery.json"], funct
 			btn.appendTo(checker);
 			var lbl = $("<span>", { class: "checker-label", text: tryAgainText });
 			lbl.appendTo(checker);
+
+			if (!this.options.settings.singleView) {
+				var btnReveal = $("<button>", {
+					class: "btn btn-primary btn-reveal btn-xs pull-right",
+					text: "Reveal Answer"
+				});
+				btnReveal.appendTo(checker);
+				btnReveal.click($.proxy(this.onClickRevealOne, this));
+
+				var btnReset = $("<button>", {
+					class: "btn btn-info btn-reset btn-xs pull-right",
+					text: "Reset Question"
+				});
+				btnReset.appendTo(checker);
+				btnReset.click($.proxy(this.onClickResetOne, this));
+			}
 
 			if (q_params.hint) {
 				if (this.options.settings.usesExplanations) {
@@ -414,6 +354,304 @@ define(["database", "highlight", "jquery.ui", "bootstrap", "jquery.json"], funct
 			}
 
 			this.element.find(".quiz-holder").append(q);
+		},
+
+		setupForMatrix: function (params) {
+			var q = params.questionEl, q_params = params.questionData, answers = params.answersEl;
+
+			q.addClass("matrix");
+
+			var cols = q_params.headings;
+
+			var t = $("<table>", { class: "matrix-table" });
+			q.find(".instructions").append(t);
+			var tr = $("<tr>");
+			t.append(tr);
+
+			tr.append($("<th>"));
+
+			var th = $("<th>", { text: cols[0] });
+			tr.append(th);
+
+			var n = cols.length - 2;
+
+			th = $("<th>", { text: cols[1], colspan: n });
+			tr.append(th);
+
+			tr = $("<tr>");
+			t.append(tr);
+
+			tr.append($("<th>"));
+			tr.append($("<th>"));
+
+			for (var i = 0; i < n; i++) {
+				th = $("<th>", { text: cols[i + 2] });
+				tr.append(th);
+			}
+
+			var availableAnswers = [];
+
+			for (var i = 0; i < q_params.answers.length; i++) {
+				var a = q_params.answers[i];
+
+				if (availableAnswers.indexOf(a) == -1) {
+					availableAnswers.push(a);
+				}
+			}
+
+			var dd = '<select>';
+			for (var i = 0; i < availableAnswers.length; i++) {
+				var s = '<option value="' + availableAnswers[i] + '">' + availableAnswers[i] + '</option>';
+				dd += s;
+			}
+			dd += '</select>';
+
+			var me = this;
+
+			for (var i = 0; i < q_params.choices.length; i++) {
+				tr = $("<tr>");
+				t.append(tr);
+
+				var td = $("<td>");
+
+				var icons = $("<div>", {class: "icons"});
+				td.append(icons);
+
+				var icon_correct = $("<i>", {class: "icon correct fa fa-2x fa-check hidden"});
+				icons.append(icon_correct);
+
+				var icon_incorrect = $("<i>", {class: "icon incorrect fa fa-2x fa-times hidden"});
+				icons.append(icon_incorrect);
+
+				tr.append(td);
+
+				td = $("<td>", { text: q_params.choices[i] });
+				tr.append(td);
+
+				for (var j = 0; j < n; j++) {
+					td = $("<td>", { class: "empty user-entry", "data-row": i, "data-col": j });
+
+					var dropdown = $(dd);
+					dropdown.change(function (event) {
+						var val = $(event.currentTarget).val();
+						var r = $(event.currentTarget).attr("data-row");
+						var c = $(event.currentTarget).attr("data-col");
+						me.onMatrixAnswer(event, r, c, val);
+					});
+					// default to 'no value'
+					dropdown[0].selectedIndex = -1;
+
+					td.append(dropdown);
+
+					td.on("dragenter", function (event) {
+						$(event.currentTarget).addClass("over");
+					});
+					td.on("dragleave", function (event) {
+						$(event.currentTarget).removeClass("over");
+					});
+					td.on("dragover", function (event) {
+						event.originalEvent.dataTransfer.dropEffect = "move";
+						return false;
+					});
+					td.on("drop", function (event) {
+						var t = event.originalEvent.dataTransfer.getData("text/plain");
+						var r = $(event.currentTarget).attr("data-row");
+						var c = $(event.currentTarget).attr("data-col");
+						me.onMatrixAnswer(event, r, c, t);
+					});
+
+					tr.append(td);
+				}
+			}
+
+			tf = $("<tfoot>");
+			t.append(tf);
+
+			tf.append($("<td>"));
+			tf.append($("<td>"));
+
+			var td = $("<td>", { colspan: n, id: "available-container" });
+			tf.append(td);
+
+			for (var i = 0; i < availableAnswers.length; i++) {
+				var btn = $("<button>", { class: "btn btn-primary matrix-choice", text: availableAnswers[i] });
+				btn.attr("draggable", true);
+
+				var t = availableAnswers[i];
+				var onDragStart = function (val, event) {
+					event.originalEvent.dataTransfer.setData("text/plain", val);
+				}
+				btn.on("dragstart", onDragStart.bind(this, t));
+
+				td.append(btn);
+			}
+		},
+
+		setupForMultipleChoice: function (params) {
+			var q = params.questionEl, q_params = params.questionData, answers = params.answersEl;
+
+			q.addClass("multiple-choice");
+
+			for (var each in q_params.answers) {
+				var answer = q_params.answers[each];
+
+				var isCorrect = false;
+				if (answer.substr(0, 1) == "*") {
+					isCorrect = true;
+					answer = answer.substr(1);
+				}
+
+				var li = $("<li>", { class: "answer" });
+
+				var icons = $("<div>", {class: "icons"});
+				li.append(icons);
+
+				var icon_correct = $("<i>", {class: "icon correct fa fa-2x fa-check hidden"});
+				icons.append(icon_correct);
+
+				var icon_incorrect = $("<i>", {class: "icon incorrect fa fa-2x fa-times hidden"});
+				icons.append(icon_incorrect);
+
+				var p = $("<button>", {class: "btn btn-primary response", html: answer });
+				if (isCorrect) p.attr("data-correct", true);
+				else p.attr("data-correct", false);
+
+				p.attr("data-index", each);
+
+				var me = this;
+
+				p.find("img").each(function () {
+					var img = $(this);
+					var path = me.options.path + "/" + img.attr("src");
+					img.attr("src", path);
+				});
+
+				p.click($.proxy(this.onClickAnswer, this));
+
+				li.append(p);
+
+				answers.append(li);
+			}
+
+			if (this.options.settings.randomizeResponses) {
+				var responses = answers.find("li.answer");
+
+				answers.children("li.answer").sort(function () {
+					return Math.round(Math.random()) - 0.5;
+				}).detach().appendTo(answers);
+			}
+		},
+
+		setupForMatching: function (params) {
+			var q = params.questionEl, q_params = params.questionData, answers = params.answersEl;
+
+			q.addClass("matching");
+
+			var mq = $("<div>", { class: "matching-container" });
+			q.append(mq);
+
+			var choices = $("<ol>", {class: "choices-holder"});
+			mq.append(choices);
+
+			for (var each in q_params.choices) {
+				var choice = q_params.choices[each];
+
+				var li = $("<li>", { class: "choice" });
+
+				var p = $("<button>", {class: "response", html: choice});
+
+				p.attr("data-index", each);
+
+				var me = this;
+
+				p.find("img").each(function () {
+					var img = $(this);
+					var path = me.options.path + "/" + img.attr("src");
+					img.attr("src", path);
+				});
+
+				p.click($.proxy(this.onClickChoice1, this));
+				li.append(p);
+
+				choices.append(li);
+			}
+
+			for (var each in q_params.answers) {
+				var answer = q_params.answers[each];
+
+				var isCorrect = false;
+				if (answer.substr(0, 1) == "*") {
+					isCorrect = true;
+					answer = answer.substr(1);
+				}
+
+				var li = $("<li>", { class: "answer" });
+
+				var icons = $("<div>", {class: "icons"});
+				var choice_li = mq.find("li.choice").eq(each);
+				choice_li.append(icons);
+
+				var icon_correct = $("<i>", {class: "icon correct fa fa-2x fa-check hidden"});
+				icons.append(icon_correct);
+
+				var icon_incorrect = $("<i>", {class: "icon incorrect fa fa-2x fa-times hidden"});
+				icons.append(icon_incorrect);
+
+				var p = $("<button>", {class: "response", html: answer});
+				if (isCorrect) p.attr("data-correct", true);
+				else p.attr("data-correct", false);
+
+				p.attr("data-index", each);
+
+				var me = this;
+
+				p.find("img").each(function () {
+					var img = $(this);
+					var path = me.options.path + "/" + img.attr("src");
+					img.attr("src", path);
+				});
+
+				p.click($.proxy(this.onClickChoice2, this));
+
+				li.append(p);
+
+				answers.append(li);
+			}
+
+			mq.append(answers);
+
+			var responses = answers.find("li.answer");
+
+			answers.children("li.answer").sort(function () {
+				return Math.round(Math.random()) - 0.5;
+			}).detach().appendTo(answers);
+		},
+
+		onMatrixAnswer: function (event, row, col, val) {
+			var q = $(event.currentTarget).parents(".question");
+
+			this.setMatrixAnswer(q, row, col, val, false);
+
+			if (this.options.settings.reviewableAfterEach && this.questionIsFilledOut(q)) {
+				q.find(".checker").removeClass("inactive animated fadeOut").addClass("animated fadeInLeft").find("button.btn-checker").removeClass("btn-danger btn-success").addClass("btn-primary").parent().find(".checker-label").css("display", "none");
+			}
+		},
+
+		getMatrixAnswer: function (q, row, col) {
+			var cell = q.find(".user-entry[data-row=" + row + "][data-col=" + col + "]");
+			var ind = cell.find("select")[0].selectedIndex;
+			return cell.find("select").val();
+		},
+
+		setMatrixAnswer: function (q, row, col, val, alsoCheck) {
+			var cell = q.find(".user-entry[data-row=" + row + "][data-col=" + col + "]");
+			cell.find("select").val(val);
+
+			if (val != "" && val != null) {
+				cell.removeClass("empty");
+				var checkTheAnswer = this.questionIsFilledOut(q);
+				this.updateAndSave(q, alsoCheck && checkTheAnswer);
+			}
 		},
 
 		onClickAnswer: function (event) {
@@ -513,8 +751,9 @@ define(["database", "highlight", "jquery.ui", "bootstrap", "jquery.json"], funct
 
 				question.find(".response.selected").removeClass("selected");
 
-				if (this.options.settings.reviewableAfterEach)
+				if (this.options.settings.reviewableAfterEach && this.questionIsFilledOut(question)) {
 					question.find(".checker").removeClass("inactive animated fadeOut").addClass("animated fadeInLeft").find("button").removeClass("btn-danger btn-success").addClass("btn-primary").parent().find(".checker-label").css("display", "none");
+				}
 			}
 		},
 
@@ -626,7 +865,7 @@ define(["database", "highlight", "jquery.ui", "bootstrap", "jquery.json"], funct
 			var q = questionElement;
 
 			if (!alsoCheck && !this.options.settings.reviewableAfterEach) {
-				q.find(".checker button").removeClass("btn-danger").addClass("btn-primary");
+				q.find(".checker .btn-checker").removeClass("btn-danger").addClass("btn-primary");
 			}
 
 			q.find(".icon").addClass("hidden");
@@ -641,36 +880,87 @@ define(["database", "highlight", "jquery.ui", "bootstrap", "jquery.json"], funct
 
 			this.adjustSummarySize();
 
-			if (!alsoCheck)
-				this.saveResponses();
+			//if (!alsoCheck)
+			this.saveResponses();
 		},
 
 		resetButton: function (question) {
 			$(question).find(".checker").addClass("inactive");
-			$(question).find(".checker button").removeClass("btn-success btn-danger").addClass("btn-primary").parent().find(".checker-label").css("display", "none");
+			$(question).find(".checker .btn-checker").removeClass("btn-success btn-danger").addClass("btn-primary").parent().find(".checker-label").css("display", "none");
 		},
 
 		getQuestionsAnswered: function () {
-			var questions = this.element.find(".question");
 			var answered = [];
 
-			questions.each(function (index, question) {
-				var q = $(question);
-				if (q.hasClass("matching")) {
-					if (q.find(".matching-line").length == q.find(".choice").length) answered.push(index);
-				} else {
-					if (q.find(".selected").length) answered.push(index);
+			for (var i = 0; i < this.data.questions.length; i++) {
+				var q = this.element.find(".question").eq(i);
+				switch (this.getQuestionType(this.data.questions[i])) {
+					case "matching":
+						if (q.find(".matching-line").length == q.find(".choice").length) answered.push(i);
+						break;
+					case "multiple choice":
+						if (q.find(".selected").length) answered.push(i);
+						break;
+					case "matrix":
+						var submitted = [];
+						var rowCount = this.data.questions[i].choices.length;
+						var columnCount = this.data.questions[i].headings.length - 2;
+						for (var j = 0; j < rowCount; j++) {
+							var rows = q.find("table.matrix-table tr");
+							var row = rows.eq(i + 2);
+							for (var k = 0; k < columnCount; k++) {
+								var response = this.getMatrixAnswer(q, j, k);
+								if (response)
+									submitted.push(response);
+							}
+						}
+
+						if (submitted.length == rowCount * columnCount)
+							answered.push(i);
+						break;
 				}
-			});
+			}
 
 			return answered;
-			//return $.unique(this.element.find(".selected").parents(".question"));
 		},
 
 		allQuestionsAnswered: function () {
 			var answered = this.getQuestionsAnswered();
 			var questions = this.element.find(".question");
 			return (answered && questions && answered.length == questions.length);
+		},
+
+		questionIsFilledOut: function (q) {
+			var index = q.attr("data-index");
+			var type = this.getQuestionType(this.data.questions[index]);
+			var filledOut = true;
+
+			switch (type) {
+				case "multiple choice":
+					filledOut = q.find(".response.selected").length > 0;
+					break;
+				case "matching":
+					var lines = q.find(".matching-line").length;
+					var choices = q.find(".choice").length;
+					filledOut = (lines == choices);
+					break;
+				case "matrix":
+					var rowCount = this.data.questions[index].choices.length;
+					var columnCount = this.data.questions[index].headings.length - 2;
+					for (var i = 0; i < rowCount; i++) {
+						var rows = q.find("table.matrix-table tr");
+						var row = rows.eq(i + 2);
+						for (var j = 0; j < columnCount; j++) {
+							var response = this.getMatrixAnswer(q, i, j);
+							if (response === "" || response === null) {
+								filledOut = false;
+							}
+						}
+					}
+					break;
+			}
+
+			return filledOut;
 		},
 
 		adjustSummarySize: function () {
@@ -744,18 +1034,18 @@ define(["database", "highlight", "jquery.ui", "bootstrap", "jquery.json"], funct
 
 				if (totalRight == q.find(".choice").length) {
 					if (animate != false) {
-						q.find(".checker button").removeClass("btn-primary btn-danger").addClass("btn-success animated fadeInLeft").parent().find(".checker-label").text(correctText).css("display", "inline");
+						q.find(".checker .btn-checker").removeClass("btn-primary btn-danger").addClass("btn-success animated fadeInLeft").parent().find(".checker-label").text(correctText).css("display", "inline");
 					} else {
-						q.find(".checker button").removeClass("btn-primary btn-danger").addClass("btn-success").parent().find(".checker-label").text(correctText).css("display", "inline");
+						q.find(".checker .btn-checker").removeClass("btn-primary btn-danger").addClass("btn-success").parent().find(".checker-label").text(correctText).css("display", "inline");
 						q.find(".checker").removeClass("animated");
 					}
 
 					q.attr("data-correct", true);
 				} else {
 					if (animate != false) {
-						q.find(".checker button").removeClass("btn-primary").addClass("btn-danger animated fadeInLeft").parent().find(".checker-label").text(tryAgainText).css("display", "inline");
+						q.find(".checker .btn-checker").removeClass("btn-primary").addClass("btn-danger animated fadeInLeft").parent().find(".checker-label").text(tryAgainText).css("display", "inline");
 					} else {
-						q.find(".checker button").removeClass("btn-primary").addClass("btn-danger").parent().find(".checker-label").text(tryAgainText).css("display", "inline");
+						q.find(".checker .btn-checker").removeClass("btn-primary").addClass("btn-danger").parent().find(".checker-label").text(tryAgainText).css("display", "inline");
 						q.find(".checker").removeClass("animated");
 					}
 
@@ -765,7 +1055,7 @@ define(["database", "highlight", "jquery.ui", "bootstrap", "jquery.json"], funct
 
 					q.find(".hint").css("display", "block");
 				}
-			} else {
+			} else if (q.hasClass("multiple-choice")) {
 				var correctAnswer = q.find(".response[data-correct=true]");
 				var chosenAnswer = q.find(".response.selected");
 
@@ -774,10 +1064,10 @@ define(["database", "highlight", "jquery.ui", "bootstrap", "jquery.json"], funct
 					chosenAnswer.parent("li").find(".correct").removeClass("hidden");
 					if (animate != false) {
 						chosenAnswer.parent("li").find(".icons").removeClass("hidden animated").hide(0).addClass("animated rollIn").show(0);
-						q.find(".checker button").removeClass("btn-primary btn-danger").addClass("btn-success animated fadeInLeft").parent().find(".checker-label").text(correctText).css("display", "inline");
+						q.find(".checker .btn-checker").removeClass("btn-primary btn-danger").addClass("btn-success animated fadeInLeft").parent().find(".checker-label").text(correctText).css("display", "inline");
 					} else {
 						chosenAnswer.parent("li").find(".icons").removeClass("hidden animated").show(0);
-						q.find(".checker button").removeClass("btn-primary btn-danger").addClass("btn-success").parent().find(".checker-label").text(correctText).css("display", "inline");
+						q.find(".checker .btn-checker").removeClass("btn-primary btn-danger").addClass("btn-success").parent().find(".checker-label").text(correctText).css("display", "inline");
 						q.find(".checker").removeClass("animated");
 					}
 
@@ -794,10 +1084,10 @@ define(["database", "highlight", "jquery.ui", "bootstrap", "jquery.json"], funct
 					});
 					if (animate != false) {
 						chosenAnswer.parent("li").find(".icons").removeClass("hidden animated").hide(0).addClass("animated rollIn").show(0);
-						q.find(".checker button").removeClass("btn-primary").addClass("btn-danger animated fadeInLeft").parent().find(".checker-label").text(responseText).css("display", "inline");
+						q.find(".checker .btn-checker").removeClass("btn-primary").addClass("btn-danger animated fadeInLeft").parent().find(".checker-label").text(responseText).css("display", "inline");
 					} else {
 						chosenAnswer.parent("li").find(".icons").removeClass("hidden animated").show(0);
-						q.find(".checker button").removeClass("btn-primary").addClass("btn-danger").parent().find(".checker-label").text(responseText).css("display", "inline");
+						q.find(".checker .btn-checker").removeClass("btn-primary").addClass("btn-danger").parent().find(".checker-label").text(responseText).css("display", "inline");
 						q.find(".checker").removeClass("animated");
 					}
 
@@ -807,6 +1097,65 @@ define(["database", "highlight", "jquery.ui", "bootstrap", "jquery.json"], funct
 
 					q.find(".hint").css("display", "block");
 				}
+			} else if (q.hasClass("matrix")) {
+				var index = q.attr("data-index");
+				var answers = this.data.questions[index].answers;
+				var submitted = [];
+				var rowCount = this.data.questions[index].choices.length;
+				var columnCount = this.data.questions[index].headings.length - 2;
+				var allCorrect = true, partialCorrect = false;
+				for (var i = 0; i < rowCount; i++) {
+					var rows = q.find("table.matrix-table tr");
+					var row = rows.eq(i + 2);
+					var rowCorrect = true;
+					for (var j = 0; j < columnCount; j++) {
+						var response = this.getMatrixAnswer(q, i, j);
+						submitted.push(response);
+						var n = i * columnCount + j;
+						if (answers[n] !== submitted[n]) {
+							rowCorrect = false;
+							allCorrect = false;
+						} else {
+							partialCorrect = true;
+						}
+					}
+
+					if (rowCorrect) {
+						q.find(".icons").eq(i).find(".correct").removeClass("hidden");
+					} else {
+						q.find(".icons").eq(i).find(".incorrect").removeClass("hidden");
+					}
+				}
+
+				var responseText;
+
+				if (allCorrect) {
+					responseText = correctText;
+
+					if (animate != false) {
+						q.find(".icons").removeClass("hidden animated").hide(0).addClass("animated rollIn").show(0);
+						q.find(".checker .btn-checker").removeClass("btn-primary btn-danger").addClass("btn-success animated fadeInLeft").parent().find(".checker-label").text(responseText).css("display", "inline");
+					} else {
+						q.find(".icons").removeClass("hidden animated").show(0);
+						q.find(".checker .btn-checker").removeClass("btn-primary btn-danger").addClass("btn-success").parent().find(".checker-label").text(responseText).css("display", "inline");
+						q.find(".checker").removeClass("animated");
+					}
+				} else {
+					responseText = partialCorrect ? partialTryAgainText : tryAgainText;
+					q.find(".hint").css("display", "block");
+
+					if (animate != false) {
+						q.find(".icons").removeClass("hidden animated").hide(0).addClass("animated rollIn").show(0);
+						q.find(".checker .btn-checker").removeClass("btn-primary").addClass("btn-danger animated fadeInLeft").parent().find(".checker-label").text(responseText).css("display", "inline");
+					} else {
+						q.find(".checker .btn-checker").removeClass("btn-primary").addClass("btn-danger").parent().find(".checker-label").text(responseText).css("display", "inline");
+						q.find(".checker").removeClass("animated");
+					}
+				}
+
+				q.find(".checker").removeClass("inactive");
+
+				q.attr("data-correct", allCorrect);
 			}
 
 			this.updateScore();
@@ -826,6 +1175,79 @@ define(["database", "highlight", "jquery.ui", "bootstrap", "jquery.json"], funct
 				q.find(".checker").removeClass("inactive");
 				q.find(".hint").css("display", "block");
 			}
+		},
+
+		onClickRevealOne: function (event) {
+			var q = $(event.currentTarget).parents(".question");
+			var index = q.attr("data-index");
+
+			switch (this.getQuestionType(this.data.questions[index])) {
+				case "multiple choice":
+					var correctAnswer = q.find(".response[data-correct=true]");
+
+					// show the right responses
+					correctAnswer.parent("li").find(".correct").removeClass("hidden");
+
+					// show the hint
+					q.find(".checker").removeClass("inactive");
+					q.find(".hint").css("display", "block");
+					break;
+				case "matching":
+					var resp = this.data.questions[index].answers;
+					for (var j = 0; j < resp.length; j++) {
+						var r_el = q.find(".choice .response[data-index=" + j + "]");
+						this.clickChoice1(r_el, false);
+						r_el = q.find(".answer .response[data-index=" + j + "]");
+						this.clickChoice2(r_el, true);
+					}
+					break;
+				case "matrix":
+					var answers = this.data.questions[index].answers;
+					var submitted = [];
+					var rowCount = this.data.questions[index].choices.length;
+					var columnCount = this.data.questions[index].headings.length - 2;
+					for (var i = 0; i < rowCount; i++) {
+						var rows = q.find("table.matrix-table tr");
+						var row = rows.eq(i + 2);
+						var rowCorrect = true;
+						for (var j = 0; j < columnCount; j++) {
+							var n = i * columnCount + j;
+							this.setMatrixAnswer(q, i, j, answers[n]);
+						}
+					}
+					this.checkQuestion(q, true);
+					break;
+			}
+		},
+
+		onClickResetOne: function (event) {
+			var q = $(event.currentTarget).parents(".question");
+			var index = q.attr("data-index");
+
+			q.attr( { "data-correct": null  } );
+
+			switch (this.getQuestionType(this.data.questions[index])) {
+				case "multiple choice":
+					console.log("reset multiple choice");
+					break;
+				case "matching":
+					q.find(".response").removeClass("selected");
+					q.find(".matching-line").remove();
+					removeMatchColors(q.find(".matched"));
+					q.find(".matched").removeClass("matched");
+					break;
+				case "matrix":
+					q.find(".user-entry").addClass("empty").find("select").val("");
+					break;
+			}
+
+			q.find(".icon").addClass("hidden");
+			q.find(".checker").addClass("inactive");
+			q.find(".hint").css("display", "none");
+
+			this.saveResponses();
+			this.updateScore();
+			this.adjustSummarySize();
 		},
 
 		onClickCheckAll: function (event) {
@@ -891,40 +1313,66 @@ define(["database", "highlight", "jquery.ui", "bootstrap", "jquery.json"], funct
 
 					if (resp.length == undefined) resp = [resp];
 
-					var alsoCheckAnswers = (this.options.settings.reviewableAfterEach || this.allQuestionsAnswered());
-
 					var q = this.element.find(".question").eq(i);
+
+					var alsoCheckAnswers = this.allQuestionsAnswered() || (this.options.settings.reviewableAfterEach && this.questionIsFilledOut(q));
+
 					if (q.length) {
-						var isMatching = false;
 						var question_params = this.data.questions[i];
-						if (question_params.choices) {
-							isMatching = true;
-						}
 
-						if (!isMatching) {
-							for (var j = 0; j < resp.length; j++) {
-								var r = resp[j];
-								if (r != -1) {
-									var r_el = q.find(".response[data-index=" + r + "]");
-									if (r_el.length)
-										this.clickResponse(r_el, alsoCheckAnswers);
+						switch (this.getQuestionType(this.data.questions[i])) {
+							case "matching":
+								for (var j = 0; j < resp.length; j += 2) {
+									var r = resp[j];
+									var r_el = q.find(".choice .response[data-index=" + r + "]");
+									if (r_el.length) {
+										this.clickChoice1(r_el, alsoCheckAnswers);
+									}
+									r = resp[j + 1];
+									r_el = q.find(".answer .response[data-index=" + r + "]");
+									if (r_el.length) {
+										this.clickChoice2(r_el, alsoCheckAnswers);
+									}
 								}
-							}
-						} else if (isMatching) {
-							for (var j = 0; j < resp.length; j += 2) {
-								var r = resp[j];
-								var r_el = q.find(".choice .response[data-index=" + r + "]");
-								if (r_el.length) {
-									this.clickChoice1(r_el, alsoCheckAnswers);
-								}
-								r = resp[j + 1];
-								r_el = q.find(".answer .response[data-index=" + r + "]");
-								if (r_el.length) {
-									this.clickChoice2(r_el, alsoCheckAnswers);
-								}
-							}
 
-							this.showInstructions(q);
+								var recheckAnswers = this.allQuestionsAnswered() || (this.options.settings.reviewableAfterEach && this.questionIsFilledOut(q));
+								if (recheckAnswers)
+									this.checkQuestion(q, false);
+
+								this.showInstructions(q);
+								break;
+							case "multiple choice":
+								for (var j = 0; j < resp.length; j++) {
+									var r = resp[j];
+									if (r != -1) {
+										var r_el = q.find(".response[data-index=" + r + "]");
+										if (r_el.length)
+											this.clickResponse(r_el, alsoCheckAnswers);
+									}
+								}
+
+								var recheckAnswers = this.allQuestionsAnswered() || (this.options.settings.reviewableAfterEach && this.questionIsFilledOut(q));
+								if (recheckAnswers)
+									this.checkQuestion(q, false);
+
+								break;
+							case "matrix":
+								var answers = this.data.questions[i].answers;
+								var rowCount = this.data.questions[i].choices.length;
+								var columnCount = this.data.questions[i].headings.length - 2;
+								var cellIndex = 0;
+								for (var j = 0; j < rowCount; j++) {
+									var rows = q.find("table.matrix-table tr");
+									var row = rows.eq(j + 2);
+									for (var k = 0; k < columnCount; k++) {
+										this.setMatrixAnswer(q, j, k, resp[cellIndex++], alsoCheckAnswers);
+									}
+								}
+
+								var recheckAnswers = this.allQuestionsAnswered() || (this.options.settings.reviewableAfterEach && this.questionIsFilledOut(q));
+								if (recheckAnswers)
+									this.checkQuestion(q, false);
+								break;
 						}
 					}
 				}
@@ -943,25 +1391,44 @@ define(["database", "highlight", "jquery.ui", "bootstrap", "jquery.json"], funct
 			for (var i = 0; i < questions.length; i++) {
 				var q = questions.eq(i);
 				var question_params = this.data.questions[i];
+				var type = this.getQuestionType(question_params);
 				var isMatching = false;
 				if (question_params.choices) {
 					isMatching = true;
 				}
-				if (!isMatching) {
-					var answers = q.find(".response");
-					var chosen = q.find(".response.selected");
-					var indices = $.map(chosen, function (item, index) {
-						return $(item).attr("data-index");
-					});
-					responses.push(indices);
-				} else {
-					var pairs = q.find(".matching-line");
-					var indices = $.map(pairs, function (item, index) {
-						var left = $(item).attr("data-left-index");
-						var right = $(item).attr("data-right-index");
-						return [left, right];
-					});
-					responses.push(indices);
+				switch (type) {
+					case "multiple choice":
+						var answers = q.find(".response");
+						var chosen = q.find(".response.selected");
+						var indices = $.map(chosen, function (item, index) {
+							return $(item).attr("data-index");
+						});
+						responses.push(indices);
+						break;
+					case "matching":
+						var pairs = q.find(".matching-line");
+						var indices = $.map(pairs, function (item, index) {
+							var left = $(item).attr("data-left-index");
+							var right = $(item).attr("data-right-index");
+							return [left, right];
+						});
+						responses.push(indices);
+						break;
+					case "matrix":
+						var answers = this.data.questions[i].answers;
+						var submitted = [];
+						var rowCount = this.data.questions[i].choices.length;
+						var columnCount = this.data.questions[i].headings.length - 2;
+						for (var j = 0; j < rowCount; j++) {
+							var rows = q.find("table.matrix-table tr");
+							var row = rows.eq(j + 2);
+							for (var k = 0; k < columnCount; k++) {
+								var response = this.getMatrixAnswer(q, j, k);
+								submitted.push(response);
+							}
+						}
+						responses.push(submitted);
+						break;
 				}
 			}
 
@@ -1019,6 +1486,7 @@ define(["database", "highlight", "jquery.ui", "bootstrap", "jquery.json"], funct
 			this.element.find(".matching-line").remove();
 			removeMatchColors(this.element.find(".matched"));
 			this.element.find(".matched").removeClass("matched");
+			this.element.find(".user-entry").addClass("empty").find("select").val("");
 
 			this.element.find(".icon").addClass("hidden");
 			this.element.find(".checker").addClass("inactive");
@@ -1057,6 +1525,7 @@ define(["database", "highlight", "jquery.ui", "bootstrap", "jquery.json"], funct
 			thisQ.find(".icon").addClass("hidden");
 			thisQ.find(".checker").addClass("inactive");
 			thisQ.find(".hint").css("display", "none");
+			thisQ.find(".user-entry").addClass("empty").find("select").val("");
 
 			this.updateScore();
 
@@ -1085,7 +1554,7 @@ define(["database", "highlight", "jquery.ui", "bootstrap", "jquery.json"], funct
 			this.element.find(".question").removeClass("current");
 			thisQ.addClass("current");
 
-			thisQ.find(".checker button").removeClass("btn-success");
+			thisQ.find(".checker .btn-checker").removeClass("btn-success");
 
 			var total = this.element.find(".question").length;
 			this.element.find(".position-label").text("Question " + (this.currentQuestion + 1) + " of " + total).click($.proxy(this.onClickSecretPosition, this));
@@ -1101,6 +1570,9 @@ define(["database", "highlight", "jquery.ui", "bootstrap", "jquery.json"], funct
 			} else {
 				this.element.find("#previous-button").attr("disabled", false);
 			}
+
+			// redraw the lines in case they were off-screen
+			this.redrawLines();
 		},
 
 		onClickSubmit: function () {

@@ -500,19 +500,26 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 
 			var src = this.toc[index].video;
 
-			var dontUseiOS10Patch = $("html").hasClass("dontUseiOS10Patch");
-			var alwaysUseRedirect = $("html").hasClass("use-redirect");
+			// NOTE: commented this out; it broke in iOS 11 (10/5/2017)
+			// var dontUseiOS10Patch = $("html").hasClass("dontUseiOS10Patch");
+			// var alwaysUseRedirect = $("html").hasClass("use-redirect");
 
 			$("video").attr("crossorigin", null);
 
 			if (src.indexOf(".mov") != -1 || src.indexOf(".mp4") != -1) {
+				// NOTE: commented this out; it broke in iOS 11 (10/5/2017)
+				/*
 				var ver = iOSversion();
 				if (alwaysUseRedirect || (ver && ver[0] >= 10 && !dontUseiOS10Patch)) {
 					this.playRedirectedURL(src);
 				} else {
 					this.player.src({type: "video/mp4", src: src});
 				}
+				*/
+				this.player.src({type: "video/mp4", src: src});
 			} else {
+				// NOTE: commented this out; it broke in iOS 11 (10/5/2017)
+				/*
 				var ver = iOSversion();
 				console.log("vers: " + ver);
 
@@ -525,6 +532,12 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 						{type: "video/ogg", src: src + ".ogv"}
 					]);
 				}
+				*/
+				this.player.src([
+					{type: "video/mp4", src: src + ".mp4"},
+					{type: "video/webm", src: src + ".webm"},
+					{type: "video/ogg", src: src + ".ogv"}
+				]);
 			}
 
 			if (options && options.time) {
