@@ -174,6 +174,8 @@ define(["database", "highlight", "jquery.ui", "bootstrap", "jquery.json"], funct
 			this.element.find("#next-button").click($.proxy(this.onClickNext, this));
 			this.element.find("#submit-button").click($.proxy(this.onClickSubmit, this));
 
+			this.element.find(".quiz-title").click($.proxy(this.onClickSecretPosition, this));
+
 			this.onLoadedData(this.options.paramData);
 
 			$(window).on("resize.quizzerator", $.proxy(this.onWindowResize, this));
@@ -274,13 +276,13 @@ define(["database", "highlight", "jquery.ui", "bootstrap", "jquery.json"], funct
 			var classes = "question";
 
 			if (this.options.settings.singleView) {
-				classes += " animated fadeInRight";
+				classes += " animated fadeInRight single-view";
 			}
 
 			var q = $("<li>", {class: classes, "data-number": (n + 1) + "." });
 			q.attr("data-index", q_params.index);
 
-			var p_question = $("<p>", {html: q_params.q});
+			var p_question = $("<p>", {class: "description", html: q_params.q});
 
 			var me = this;
 
@@ -323,14 +325,14 @@ define(["database", "highlight", "jquery.ui", "bootstrap", "jquery.json"], funct
 			var lbl = $("<span>", { class: "checker-label", text: tryAgainText });
 			lbl.appendTo(checker);
 
-			if (!this.options.settings.singleView) {
-				var btnReveal = $("<button>", {
-					class: "btn btn-primary btn-reveal btn-xs pull-right",
-					text: "Reveal Answer"
-				});
-				btnReveal.appendTo(checker);
-				btnReveal.click($.proxy(this.onClickRevealOne, this));
+			var btnReveal = $("<button>", {
+				class: "btn btn-primary btn-reveal btn-xs pull-right hidden",
+				text: "Reveal Answer"
+			});
+			btnReveal.appendTo(checker);
+			btnReveal.click($.proxy(this.onClickRevealOne, this));
 
+			if (!this.options.settings.singleView) {
 				var btnReset = $("<button>", {
 					class: "btn btn-info btn-reset btn-xs pull-right",
 					text: "Reset Question"
@@ -443,20 +445,24 @@ define(["database", "highlight", "jquery.ui", "bootstrap", "jquery.json"], funct
 
 					td.append(dropdown);
 
-					td.on("dragenter", function (event) {
-						$(event.currentTarget).addClass("over");
+					var hiddenAnswer = $("<span>", { text: q_params.answers[i * n + j], class: "hidden-answer hidden" });
+					td.append(hiddenAnswer);
+
+					dropdown.on("dragenter", function (event) {
+						$(event.currentTarget).parent().addClass("over");
 					});
-					td.on("dragleave", function (event) {
-						$(event.currentTarget).removeClass("over");
+					dropdown.on("dragleave", function (event) {
+						$(event.currentTarget).parent().removeClass("over");
 					});
-					td.on("dragover", function (event) {
+					dropdown.on("dragover", function (event) {
 						event.originalEvent.dataTransfer.dropEffect = "move";
 						return false;
 					});
-					td.on("drop", function (event) {
+					dropdown.on("drop", function (event) {
+						$(event.currentTarget).parent().removeClass("over");
 						var t = event.originalEvent.dataTransfer.getData("text/plain");
-						var r = $(event.currentTarget).attr("data-row");
-						var c = $(event.currentTarget).attr("data-col");
+						var r = $(event.currentTarget).parent().attr("data-row");
+						var c = $(event.currentTarget).parent().attr("data-col");
 						me.onMatrixAnswer(event, r, c, t);
 					});
 
@@ -472,6 +478,8 @@ define(["database", "highlight", "jquery.ui", "bootstrap", "jquery.json"], funct
 
 			var td = $("<td>", { colspan: n, id: "available-container" });
 			tf.append(td);
+
+			td.append("<p class='small'>Draggable choices:</p>");
 
 			for (var i = 0; i < availableAnswers.length; i++) {
 				var btn = $("<button>", { class: "btn btn-primary matrix-choice", text: availableAnswers[i] });
@@ -738,6 +746,8 @@ define(["database", "highlight", "jquery.ui", "bootstrap", "jquery.json"], funct
 		},
 
 		checkForTwoChoices: function (question) {
+			var showCheckButton = false;
+
 			var one = question.find(".choice .response.selected");
 			var two = question.find(".answer .response.selected");
 
@@ -751,18 +761,31 @@ define(["database", "highlight", "jquery.ui", "bootstrap", "jquery.json"], funct
 
 				question.find(".response.selected").removeClass("selected");
 
-				if (this.options.settings.reviewableAfterEach && this.questionIsFilledOut(question)) {
-					question.find(".checker").removeClass("inactive animated fadeOut").addClass("animated fadeInLeft").find("button").removeClass("btn-danger btn-success").addClass("btn-primary").parent().find(".checker-label").css("display", "none");
+				if (this.options.settings.reviewableAfterEach) {
+					if (this.questionIsFilledOut(question)) {
+						showCheckButton = true;
+					}
 				}
+			}
+
+			if (showCheckButton) {
+				question.find(".checker").removeClass("inactive animated fadeOut").addClass("animated fadeInLeft").find("button").removeClass("btn-danger btn-success").addClass("btn-primary").parent().find(".checker-label").css("display", "none");
+			} else {
+				question.find(".checker").addClass("inactive");
+				question.find(".checker .btn-checker").removeClass("btn-success btn-danger").addClass("btn-primary").parent().find(".checker-label").css("display", "none");
 			}
 		},
 
-		drawLineBetween: function (question, one, two) {
+		drawLineBetween: function (question, one, two, actual) {
+			if (actual === undefined) actual = true;
+
+			var lineClass = actual ? "matching-line" : "teacher-line";
+
 			var left_index = one.attr("data-index");
 			var right_index = two.attr("data-index");
-			var line = question.find(".matching-line[data-left-index=" + left_index + "]");
+			var line = question.find("." + lineClass + "[data-left-index=" + left_index + "]");
 			if (line.length == 0) {
-				line = $("<div>", {class: "matching-line"});
+				line = $("<div>", {class: lineClass });
 				line.attr({"data-left-index": left_index, "data-right-index": right_index, "data-question-index": question.attr("data-index")});
 				question.prepend(line);
 			}
@@ -800,7 +823,7 @@ define(["database", "highlight", "jquery.ui", "bootstrap", "jquery.json"], funct
 		},
 
 		redrawLines: function () {
-			var lines = this.element.find(".matching-line");
+			var lines = this.element.find(".matching-line, .teacher-line");
 			var me = this;
 			lines.each(function (index, line) {
 				me.doDrawLine($(line));
@@ -1003,6 +1026,18 @@ define(["database", "highlight", "jquery.ui", "bootstrap", "jquery.json"], funct
 		onClickCheck: function (event) {
 			var q = $(event.currentTarget).parents(".question");
 
+			var questionAttempts = q.attr("data-attempts");
+			if (questionAttempts === undefined) {
+				questionAttempts = 1;
+			} else {
+				questionAttempts++;
+			}
+			q.attr("data-attempts", questionAttempts);
+
+			if (questionAttempts >= 2) {
+				q.find(".btn-reveal").removeClass("hidden");
+			}
+
 			this.checkQuestion(q);
 		},
 
@@ -1161,15 +1196,12 @@ define(["database", "highlight", "jquery.ui", "bootstrap", "jquery.json"], funct
 			this.updateScore();
 		},
 
-		markAllCorrectResponses: function () {
+		showCorrectResponses: function () {
 			var questions = this.element.find(".question");
 			for (var i = 0; i < questions.length; i++) {
 				var q = questions.eq(i);
 
-				var correctAnswer = q.find(".response[data-correct=true]");
-
-				// show the right responses
-				correctAnswer.parent("li").find(".correct").removeClass("hidden");
+				this.revealAnswer(q, i);
 
 				// show the hint
 				q.find(".checker").removeClass("inactive");
@@ -1177,10 +1209,7 @@ define(["database", "highlight", "jquery.ui", "bootstrap", "jquery.json"], funct
 			}
 		},
 
-		onClickRevealOne: function (event) {
-			var q = $(event.currentTarget).parents(".question");
-			var index = q.attr("data-index");
-
+		revealAnswer: function (q, index) {
 			switch (this.getQuestionType(this.data.questions[index])) {
 				case "multiple choice":
 					var correctAnswer = q.find(".response[data-correct=true]");
@@ -1191,6 +1220,45 @@ define(["database", "highlight", "jquery.ui", "bootstrap", "jquery.json"], funct
 					// show the hint
 					q.find(".checker").removeClass("inactive");
 					q.find(".hint").css("display", "block");
+					break;
+				case "matching":
+					var resp = this.data.questions[index].answers;
+					for (var j = 0; j < resp.length; j++) {
+						var r_el1 = q.find(".choice .response[data-index=" + j + "]");
+						var r_el2 = q.find(".answer .response[data-index=" + j + "]");
+						this.drawLineBetween(q, r_el1, r_el2, false);
+					}
+					break;
+				case "matrix":
+					q.find(".hidden-answer").removeClass("hidden");
+					break;
+			}
+		},
+
+		onClickRevealOne: function (event) {
+			var q = $(event.currentTarget).parents(".question");
+			var index = q.attr("data-index");
+
+			this.revealAnswer(q, index);
+		},
+
+		markCorrectResponses: function () {
+			var questions = this.element.find(".question");
+			for (var i = 0; i < questions.length; i++) {
+				var q = questions.eq(i);
+
+				this.correctAnswer(q, i);
+			}
+		},
+
+		correctAnswer: function (q, index) {
+			switch (this.getQuestionType(this.data.questions[index])) {
+				case "multiple choice":
+					var correctAnswer = q.find(".response[data-correct=true]");
+					q.find(".response").removeClass("selected");
+					correctAnswer.addClass("selected");
+
+					this.checkQuestion(q, true);
 					break;
 				case "matching":
 					var resp = this.data.questions[index].answers;
@@ -1222,22 +1290,32 @@ define(["database", "highlight", "jquery.ui", "bootstrap", "jquery.json"], funct
 
 		onClickResetOne: function (event) {
 			var q = $(event.currentTarget).parents(".question");
+
+			this.clearQuestion(q);
+		},
+
+		onClickCheckAll: function (event) {
+			this.checkAllQuestions(true);
+		},
+
+		clearQuestion: function (q) {
 			var index = q.attr("data-index");
 
 			q.attr( { "data-correct": null  } );
 
 			switch (this.getQuestionType(this.data.questions[index])) {
 				case "multiple choice":
-					console.log("reset multiple choice");
+					q.find(".response").removeClass("selected");
 					break;
 				case "matching":
 					q.find(".response").removeClass("selected");
-					q.find(".matching-line").remove();
+					q.find(".matching-line, .teacher-line").remove();
 					removeMatchColors(q.find(".matched"));
 					q.find(".matched").removeClass("matched");
 					break;
 				case "matrix":
 					q.find(".user-entry").addClass("empty").find("select").val("");
+					q.find(".hidden-answer").addClass("hidden");
 					break;
 			}
 
@@ -1248,10 +1326,6 @@ define(["database", "highlight", "jquery.ui", "bootstrap", "jquery.json"], funct
 			this.saveResponses();
 			this.updateScore();
 			this.adjustSummarySize();
-		},
-
-		onClickCheckAll: function (event) {
-			this.checkAllQuestions(true);
 		},
 
 		checkAllQuestions: function (animate) {
@@ -1483,10 +1557,11 @@ define(["database", "highlight", "jquery.ui", "bootstrap", "jquery.json"], funct
 		onStartOver: function () {
 			this.element.find(".question").attr( { "data-correct": null  } );
 			this.element.find(".response").removeClass("selected");
-			this.element.find(".matching-line").remove();
+			this.element.find(".matching-line, .teacher-line").remove();
 			removeMatchColors(this.element.find(".matched"));
 			this.element.find(".matched").removeClass("matched");
 			this.element.find(".user-entry").addClass("empty").find("select").val("");
+			this.element.find(".hidden-answer").addClass("hidden");
 
 			this.element.find(".icon").addClass("hidden");
 			this.element.find(".checker").addClass("inactive");
@@ -1516,22 +1591,7 @@ define(["database", "highlight", "jquery.ui", "bootstrap", "jquery.json"], funct
 		onClickClear: function () {
 			var thisQ = this.element.find(".question").eq(this.currentQuestion);
 
-			thisQ.attr( { "data-correct": null  } );
-			thisQ.find(".response").removeClass("selected");
-			thisQ.find(".matching-line").remove();
-			removeMatchColors(thisQ.find(".matched"));
-			thisQ.find(".matched").removeClass("matched");
-
-			thisQ.find(".icon").addClass("hidden");
-			thisQ.find(".checker").addClass("inactive");
-			thisQ.find(".hint").css("display", "none");
-			thisQ.find(".user-entry").addClass("empty").find("select").val("");
-
-			this.updateScore();
-
-			this.saveResponses();
-
-			this.adjustSummarySize();
+			this.clearQuestion(thisQ);
 		},
 
 		onClickPrevious: function () {
@@ -1557,7 +1617,7 @@ define(["database", "highlight", "jquery.ui", "bootstrap", "jquery.json"], funct
 			thisQ.find(".checker .btn-checker").removeClass("btn-success");
 
 			var total = this.element.find(".question").length;
-			this.element.find(".position-label").text("Question " + (this.currentQuestion + 1) + " of " + total).click($.proxy(this.onClickSecretPosition, this));
+			this.element.find(".position-label").text("Question " + (this.currentQuestion + 1) + " of " + total);
 
 			if (this.currentQuestion >= total - 1) {
 				this.element.find("#next-button").attr("disabled", true);
@@ -1584,16 +1644,18 @@ define(["database", "highlight", "jquery.ui", "bootstrap", "jquery.json"], funct
 
 			this.saveResponses();
 
-			// now show correct answers and explanations
-			this.markAllCorrectResponses();
+			this.element.addClass("grading");
 
-			this.element.toggleClass("grading");
+			// now show correct answers and explanations
+			this.showCorrectResponses();
 
 			// this will show the summary pane and scroll to it
 
 			var me = this;
 
 			setTimeout(function () {
+				me.redrawLines();
+
 				var t = me.element.find(".summary").offset().top;
 				var h = $(window).height() * .5;
 				$(window).animate({scrollTop: t - h}, 1000);
@@ -1605,36 +1667,15 @@ define(["database", "highlight", "jquery.ui", "bootstrap", "jquery.json"], funct
 		},
 
 		onClickSecretPosition: function (event) {
-			this.markAllAnswersCorrectly();
+			if (event.shiftKey) {
+				this.cheatCode();
+			}
 		},
 
-		markAllAnswersCorrectly: function () {
-			var questions = this.element.find(".question");
-			for (var i = 0; i < questions.length; i++) {
-				var q = questions.eq(i);
-				var correctAnswer = q.find(".response[data-correct=true]");
-				q.find(".response").removeClass("selected");
-				correctAnswer.addClass("selected");
-			}
+		cheatCode: function () {
+			this.markCorrectResponses();
 
-			this.checkAllQuestions(false);
-
-			this.updateScore();
-
-			// now show correct answers and explanations
-			this.markAllCorrectResponses();
-
-			this.element.toggleClass("grading");
-
-			// this will show the summary pane and scroll to it
-
-			var me = this;
-
-			setTimeout(function () {
-				var t = me.element.find(".summary").offset().top;
-				var h = $(window).height() * .5;
-				$(window).animate({scrollTop: t - h}, 1000);
-			}, 200);
+			this.onClickSubmit();
 		}
 	});
 

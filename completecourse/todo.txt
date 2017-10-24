@@ -1,5 +1,4 @@
-// TODO: quizzerator: reveal answers after 2 attempts
-// TODO: quizzerator: markAllCorrectResponses needs to work for all question types
+// TODO: quizzerator: add hotspot exercises
 // TODO: quizzerator: analytics for matrix UI
 // TODO: compress quizzerator responses' saved data?
 // TODO: at narrow widths: notes & comments s/b 100% width
@@ -315,3 +314,6 @@
 // DONE: make quizzerator (matching) keyboard accessible
 // DONE: quizzerator matching doesn't show existing lines upon reloading [they were off-screen]
 // DONE: quizzerator: start over a single question
+// DONE: quizzerator: reveal answers after 2 attempts
+// DONE: quizzerator: turn off "check answer" for matching if not all lines are drawn
+// DONE: quizzerator: markAllCorrectResponses needs to work for all question types
