@@ -187,6 +187,8 @@ define(["database", "highlight", "jquery.ui", "bootstrap", "jquery.json"], funct
 
 		onImagesLoaded: function () {
 			this.redrawLines();
+
+			this.redrawHotspots();
 		},
 
 		onLoadedData: function (data) {
@@ -230,9 +232,14 @@ define(["database", "highlight", "jquery.ui", "bootstrap", "jquery.json"], funct
 				q.index = i;
 				q.q = d_q.text;
 				q.hint = d_q.ref;
-				q.answers = d_q.answers.slice();
+				if (d_q.answers)
+					q.answers = d_q.answers.slice();
 				if (d_q.choices)
 					q.choices = d_q.choices.slice();
+				if (d_q.steps)
+					q.steps = d_q.steps.slice();
+				if (d_q.instructions)
+					q.instructions = d_q.instructions;
 				q.headings = d_q.headings;
 
 				this.addQuestion(q);
@@ -266,6 +273,7 @@ define(["database", "highlight", "jquery.ui", "bootstrap", "jquery.json"], funct
 			var questionType = "multiple choice";
 			if (questionData.headings) questionType = "matrix";
 			else if (questionData.choices) questionType = "matching";
+			else if (questionData.steps) questionType = "exercise";
 
 			return questionType;
 		},
@@ -316,6 +324,9 @@ define(["database", "highlight", "jquery.ui", "bootstrap", "jquery.json"], funct
 				case "matrix":
 					this.setupForMatrix(params);
 					break;
+				case "exercise":
+					this.setupForExercise(params);
+					break;
 			}
 
 			var checker = $("<div>", {class: "checker inactive"}).appendTo(q);
@@ -326,7 +337,7 @@ define(["database", "highlight", "jquery.ui", "bootstrap", "jquery.json"], funct
 			lbl.appendTo(checker);
 
 			var btnReveal = $("<button>", {
-				class: "btn btn-primary btn-reveal btn-xs pull-right hidden",
+				class: "btn btn-primary btn-reveal btn-xs hidden",
 				text: "Reveal Answer"
 			});
 			btnReveal.appendTo(checker);
@@ -334,7 +345,7 @@ define(["database", "highlight", "jquery.ui", "bootstrap", "jquery.json"], funct
 
 			if (!this.options.settings.singleView) {
 				var btnReset = $("<button>", {
-					class: "btn btn-info btn-reset btn-xs pull-right",
+					class: "btn btn-info btn-reset btn-xs",
 					text: "Reset Question"
 				});
 				btnReset.appendTo(checker);
@@ -353,6 +364,12 @@ define(["database", "highlight", "jquery.ui", "bootstrap", "jquery.json"], funct
 					hint.append(link);
 					checker.append(hint);
 				}
+			}
+
+			switch (this.getQuestionType(q_params)) {
+				case "exercise":
+					this.postSetupForExercise(params);
+					break;
 			}
 
 			this.element.find(".quiz-holder").append(q);
@@ -635,6 +652,74 @@ define(["database", "highlight", "jquery.ui", "bootstrap", "jquery.json"], funct
 			}).detach().appendTo(answers);
 		},
 
+		setupForExercise: function (params) {
+			var q = params.questionEl, q_params = params.questionData, answers = params.answersEl;
+
+			q.addClass("exercise");
+
+			q.find(".description").text(this.data.title);
+
+			q.find(".instructions").text(q_params.instructions);
+
+			var ol = q.find("ol.answers-holder");
+
+			// hardcoded window height minus navbar minus exercise controls minus border radius minus small buffer
+			var wh = $(window).outerHeight() - 150;
+
+			var me = this;
+
+			for (var i = 0; i < q_params.steps.length; i++) {
+				var step = q_params.steps[i];
+				var step_el = $("<li>", { class: "step" });
+				if (i == 0) {
+					step_el.addClass("current");
+				}
+
+				step_el.attr("data-type", step.type);
+				step_el.attr("data-hint", step.action);
+
+				var div = $("<div>", { class: "step" });
+				var lbl = $("<p>", { class: "step-label", text: step.label });
+				div.append(lbl);
+
+				var img_div = $("<div>", { class: "image-holder" });
+				img_div.click($.proxy(this.onClickIncorrectArea, this));
+				img_div[0].oncontextmenu = function (event) {
+					me.onClickIncorrectArea(event);
+					return false;
+				}
+
+				var img = $("<img>", { class: "hotspot", src: step.image });
+
+				//img[0].oncontextmenu = function () { return false; };
+
+				img.css("max-height", wh);
+				img_div.append(img);
+				if (step.hotspot) {
+					var hotspot = $("<div>", {class: "hotspot"});
+					hotspot.attr("data-rect", step.hotspot);
+					var rect = step.hotspot.split(",");
+					hotspot.css({ left: rect[0] + "px", top: rect[1] + "px", width: rect[2] + "px", height: rect[3] + "px" });
+					img_div.append(hotspot);
+					hotspot[0].oncontextmenu = $.proxy(this.onClickHotspot, this);
+					hotspot.click($.proxy(this.onClickHotspot, this));
+				}
+
+				div.append(img_div);
+				step_el.append(div);
+				ol.append(step_el);
+			}
+		},
+
+		postSetupForExercise: function (params) {
+			var q = params.questionEl, q_params = params.questionData, answers = params.answersEl;
+
+			q.find(".checker").removeClass("inactive").find(".btn-checker").text("Hint");
+			q.find(".checker .btn-reset").text("Reset Exercise");
+
+			q.find(".btn-reveal").removeClass("btn-primary").addClass("btn-danger");
+		},
+
 		onMatrixAnswer: function (event, row, col, val) {
 			var q = $(event.currentTarget).parents(".question");
 
@@ -830,6 +915,33 @@ define(["database", "highlight", "jquery.ui", "bootstrap", "jquery.json"], funct
 			});
 		},
 
+		doResizeHotspot: function (hotspot) {
+			var scale = hotspot.width() / hotspot[0].naturalWidth;
+
+			var rect = hotspot.parent().find("div.hotspot");
+			if (rect.length) {
+				var r = rect.attr("data-rect");
+				if (r) {
+					var r_rect = r.split(",");
+					rect.css({ left: r_rect[0] * scale + "px", top: r_rect[1] * scale + "px", width: r_rect[2] * scale + "px", height: r_rect[3] * scale + "px" });
+					rect.attr("data-scale", scale);
+				}
+			}
+		},
+
+		redrawHotspots: function () {
+			var hotspots = this.element.find("img.hotspot");
+			var me = this;
+			hotspots.each(function (index, hotspot) {
+				me.doResizeHotspot($(hotspot));
+			});
+
+			var exercises = this.element.find("li.exercise");
+			exercises.each(function (index, q) {
+				me.sizeHolderToFitExercises($(q));
+			});
+		},
+
 		eraseLineConnectedTo: function (options) {
 			var question = options.question;
 			var line;
@@ -941,6 +1053,11 @@ define(["database", "highlight", "jquery.ui", "bootstrap", "jquery.json"], funct
 						if (submitted.length == rowCount * columnCount)
 							answered.push(i);
 						break;
+					case "exercise":
+						if (q.attr("data-correct")) {
+							answered.push(i);
+						}
+						break;
 				}
 			}
 
@@ -1039,6 +1156,10 @@ define(["database", "highlight", "jquery.ui", "bootstrap", "jquery.json"], funct
 			}
 
 			this.checkQuestion(q);
+		},
+
+		resetAttempts: function (q) {
+			q.attr("data-attempts", "0");
 		},
 
 		checkQuestion: function (q, animate) {
@@ -1191,6 +1312,13 @@ define(["database", "highlight", "jquery.ui", "bootstrap", "jquery.json"], funct
 				q.find(".checker").removeClass("inactive");
 
 				q.attr("data-correct", allCorrect);
+			} else if (q.hasClass("exercise")) {
+				var hint = q.find("li.step.current").attr("data-hint");
+				if (!hint) {
+					hint = "Sorry, no hint available for this step.";
+				}
+
+				q.find(".checker-label").text(hint).css("display", "inline");
 			}
 
 			this.updateScore();
@@ -1231,6 +1359,9 @@ define(["database", "highlight", "jquery.ui", "bootstrap", "jquery.json"], funct
 					break;
 				case "matrix":
 					q.find(".hidden-answer").removeClass("hidden");
+					break;
+				case "exercise":
+					q.find(".hotspot").addClass("revealed");
 					break;
 			}
 		},
@@ -1303,7 +1434,9 @@ define(["database", "highlight", "jquery.ui", "bootstrap", "jquery.json"], funct
 
 			q.attr( { "data-correct": null  } );
 
-			switch (this.getQuestionType(this.data.questions[index])) {
+			var t = this.getQuestionType(this.data.questions[index]);
+
+			switch (t) {
 				case "multiple choice":
 					q.find(".response").removeClass("selected");
 					break;
@@ -1317,10 +1450,18 @@ define(["database", "highlight", "jquery.ui", "bootstrap", "jquery.json"], funct
 					q.find(".user-entry").addClass("empty").find("select").val("");
 					q.find(".hidden-answer").addClass("hidden");
 					break;
+				case "exercise":
+					q.find("li.step.current").removeClass("current");
+					q.find("li.step").eq(0).addClass("current");
+
+					this.resetExerciseControls(q);
+					break;
 			}
 
 			q.find(".icon").addClass("hidden");
-			q.find(".checker").addClass("inactive");
+			if (t != "exercise") {
+				q.find(".checker").addClass("inactive");
+			}
 			q.find(".hint").css("display", "none");
 
 			this.saveResponses();
@@ -1447,6 +1588,13 @@ define(["database", "highlight", "jquery.ui", "bootstrap", "jquery.json"], funct
 								if (recheckAnswers)
 									this.checkQuestion(q, false);
 								break;
+							case "exercise":
+								if (resp.indexOf(null) !== -1) {
+									console.log("not done yet");
+								} else {
+									q.attr("data-correct", true);
+								}
+								break;
 						}
 					}
 				}
@@ -1502,6 +1650,13 @@ define(["database", "highlight", "jquery.ui", "bootstrap", "jquery.json"], funct
 							}
 						}
 						responses.push(submitted);
+						break;
+					case "exercise":
+						var steps = q.find("li.step");
+						var correct = $.map(steps, function (item, index) {
+							return [$(item).attr("data-correct")];
+						});
+						responses.push(correct);
 						break;
 				}
 			}
@@ -1664,6 +1819,88 @@ define(["database", "highlight", "jquery.ui", "bootstrap", "jquery.json"], funct
 
 		unload: function () {
 			$(window).off("resize.quizzerator");
+		},
+
+		onClickHotspot: function (event) {
+			var step = $(event.currentTarget).parents("li.step");
+			var type = step.attr("data-type");
+
+			var correct = false;
+
+			switch (type) {
+				case "click":
+					if (event.which == 1)
+						correct = true;
+					break;
+				case "right-click":
+					if (event.which == 3)
+						correct = true;
+					break;
+			}
+
+			if (correct) {
+				step.attr("data-correct", true);
+				var q = $(event.currentTarget).parents(".question");
+
+				this.saveResponses();
+
+				this.advanceToNextExerciseStep(q);
+			}
+
+			event.stopImmediatePropagation();
+
+			return false;
+		},
+
+		advanceToNextExerciseStep: function (q) {
+			var step = q.find("li.step.current");
+
+			var nextStep = step.next("li.step");
+			nextStep.addClass("current");
+			step.removeClass("current");
+
+			// at end?
+			if (nextStep.length == 0) {
+				q.attr("data-correct", true);
+
+				this.updateScore();
+			}
+
+			this.resetExerciseControls(q);
+		},
+
+		resetExerciseControls: function (q) {
+			this.resetAttempts(q);
+
+			q.find(".checker-label").css("display", "none");
+			q.find(".btn-reveal").addClass("hidden");
+			q.find(".hotspot.revealed").removeClass("revealed");
+
+			if (q.find("li.step.current").length) {
+				q.find(".btn-checker").removeClass("hidden");
+			} else {
+				q.find(".btn-checker").addClass("hidden");
+			}
+		},
+
+		sizeHolderToFitExercises: function (q) {
+			var items = q.find("li.step");
+			var heights = items.map(function (index, step) {
+				return $(step).height();
+			});
+
+//			var max = Math.max.apply(this, heights);
+
+			const max = heights.toArray().reduce(function(max, value) {
+				return value > max ? value : max;
+			}, 0);
+
+			// leave room for biggest image:
+			q.find(".answers-holder").height(max);
+		},
+
+		onClickIncorrectArea: function (event) {
+			this.onClickCheck(event);
 		},
 
 		onClickSecretPosition: function (event) {

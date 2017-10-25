@@ -1,3 +1,4 @@
+// TODO: quizzerator: hotspots don't always seem to size correctly at first
 // TODO: quizzerator: add hotspot exercises
 // TODO: quizzerator: analytics for matrix UI
 // TODO: compress quizzerator responses' saved data?
@@ -317,3 +318,5 @@
 // DONE: quizzerator: reveal answers after 2 attempts
 // DONE: quizzerator: turn off "check answer" for matching if not all lines are drawn
 // DONE: quizzerator: markAllCorrectResponses needs to work for all question types
+// DONE: quizzerator: show "completed" message for exercises
+// DONE: quizzerator: save and load completion status for exercises

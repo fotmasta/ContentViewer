@@ -248,13 +248,17 @@ ol.quiz-holder {
 		&:only-child {
 			list-style-type: none;
 
-			p.description {
+			p.description, p.title, div.instructions {
 				margin-left: -40px;
 			}
 		}
 	}
 
 	.checker {
+		display: flex;
+		justify-content: flex-start;
+		align-items: center;
+
 		margin-top: .5em;
 
 		&.inactive {
@@ -273,8 +277,95 @@ ol.quiz-holder {
 		}
 
 		.btn-reveal, .btn-reset {
+			margin-left: auto;
+
+			/*
+				margin-top: 10px;
+				margin-left: 10px;
+			*/
+		}
+	}
+
+	li.exercise {
+		div.instructions {
+			font-size: smaller;
+		}
+
+		img {
+			max-width: 100%;
+			vertical-align: top;
+		}
+
+		.checker {
+			margin-bottom: 50px;
+		}
+
+		p.step-label {
+			text-transform: uppercase;
+			font-weight: bold;
 			margin-top: 10px;
-			margin-left: 10px;
+
+			&:after {
+				content: ":";
+				display: inline;
+			}
+		}
+
+		ol.answers-holder {
+			list-style-type: none;
+			margin-left: -40px;
+			margin-top: 10px;
+			box-shadow: -5px 5px 10px 5px rgba(0, 0, 0, .5);
+			max-width: 100%;
+			border-radius: 15px;
+			border: 2px solid lightblue;
+
+			li.step {
+				position: absolute;
+				left: 0;
+				top: 0;
+				padding: 10px;
+				z-index: 1;
+
+				&:not(.current) {
+					opacity: 0;
+					user-select: none;
+					z-index: -1;
+				}
+
+				div.step {
+					div.image-holder {
+						position: relative;
+					}
+
+					div.hotspot {
+						position: absolute;
+						box-sizing: border-box;
+
+						&.revealed {
+							border: 3px dashed red;
+							background: rgba(128, 0, 0, .25);
+						}
+					}
+				}
+			}
+		}
+
+		.checker {
+			width: 95%;
+		}
+
+		&[data-correct=true] ol.answers-holder:after {
+			content: "Exercise Complete!";
+			display: block;
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%);
+			z-index: 1;
+			background-color: green;
+			padding: 10px 20px;
+			color: white;
 		}
 	}
 }
