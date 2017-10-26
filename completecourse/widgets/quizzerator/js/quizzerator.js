@@ -108,7 +108,7 @@ function removeMatchColors (el) {
 	el.removeClass(s);
 }
 
-define(["database", "highlight", "jquery.ui", "bootstrap", "jquery.json"], function (database) {
+define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jquery.json"], function (database, imagesLoaded) {
 
 	var tryAgainText = "That's not correct. Try a different response.";
 	var partialTryAgainText = "That's partially correct. Keep trying.";
@@ -709,6 +709,8 @@ define(["database", "highlight", "jquery.ui", "bootstrap", "jquery.json"], funct
 				step_el.append(div);
 				ol.append(step_el);
 			}
+
+			imagesLoaded(q, function () { me.onImagesLoaded(); });
 		},
 
 		postSetupForExercise: function (params) {
@@ -1590,7 +1592,7 @@ define(["database", "highlight", "jquery.ui", "bootstrap", "jquery.json"], funct
 								break;
 							case "exercise":
 								if (resp.indexOf(null) !== -1) {
-									console.log("not done yet");
+									// not done yet
 								} else {
 									q.attr("data-correct", true);
 								}

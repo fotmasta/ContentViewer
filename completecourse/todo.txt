@@ -1,5 +1,5 @@
+// TODO: quizzerator: put images in external json files for asynchronous loading? [or save them as 8-bit PNGs so they're much smaller]
 // TODO: quizzerator: hotspots don't always seem to size correctly at first
-// TODO: quizzerator: add hotspot exercises
 // TODO: quizzerator: analytics for matrix UI
 // TODO: compress quizzerator responses' saved data?
 // TODO: at narrow widths: notes & comments s/b 100% width
@@ -320,3 +320,4 @@
 // DONE: quizzerator: markAllCorrectResponses needs to work for all question types
 // DONE: quizzerator: show "completed" message for exercises
 // DONE: quizzerator: save and load completion status for exercises
+// DONE: quizzerator: add hotspot exercises
