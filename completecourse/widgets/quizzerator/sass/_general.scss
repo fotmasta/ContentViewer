@@ -5,7 +5,7 @@ $incorrect-color: #d9534f;
 	margin-left: 140px;
 
 	code {
-		font-family: Courier;
+		font-family: Courier, monospace;
 		color: black;
 		font-size: 100%;
 	}
@@ -197,6 +197,7 @@ $incorrect-color: #d9534f;
 		& th, & td {
 			line-height: 1em;
 			padding: 10px 0;
+			position: relative;
 		}
 
 		& tfoot td {
@@ -205,7 +206,7 @@ $incorrect-color: #d9534f;
 
 		.icons {
 			position: absolute;
-			left: -45px;
+			left: -40px;
 			height: 100%;
 		}
 
@@ -345,6 +346,56 @@ ol.quiz-holder {
 						&.revealed {
 							border: 3px dashed red;
 							background: rgba(128, 0, 0, .25);
+						}
+					}
+
+					span {
+						outline: none;
+						color: #0cef57;
+						font-family: "Lucida Console", Courier, monospace;
+						font-size: 18px;
+					}
+
+					span.prompt {
+						user-select: none;
+						cursor: default;
+					}
+
+					span.prefill {
+
+						&:not(:empty) {
+							padding-left: .5em;
+						}
+
+						// NOTE: placed icon pointer here because when it was on span.entry it somehow blocked the text cursor
+						&:not(.has-focus):after {
+							content: "\f063";
+							font-family: "FontAwesome";
+							display: inline;
+							position: absolute;
+							top: 0;
+							transform: translateY(-75%);
+							animation: 1s blinkie step-end infinite;
+						}
+					}
+
+					span.entry {
+						padding-left: .5em;
+						padding-right: 50px;	// give it some width for clicking
+					}
+
+					i.blinking-cursor {
+						position: static;
+						transform: translateY(-85%);
+					}
+
+					@keyframes blinkie {
+						from, to {
+							color: transparent;
+						}
+
+						50% {
+							color: pink;
 						}
 					}
 				}

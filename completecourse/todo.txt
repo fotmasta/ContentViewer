@@ -321,3 +321,5 @@
 // DONE: quizzerator: show "completed" message for exercises
 // DONE: quizzerator: save and load completion status for exercises
 // DONE: quizzerator: add hotspot exercises
+// DONE: quizzerator: resolve cursor UI for text-based exercises
+// DONE: quizzerator: for text input, use multiline textbox with pre-populated text (for steps 2 and later)

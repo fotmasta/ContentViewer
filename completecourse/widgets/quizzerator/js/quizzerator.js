@@ -496,7 +496,7 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 			var td = $("<td>", { colspan: n, id: "available-container" });
 			tf.append(td);
 
-			td.append("<p class='small'>Draggable choices:</p>");
+			td.append("<p class='small'>Answer using the dropdown boxes above or drag-and-drop the choices below:</p>");
 
 			for (var i = 0; i < availableAnswers.length; i++) {
 				var btn = $("<button>", { class: "btn btn-primary matrix-choice", text: availableAnswers[i] });
@@ -668,6 +668,23 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 
 			var me = this;
 
+			function parseExerciseActionField (p) {
+				var r = {};
+				var lines = p.split("\n");
+				for (var i = 0; i < lines.length; i++) {
+					var line = lines[i];
+					if (line.indexOf("prompt:") == 0) {
+						r.prompt = line.substr(7).trim();
+					} else if (line.indexOf("prefill:") == 0) {
+						r.prefill = line.substr(8).trim();
+					} else {
+						r.hint = line;
+					}
+				}
+
+				return r;
+			}
+
 			for (var i = 0; i < q_params.steps.length; i++) {
 				var step = q_params.steps[i];
 				var step_el = $("<li>", { class: "step" });
@@ -676,18 +693,16 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 				}
 
 				step_el.attr("data-type", step.type);
-				step_el.attr("data-hint", step.action);
+
+				var props = parseExerciseActionField(step.action);
+
+				step_el.attr("data-hint", props.hint);
 
 				var div = $("<div>", { class: "step" });
 				var lbl = $("<p>", { class: "step-label", text: step.label });
 				div.append(lbl);
 
 				var img_div = $("<div>", { class: "image-holder" });
-				img_div.click($.proxy(this.onClickIncorrectArea, this));
-				img_div[0].oncontextmenu = function (event) {
-					me.onClickIncorrectArea(event);
-					return false;
-				}
 
 				var img = $("<img>", { class: "hotspot", src: step.image });
 
@@ -696,13 +711,44 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 				img.css("max-height", wh);
 				img_div.append(img);
 				if (step.hotspot) {
+					var rect = step.hotspot.split(",");
 					var hotspot = $("<div>", {class: "hotspot"});
 					hotspot.attr("data-rect", step.hotspot);
-					var rect = step.hotspot.split(",");
 					hotspot.css({ left: rect[0] + "px", top: rect[1] + "px", width: rect[2] + "px", height: rect[3] + "px" });
 					img_div.append(hotspot);
-					hotspot[0].oncontextmenu = $.proxy(this.onClickHotspot, this);
-					hotspot.click($.proxy(this.onClickHotspot, this));
+
+					switch (step.type) {
+						case "text":
+							var s1 = $("<span>", { class: "prompt", text: props.prompt });
+							hotspot.append(s1);
+
+							var s1a = $("<span>", {class: "prefill", text: props.prefill});
+							hotspot.append(s1a);
+
+							var s2 = $("<span>", { class: "entry", contenteditable: true });
+							s2.on("focus", function (event) {
+								$(event.target).siblings(".prefill").addClass("has-focus");
+							});
+							s2.blur(function (event) {
+								$(event.target).siblings(".prefill").removeClass("has-focus");
+							});
+							s2.on("input", $.proxy(this.onExerciseInput, this));
+
+							hotspot.append(s2);
+
+							break;
+						default:
+							hotspot[0].oncontextmenu = $.proxy(this.onClickHotspot, this);
+							hotspot.click($.proxy(this.onClickHotspot, this));
+
+							img_div.click($.proxy(this.onClickIncorrectArea, this));
+							img_div[0].oncontextmenu = function (event) {
+								me.onClickIncorrectArea(event);
+								return false;
+							}
+
+							break;
+					}
 				}
 
 				div.append(img_div);
@@ -710,7 +756,9 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 				ol.append(step_el);
 			}
 
-			imagesLoaded(q, function () { me.onImagesLoaded(); });
+			imagesLoaded(q, function () {
+				me.onImagesLoaded();
+			});
 		},
 
 		postSetupForExercise: function (params) {
@@ -1363,7 +1411,13 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 					q.find(".hidden-answer").removeClass("hidden");
 					break;
 				case "exercise":
-					q.find(".hotspot").addClass("revealed");
+					var type = q.find(".step.current").attr("data-type");
+					if (type == "text") {
+						var hint = q.find(".step.current").attr("data-hint");
+						q.find(".step.current span.entry").text(hint).focus();
+					} else {
+						q.find(".step.current .hotspot").addClass("revealed");
+					}
 					break;
 			}
 		},
@@ -1878,8 +1932,11 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 			q.find(".btn-reveal").addClass("hidden");
 			q.find(".hotspot.revealed").removeClass("revealed");
 
-			if (q.find("li.step.current").length) {
+			var step = q.find("li.step.current");
+
+			if (step.length) {
 				q.find(".btn-checker").removeClass("hidden");
+				step.find("span.entry").text("").focus();
 			} else {
 				q.find(".btn-checker").addClass("hidden");
 			}
@@ -1897,12 +1954,29 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 				return value > max ? value : max;
 			}, 0);
 
-			// leave room for biggest image:
-			q.find(".answers-holder").height(max);
+			// leave room for biggest image (plus padding/round border):
+			q.find(".answers-holder").height(max + 10);
 		},
 
 		onClickIncorrectArea: function (event) {
 			this.onClickCheck(event);
+		},
+
+		onExerciseInput: function (event) {
+			var field = $(event.target);
+			var entry = field.text();
+
+			var step = field.parents("li.step");
+			var answer = step.attr("data-hint");
+
+			if (entry == answer) {
+				var q = field.parents(".question");
+				this.advanceToNextExerciseStep(q);
+			} else {
+				if (entry.length >= answer.length) {
+					this.onClickCheck(event);
+				}
+			}
 		},
 
 		onClickSecretPosition: function (event) {
