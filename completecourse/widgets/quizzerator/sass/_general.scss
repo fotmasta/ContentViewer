@@ -366,17 +366,6 @@ ol.quiz-holder {
 						&:not(:empty) {
 							padding-left: .5em;
 						}
-
-						// NOTE: placed icon pointer here because when it was on span.entry it somehow blocked the text cursor
-						&:not(.has-focus):after {
-							content: "\f063";
-							font-family: "FontAwesome";
-							display: inline;
-							position: absolute;
-							top: 0;
-							transform: translateY(-75%);
-							animation: 1s blinkie step-end infinite;
-						}
 					}
 
 					span.entry {
@@ -395,9 +384,24 @@ ol.quiz-holder {
 						}
 
 						50% {
-							color: pink;
+							color: orange;
 						}
 					}
+				}
+			}
+		}
+
+		&:not([data-correct=true]) {
+			span.prefill {
+				// NOTE: placed icon pointer here because when it was on span.entry it somehow blocked the text cursor
+				&:not(.has-focus):after {
+					content: "\f063";
+					font-family: "FontAwesome";
+					display: inline;
+					position: absolute;
+					top: 0;
+					transform: translateY(-75%);
+					animation: 1s blinkie step-end infinite;
 				}
 			}
 		}

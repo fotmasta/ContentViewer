@@ -1,4 +1,3 @@
-// TODO: quizzerator: put images in external json files for asynchronous loading? [or save them as 8-bit PNGs so they're much smaller]
 // TODO: quizzerator: hotspots don't always seem to size correctly at first
 // TODO: quizzerator: analytics for matrix UI
 // TODO: compress quizzerator responses' saved data?
@@ -323,3 +322,5 @@
 // DONE: quizzerator: add hotspot exercises
 // DONE: quizzerator: resolve cursor UI for text-based exercises
 // DONE: quizzerator: for text input, use multiline textbox with pre-populated text (for steps 2 and later)
+// DONE: quizzerator: put images in external json files for asynchronous loading? [or, save them as 8-bit PNGs so they're much smaller]
+// DONE: quizzerator: save and load progress (or just completion status of) text-based exercises

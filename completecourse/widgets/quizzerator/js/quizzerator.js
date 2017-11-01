@@ -1419,6 +1419,7 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 					if (type == "text") {
 						var hint = q.find(".step.current").attr("data-hint");
 						q.find(".step.current span.entry").text(hint).focus();
+						q.find(".btn-reveal").removeClass("btn-danger").addClass("btn-success").text("Go to Next Step");
 					}
 					break;
 			}
@@ -1898,7 +1899,6 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 
 			if (correct) {
 				step.attr("data-correct", true);
-				var q = $(event.currentTarget).parents(".question");
 
 				this.saveResponses();
 
@@ -1914,11 +1914,11 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 			var step = q.find("li.step.current");
 
 			var nextStep = step.next("li.step");
-			nextStep.addClass("current");
-			step.removeClass("current");
 
-			// at end?
-			if (nextStep.length == 0) {
+			if (nextStep.length) {
+				nextStep.addClass("current");
+				step.removeClass("current");
+			} else {
 				q.attr("data-correct", true);
 
 				this.updateScore();
@@ -1934,13 +1934,21 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 			q.find(".btn-reveal").addClass("hidden");
 			q.find(".hotspot.revealed").removeClass("revealed");
 
+			q.find(".btn-reveal").removeClass("btn-success").addClass("btn-danger").text("Reveal Answer");
+
 			var step = q.find("li.step.current");
 
-			if (step.length) {
-				q.find(".btn-checker").removeClass("hidden");
-				step.find("span.entry").text("").focus();
-			} else {
+			if (q.attr("data-correct")) {
+				// all done; freeze on last step
 				q.find(".btn-checker").addClass("hidden");
+				step.find("span.entry").prop("contenteditable", false);
+			} else {
+				if (step.length) {
+					q.find(".btn-checker").removeClass("hidden");
+					step.find("span.entry").text("").focus();
+				} else {
+					q.find(".btn-checker").addClass("hidden");
+				}
 			}
 		},
 
@@ -1972,7 +1980,12 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 			var answer = step.attr("data-hint");
 
 			if (entry == answer) {
+				step.attr("data-correct", true);
+
+				this.saveResponses();
+
 				var q = field.parents(".question");
+
 				this.advanceToNextExerciseStep(q);
 			} else {
 				if (entry.length >= answer.length) {
