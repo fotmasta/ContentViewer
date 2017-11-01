@@ -731,6 +731,9 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 							});
 							s2.blur(function (event) {
 								$(event.target).siblings(".prefill").removeClass("has-focus");
+								var h = $(event.target).parents(".hotspot");
+								if (h.hasClass("revealed"))
+									me.onExerciseInput(event);
 							});
 							s2.on("input", $.proxy(this.onExerciseInput, this));
 
@@ -1412,11 +1415,10 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 					break;
 				case "exercise":
 					var type = q.find(".step.current").attr("data-type");
+					q.find(".step.current .hotspot").addClass("revealed");
 					if (type == "text") {
 						var hint = q.find(".step.current").attr("data-hint");
 						q.find(".step.current span.entry").text(hint).focus();
-					} else {
-						q.find(".step.current .hotspot").addClass("revealed");
 					}
 					break;
 			}
