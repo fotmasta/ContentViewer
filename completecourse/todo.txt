@@ -1,5 +1,4 @@
 // TODO: quizzerator: hotspots don't always seem to size correctly at first
-// TODO: quizzerator: analytics for matrix UI
 // TODO: compress quizzerator responses' saved data?
 // TODO: at narrow widths: notes & comments s/b 100% width
 // TODO: is there a resize event when scrolling on iOS and top buttons go away (so we can resize the TOC)?
@@ -324,3 +323,5 @@
 // DONE: quizzerator: for text input, use multiline textbox with pre-populated text (for steps 2 and later)
 // DONE: quizzerator: put images in external json files for asynchronous loading? [or, save them as 8-bit PNGs so they're much smaller]
 // DONE: quizzerator: save and load progress (or just completion status of) text-based exercises
+// DONE: quizzerator: analytics for matrix, exercise, and text activities
+// DONE: quizzerator: analytics for "reveal answer"

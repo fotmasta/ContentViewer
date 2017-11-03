@@ -1209,6 +1209,14 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 			}
 
 			this.checkQuestion(q);
+
+			var index = q.attr("data-index");
+			var t = this.getQuestionType(this.data.questions[index]);
+			if (t != "exercise") {
+				// ANALYTICS for "checking answer" (exercises are counted when advanced)
+				var s = this.getQuestionIDandResponses();
+				ga("send", "event", "interface", "quiz-check", s);
+			}
 		},
 
 		resetAttempts: function (q) {
@@ -1430,6 +1438,10 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 			var index = q.attr("data-index");
 
 			this.revealAnswer(q, index);
+
+			// ANALYTICS
+			var s = this.getQuestionIDandResponses(q);
+			ga("send", "event", "interface", "quiz-reveal", s);
 		},
 
 		markCorrectResponses: function () {
@@ -1677,53 +1689,70 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 				if (question_params.choices) {
 					isMatching = true;
 				}
-				switch (type) {
-					case "multiple choice":
-						var answers = q.find(".response");
-						var chosen = q.find(".response.selected");
-						var indices = $.map(chosen, function (item, index) {
-							return $(item).attr("data-index");
-						});
-						responses.push(indices);
-						break;
-					case "matching":
-						var pairs = q.find(".matching-line");
-						var indices = $.map(pairs, function (item, index) {
-							var left = $(item).attr("data-left-index");
-							var right = $(item).attr("data-right-index");
-							return [left, right];
-						});
-						responses.push(indices);
-						break;
-					case "matrix":
-						var answers = this.data.questions[i].answers;
-						var submitted = [];
-						var rowCount = this.data.questions[i].choices.length;
-						var columnCount = this.data.questions[i].headings.length - 2;
-						for (var j = 0; j < rowCount; j++) {
-							var rows = q.find("table.matrix-table tr");
-							var row = rows.eq(j + 2);
-							for (var k = 0; k < columnCount; k++) {
-								var response = this.getMatrixAnswer(q, j, k);
-								submitted.push(response);
-							}
-						}
-						responses.push(submitted);
-						break;
-					case "exercise":
-						var steps = q.find("li.step");
-						var correct = $.map(steps, function (item, index) {
-							return [$(item).attr("data-correct")];
-						});
-						responses.push(correct);
-						break;
-				}
+
+				var response = this.getResponses(q);
+
+				responses.push(response);
 			}
 
 			var obj = {responses: responses, attempts: this.attempts};
 			var to_json = $.toJSON(obj);
 
 			this.db.setTitleProperty(this.id, to_json);
+		},
+
+		getQuestionIDandResponses: function (q) {
+			var id = this.id + " #" + q.attr("data-index") + ":";
+			return id + this.getResponses(q).toString();
+		},
+
+		getResponses: function (q) {
+			var i = q.attr("data-index");
+
+			var question_params = this.data.questions[i];
+			var type = this.getQuestionType(question_params);
+
+			switch (type) {
+				case "multiple choice":
+					var answers = q.find(".response");
+					var chosen = q.find(".response.selected");
+					var indices = $.map(chosen, function (item, index) {
+						return $(item).attr("data-index");
+					});
+					return indices;
+					break;
+				case "matching":
+					var pairs = q.find(".matching-line");
+					var indices = $.map(pairs, function (item, index) {
+						var left = $(item).attr("data-left-index");
+						var right = $(item).attr("data-right-index");
+						return [left, right];
+					});
+					return indices;
+					break;
+				case "matrix":
+					var answers = this.data.questions[i].answers;
+					var submitted = [];
+					var rowCount = this.data.questions[i].choices.length;
+					var columnCount = this.data.questions[i].headings.length - 2;
+					for (var j = 0; j < rowCount; j++) {
+						var rows = q.find("table.matrix-table tr");
+						var row = rows.eq(j + 2);
+						for (var k = 0; k < columnCount; k++) {
+							var response = this.getMatrixAnswer(q, j, k);
+							submitted.push(response);
+						}
+					}
+					return submitted;
+					break;
+				case "exercise":
+					var steps = q.find("li.step");
+					var correct = $.map(steps, function (item, index) {
+						return [$(item).attr("data-correct")];
+					});
+					return correct;
+					break;
+			}
 		},
 
 		convertHintLinksToHumanReadable: function () {
@@ -1902,6 +1931,8 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 
 				this.saveResponses();
 
+				var q = step.parents(".question");
+
 				this.advanceToNextExerciseStep(q);
 			}
 
@@ -1925,6 +1956,10 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 			}
 
 			this.resetExerciseControls(q);
+
+			// ANALYTICS
+			var s = this.getQuestionIDandResponses(q);
+			ga("send", "event", "interface", "quiz-check", s);
 		},
 
 		resetExerciseControls: function (q) {
