@@ -327,11 +327,22 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 					li.append(lbl);
 					linkholder = lbl;
 
-					var dropper = $("<i>", { class: "dropper opened fa fa-caret-down"});
+					var dropper = $("<i>", { class: "dropper opened fa fa-caret-down", tabindex: 10 });
 					dropper.click(toggleDropper);
+					dropper.keydown(function (event) {
+						if (event.keyCode == 13 || event.keyCode == 32) {
+							toggleDropper.apply(dropper, [event]);
+						}
+					});
 					linkholder.append(dropper);
-					dropper = $("<i>", { class: "dropper closed fa fa-caret-right"});
+
+					dropper = $("<i>", { class: "dropper closed fa fa-caret-right", tabindex: 10 });
 					dropper.click(toggleDropper);
+					dropper.keydown(function (event) {
+						if (event.keyCode == 13 || event.keyCode == 32) {
+							toggleDropper.apply(dropper, [event]);
+						}
+					});
 					linkholder.append(dropper);
 
 					var ul = $("<ul>", {class: "nav nav-list tree", role: "group"});
@@ -628,7 +639,7 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 					var label = MakeAShortLabelForSearchResults(node);
 					var section_label = " <p class='section-label'>" + label + "</p>";
 					var hit_label = "<p class='hit-label'>" + hit.desc + "</p>";
-					var hitResult = $("<div>", {class: "hit", tabindex: 0, html: section_label + hit_label}).data("index", index);
+					var hitResult = $("<div>", {class: "hit", tabindex: 0, html: section_label + hit_label}).data("index", index).attr("role", "link");
 					var me = this;
 					hitResult.click(function (event) {
 						var index = $(this).data("index");
@@ -903,6 +914,7 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 		},
 
 		collapseTOC: function () {
+			$(this.options.expander).attr("aria-expanded", false);
 			$(this.options.expander + " i").removeClass("fa-caret-up").addClass("fa-caret-down");
 			this.holder.find("> li > ul").hide(300);
 			this.holder.find(".dropper.opened").hide(0);
@@ -912,6 +924,7 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 		},
 
 		expandTOC: function () {
+			$(this.options.expander).attr("aria-expanded", true);
 			$(this.options.expander + " i").removeClass("fa-caret-down").addClass("fa-caret-up");
 			this.holder.find("li ul").show(300);
 			this.holder.find(".dropper.opened").show(0);

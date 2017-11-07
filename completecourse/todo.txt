@@ -325,3 +325,7 @@
 // DONE: quizzerator: save and load progress (or just completion status of) text-based exercises
 // DONE: quizzerator: analytics for matrix, exercise, and text activities
 // DONE: quizzerator: analytics for "reveal answer"
+// DONE: make cross-sell have a "don't bug me again" option; and track it via Google
+// DONE: make cross-sell have a discount code
+// DONE: make cross-sell appear after x number of page clicks [10% of title]
+// DONE: cross-sell: track appearances, clicks, closings with Google Analytics [cross-sell-show, cross-sell-click, cross-sell-close, cross-sell-stop]

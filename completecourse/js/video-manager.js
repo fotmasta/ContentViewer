@@ -1,4 +1,4 @@
-define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-markers", "jquery.onscreen", "jquery.scrollTo", "iframe-holder", "jquery.ui"], function (BootstrapDialog, Database) {
+define(["bootstrap-dialog", "database", "imagesloaded", "common", "bootstrap-notify", "videojs", "videojs-markers", "jquery.onscreen", "jquery.scrollTo", "iframe-holder", "jquery.ui"], function (BootstrapDialog, Database, imagesLoaded, Common) {
 
 	// NOTE: I don't understand why I couldn't use this.waitingForAutoAdvance; somehow the instance of VideoManager passed into iframe-holder wasn't the same (!)
 
@@ -155,6 +155,10 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 			}
 		}
 		*/
+	}
+
+	function clickCrossSell () {
+		console.log("ok");
 	}
 
 	var totalVideoTime = undefined;
@@ -690,12 +694,23 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 			var el = iframe ? iframe.contents().find(hash) : [];
 			var dest = 0;
 
-			if (el.length) {
-				var top = el.offset().top;
-				dest = top - 30;
+			if (iframe && iframe.contents()) {
+				var el = iframe.contents().find(hash);
 
-				if (this.initialPageLoad == false)
-					el.attr("tabindex", -1).focus();
+				// if there's no #hashtag in the url or on the page, just navigate to the first anchor tag
+				if (!el.length) {
+					el = iframe.contents().find("a").first();
+				}
+
+				if (el.length) {
+					var top = el.offset().top;
+					dest = top - 30;
+
+					if (this.initialPageLoad == false) {
+						el.attr("tabindex", -1).focus();
+					}
+
+				}
 			}
 
 			this.initialPageLoad = false;
@@ -960,6 +975,20 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 			// this is used by .progress::after (works on all browsers?)
 			$(".progress").attr("data-progress", pct + "% Complete");
 			$("#accessible-progress").text(pct + "% Complete");
+
+			this.possiblyShowCrossSell(pct);
+		},
+
+		possiblyShowCrossSell: function (pct) {
+			if (pct > 10 && this.options.crossSell) {
+				if (Database.getTitleProperty("cross-sell-shown") != true) {
+					Database.setTitleProperty("cross-sell-shown", true);
+
+					var me = this;
+
+					setTimeout(function () { me.showCrossSell(); }, 5000);
+				}
+			}
 		},
 
 		// [{time,text}]
@@ -1792,6 +1821,112 @@ define(["bootstrap-dialog", "database", "bootstrap-notify", "videojs", "videojs-
 			}).fail(function (err) {
 				callback(false);
 			});
+		},
+
+		showCrossSell: function () {
+			var bug_me_not = Database.getTitleProperty("bug_me_not");
+
+			if (bug_me_not == true) return;
+
+			var htmlString =
+				'<div>Enjoying this title? You might want to check out this other popular title:' +
+					'<a id="sell-link" target="_blank" href="https://www.informit.com/store/learn-python-3-the-hard-way-a-very-simple-introduction-9780134693651">' +
+						'<div class="book-title">' +
+							'<img src="https://informit.com/ShowCover.aspx?isbn=0134693655&amp;type=f" alt="Learn Python 3 the Hard Way: A Very Simple Introduction to the Terrifyingly Beautiful World of Computers and Code" class="product" width="160">' +
+							'<div class="info">' +
+								'<p class="title">Learn Python 3 the Hard, Hard, Hard Way</p>' +
+								'<p class="discount">Use discount code: <span class="discount-code">cross35</span><br><span class="percent">… 35% off!</span></p>' +
+							'</div>' +
+						'</div>' +
+					'</a>' +
+					'<div class="footer">' +
+						'<div class="checkbox">' +
+							'<label><input id="cease" type="checkbox" value="">Don\'t show me any more of these messages</label>' +
+						'</div>'
+					'</div>' +
+				'</div>';
+
+			var preload = $(htmlString);
+
+			// wait until everything's loaded to show this:
+			imagesLoaded(preload, doShowCrossSell);
+
+			function doShowCrossSell (obj) {
+				$.notify({
+					message: htmlString
+				}, {
+					// settings
+					type: 'sales',
+					allow_dismiss: true,
+					placement: {
+						from: "top",
+						align: "center"
+					},
+					offset: 0,
+					delay: 0,
+					z_index: 5000,
+					animate: {
+						enter: 'animated fadeInDown',
+						exit: 'animated fadeOutUp'
+					},
+					onClose: onCloseCrossSell,
+					onShow: onShowCrossSell
+					/*,
+					template: '<div data-notify="container" class="col-xs-11 col-sm-3 alert alert-{0}" role="alert">' +
+					 '<div>It looks like you\'re getting a lot of use out of this book. You might want to check out this other popular title:' +
+					 '<a target="_blank" href="https://www.informit.com/store/learn-python-3-the-hard-way-a-very-simple-introduction-9780134693651">' +
+					 '<div class="book-title">' +
+					 '<img src="https://informit.com/ShowCover.aspx?isbn=0134693655&amp;type=f" alt="Learn Python 3 the Hard Way: A Very Simple Introduction to the Terrifyingly Beautiful World of Computers and Code" class="product" width="160">' +
+					 '<span class="title" data-notify="title">{1}</span>' +
+					 '<span data-notify="topic">{2}</span>' +
+					 '</div></a></div>' +
+					 '<button type="button" aria-hidden="true" class="close" data-notify="dismiss">×</button>' +
+					 '</div>'*/
+				});
+
+				var isbn = "";
+				if (Common.getISBNFromLocation) {
+					isbn = Common.getISBNFromLocation();
+					if (isbn) {
+						ga("send", "event", "interface", "cross-sell-show", isbn);
+					}
+				}
+			}
+
+			function onCloseCrossSell () {
+				var checkbox = this.find("input#cease");
+				var checked = checkbox.prop("checked");
+
+				var isbn = "";
+				if (Common.getISBNFromLocation) {
+					isbn = Common.getISBNFromLocation();
+				}
+
+				if (checked) {
+					Database.setTitleProperty("bug_me_not", true);
+
+					if (isbn) {
+						ga("send", "event", "interface", "cross-sell-stop", isbn);
+					}
+				} else {
+					if (isbn) {
+						ga("send", "event", "interface", "cross-sell-close", isbn);
+					}
+				}
+			}
+
+			function onShowCrossSell () {
+				var a = $(this).find("a#sell-link");
+				a.click(function () {
+					var isbn = "";
+					if (Common.getISBNFromLocation) {
+						isbn = Common.getISBNFromLocation();
+						if (isbn) {
+							ga("send", "event", "interface", "cross-sell-click", isbn);
+						}
+					}
+				});
+			}
 		}
 	});
 

@@ -94,7 +94,8 @@ body.skin-Microsoft {
     body.skin-Microsoft .search-results .row {
       background-color: #FFB900; }
     body.skin-Microsoft .search-results .search-result-list .selected {
-      background-color: #3B6DCB; }
+      background-color: #3B6DCB;
+      border: 4px dotted white; }
       body.skin-Microsoft .search-results .search-result-list .selected p {
         color: white; }
   body.skin-Microsoft #toc-toggler:focus {
@@ -565,8 +566,9 @@ ul.toc-holder {
 
 #contents .level {
   display: block;
-  background-color: #404040;
+  background-color: black;
   color: white;
+  font-weight: bold;
   font-size: 12px;
   font-family: 'Source Sans Pro', sans-serif;
   border-radius: 3px;
@@ -700,7 +702,7 @@ span.completed {
     padding: 1em; }
 
 .blocky {
-  color: #959595;
+  color: black;
   font-size: 12px;
   font-weight: 700;
   text-transform: uppercase;
@@ -1301,6 +1303,74 @@ p#version-info {
 
 #page-limit-info span:not(:last-child):after {
   content: ", "; }
+
+.alert-sales[data-notify="container"] {
+  max-width: 400px;
+  background-color: #ffffee;
+  border-width: 0;
+  border-top: 15px solid #fff06a;
+  border-radius: 0 0 30px 30px;
+  font-size: larger;
+  box-shadow: -5px 5px 10px rgba(0, 0, 0, 0.5); }
+  .alert-sales[data-notify="container"] .book-title {
+    margin-top: 25px;
+    background: white;
+    border-radius: 5px;
+    padding: 10px;
+    box-shadow: -3px 3px 10px;
+    display: flex;
+    align-items: center; }
+    .alert-sales[data-notify="container"] .book-title img {
+      max-width: 75px; }
+    .alert-sales[data-notify="container"] .book-title div.info {
+      margin-left: 1em; }
+      .alert-sales[data-notify="container"] .book-title div.info p.title {
+        vertical-align: top;
+        font-weight: bold;
+        font-size: larger;
+        line-height: 1.25em; }
+      .alert-sales[data-notify="container"] .book-title div.info p.discount {
+        margin-top: 1.5em; }
+      .alert-sales[data-notify="container"] .book-title div.info span.discount-code {
+        background-color: black;
+        color: white;
+        padding: 5px 10px;
+        font-weight: bold;
+        margin-left: .5em; }
+      .alert-sales[data-notify="container"] .book-title div.info span.percent {
+        font-style: italic; }
+  .alert-sales[data-notify="container"] a {
+    color: inherit; }
+    .alert-sales[data-notify="container"] a:hover {
+      text-decoration: none; }
+      .alert-sales[data-notify="container"] a:hover .book-title {
+        background-color: #e5f1f5; }
+        .alert-sales[data-notify="container"] a:hover .book-title p.title {
+          text-decoration: underline; }
+        .alert-sales[data-notify="container"] a:hover .book-title span.discount-code {
+          background-color: lightgreen;
+          color: black; }
+  .alert-sales[data-notify="container"] button.close {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    opacity: 1;
+    background: white;
+    border: 3px solid green;
+    border-radius: 20px;
+    width: 40px;
+    height: 40px;
+    color: green;
+    transform: translateX(50%) translateY(50%); }
+    .alert-sales[data-notify="container"] button.close:hover {
+      background-color: #bee1cb;
+      border-color: #002f00;
+      color: #002f00; }
+  .alert-sales[data-notify="container"] .footer {
+    font-size: smaller;
+    margin: 20px 0 0 0; }
+    .alert-sales[data-notify="container"] .footer .checkbox {
+      margin: 0 0 0 2em; }
 
 /* CUP styling overrides */
 section.cup-new:before {

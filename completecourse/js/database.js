@@ -341,6 +341,8 @@ define(["common"], function (Common) {
 				this.items[i].completed = this.items[i].started = false;
 			}
 
+			this.setTitleProperty("cross-sell-shown", undefined);
+
 			this.saveToLocalStorage();
 		},
 

@@ -158,6 +158,7 @@ body.skin-Microsoft {
 
 		.search-result-list .selected {
 			background-color: #3B6DCB;
+			border: 4px dotted white;
 			p {
 				color: white;
 			}
@@ -888,8 +889,9 @@ ul.toc-holder {
 #contents {
 	.level {
 		display: block;
-		background-color: $link-color;
+		background-color: black;
 		color: white;
+		font-weight: bold;
 		font-size: 12px;
 		font-family: 'Source Sans Pro', sans-serif;
 		border-radius: 3px;
@@ -1079,7 +1081,7 @@ span.completed {
 }
 
 .blocky {
-	color: #959595;
+	color: black;
 	font-size: 12px;
 	font-weight: 700;
 	text-transform: uppercase;
@@ -1945,6 +1947,108 @@ p#version-info {
 	span:not(:last-child) {
 		&:after {
 			content: ", ";
+		}
+	}
+}
+
+.alert-sales[data-notify="container"] {
+	max-width: 400px;
+
+	background-color: rgb(255, 255, 238);
+	border-width: 0;
+	border-top: 15px solid rgb(255, 240, 106);
+	border-radius: 0 0 30px 30px;
+	font-size: larger;
+	box-shadow: -5px 5px 10px rgba(0, 0, 0, .5);
+
+	.book-title {
+		margin-top: 25px;
+		background: white;
+		border-radius: 5px;
+		padding: 10px;
+		box-shadow: -3px 3px 10px;
+		display: flex;
+		align-items: center;
+
+		img {
+			max-width: 75px;
+		}
+
+		div.info {
+			margin-left: 1em;
+
+			p.title {
+				vertical-align: top;
+				font-weight: bold;
+				font-size: larger;
+				line-height: 1.25em;
+			}
+
+			p.discount {
+				margin-top: 1.5em;
+			}
+
+			span.discount-code {
+				background-color: black;
+				color: white;
+				padding: 5px 10px;
+				font-weight: bold;
+				margin-left: .5em;
+			}
+
+			span.percent {
+				font-style: italic;
+			}
+		}
+	}
+
+	a {
+		color: inherit;
+
+		&:hover {
+			text-decoration: none;
+
+			.book-title {
+				background-color: #e5f1f5;
+
+				p.title {
+					text-decoration: underline;
+				}
+
+				span.discount-code {
+					background-color: lightgreen;
+					color: black;
+				}
+			}
+		}
+	}
+
+	button.close {
+		position: absolute;
+		bottom: 10px;
+		right: 10px;
+		opacity: 1;
+		background: white;
+		border: 3px solid green;
+		border-radius: 20px;
+		width: 40px;
+		height: 40px;
+		color: green;
+		transform: translateX(50%) translateY(50%);
+
+		&:hover {
+			background-color: #bee1cb;
+			border-color: #002f00;
+			color: #002f00;
+		}
+	}
+
+	.footer {
+		font-size: smaller;
+		margin: 20px 0 0 0;
+
+		.checkbox {
+			margin: 0 0 0 2em;
 		}
 	}
 }

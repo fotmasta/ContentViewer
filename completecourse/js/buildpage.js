@@ -739,6 +739,12 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 		}
 	}
 
+	function onClickHeaderNav (event) {
+		if (event.shiftKey) {
+			$("#video").VideoManager("showCrossSell");
+		}
+	}
+
 	var BuildPage = {
 		build: function (options) {
 			if (window.location.host.indexOf("learnercommunity") != -1) {
@@ -813,6 +819,8 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 			//$("#resource-toggler").click(onToggleResources);
 			//$("a[data-toggle='tab']").on("shown.bs.tab", onResize);
 			//$(".resource-list").on("playvideo", onClickMarker);
+
+			$("#header-nav").click(onClickHeaderNav);
 
 			$(".search-button").click(onSearch);
 			$(".search-results .close-btn").click(onCloseSearch);
