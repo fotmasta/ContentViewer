@@ -109,10 +109,38 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 
 	$("body").css("opacity", 0);
 
+	$.extend({
+		replaceTag: function (currentElem, newTagObj, keepProps) {
+			var $currentElem = $(currentElem);
+			var i, $newTag = $(newTagObj).clone();
+			if (keepProps) {//{{{
+				newTag = $newTag[0];
+				newTag.className = currentElem.className;
+				$.extend(newTag.classList, currentElem.classList);
+				$.extend(newTag.attributes, currentElem.attributes);
+			}//}}}
+			$currentElem.wrapAll($newTag);
+			$currentElem.contents().unwrap();
+			// return node; (Error spotted by Frank van Luijn)
+			return this; // Suggested by ColeLawrence
+		}
+	});
+
+	$.fn.extend({
+		replaceTag: function (newTagObj, keepProps) {
+			// "return" suggested by ColeLawrence
+			return this.each(function() {
+				jQuery.replaceTag(this, newTagObj, keepProps);
+			});
+		}
+	});
+
 	function initialize () {
 		onResize();
 
 		var v = $("#video .overlay").VideoOverlay();
+
+		$("#video .video-js label").replaceTag("<span>");
 
 		// NOTE: started using opacity too since the tab panels were overriding "invisible"
 		$("#main").removeClass("invisible").css("opacity", 1);
@@ -766,6 +794,7 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 
 		doBuild: function (options) {
 			$(".navbar-brand span").text(options.title);
+			$("#toc-toggler").attr("aria-label", "Show and Hide the Table of Contents - " + options.title);
 
 			$("html").addClass("ui");
 

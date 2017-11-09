@@ -697,9 +697,9 @@ define(["bootstrap-dialog", "database", "imagesloaded", "common", "bootstrap-not
 			if (iframe && iframe.contents()) {
 				var el = iframe.contents().find(hash);
 
-				// if there's no #hashtag in the url or on the page, just navigate to the first anchor tag
+				// if there's no #hashtag in the url or on the page, just navigate to the first non-button
 				if (!el.length) {
-					el = iframe.contents().find("a").first();
+					el = iframe.contents().find("body").children("*:not(.button)").first();
 				}
 
 				if (el.length) {
