@@ -232,6 +232,7 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 				q.index = i;
 				q.q = d_q.text;
 				q.hint = d_q.ref;
+				q.questionType = this.data.questionType;
 				if (d_q.answers)
 					q.answers = d_q.answers.slice();
 				if (d_q.choices)
@@ -270,12 +271,17 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 		},
 
 		getQuestionType: function (questionData) {
-			var questionType = "multiple choice";
-			if (questionData.headings) questionType = "matrix";
-			else if (questionData.choices) questionType = "matching";
-			else if (questionData.steps) questionType = "exercise";
+			if (questionData.questionType) {
+				return questionData.questionType;
+			} else {
+				var questionType = "multiple choice";
+				if (questionData.headings) questionType = "matrix";
+				else if (questionData.choices) questionType = "matching";
+				else if (questionData.steps && questionData.steps[0].order != undefined) questionType = "sorting";
+				else if (questionData.steps) questionType = "exercise";
 
-			return questionType;
+				return questionType;
+			}
 		},
 
 		addQuestion: function (q_params) {
@@ -326,6 +332,9 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 					break;
 				case "exercise":
 					this.setupForExercise(params);
+					break;
+				case "sorting":
+					this.setupForSorting(params);
 					break;
 			}
 
@@ -764,6 +773,182 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 			});
 		},
 
+		setupForSorting: function (params) {
+			var q = params.questionEl, q_params = params.questionData, answers = params.answersEl;
+			var me = this;
+
+			q.addClass("sorting");
+
+			q.find(".instructions").text(q_params.instructions);
+
+			var mq = $("<div>", { class: "sorting-container" });
+			q.append(mq);
+
+			var steps = $("<ol>", {class: "steps-holder choices-holder"});
+			mq.append(steps);
+
+			var availableAnswers = ["&#xf05e;"];
+			for (var i = 0; i < q_params.steps.length; i++) {
+				availableAnswers.push(i + 1);
+			}
+
+			function saveProgress (q) {
+				me.updateAndSave(q, false);
+			}
+
+			function moveUp (a, b) {
+				if (a.hasClass("moving")) return;
+
+				a.addClass("moving");
+
+				var ha = a.outerHeight() + 10;
+				var hb = b.outerHeight() + 10;
+				a.css("transform", "translateY(-" + hb + "px)");
+				b.css("transform", "translateY(" + ha + "px)");
+				setTimeout(function () {
+					a.css("transition", "none");
+					b.css("transition", "none");
+					a.css("transform", "");
+					b.css("transform", "");
+					b.insertAfter(a);
+					setTimeout(function () {
+						a.css("transition", transitionCSS);
+						b.css("transition", transitionCSS);
+						a.removeClass("moving");
+						var q = a.parents(".question");
+						me.showCheckButton(q, true);
+						saveProgress(q);
+					}, 100);
+				}, 250);
+			}
+
+			function moveDown (a, b) {
+				if (a.hasClass("moving")) return;
+
+				a.addClass("moving");
+
+				var ha = a.outerHeight() + 10;
+				var hb = b.outerHeight() + 10;
+				a.css("transform", "translateY(" + hb + "px)");
+				b.css("transform", "translateY(-" + ha + "px)");
+
+				setTimeout(function () {
+					a.css("transition", "none");
+					b.css("transition", "none");
+					a.css("transform", "");
+					b.css("transform", "");
+					b.insertBefore(a);
+					setTimeout(function () {
+						a.css("transition", transitionCSS);
+						b.css("transition", transitionCSS);
+						a.removeClass("moving");
+						var q = a.parents(".question");
+						me.showCheckButton(q, true);
+						saveProgress(q);
+					}, 100);
+				}, 250);
+			}
+
+			for (var each in q_params.steps) {
+				var step = q_params.steps[each];
+
+				var li = $("<li>", { class: "step" });
+
+				li.hover(function (event) {
+					$(event.currentTarget).parents("ol").find("li.selected").removeClass("selected");
+					$(event.currentTarget).addClass("selected");
+					$(event.currentTarget).find(".sort-step").focus();
+				});
+
+				var stepBtn = $("<div>", { tabindex: 0, class: "sort-step" });
+
+				var p = $("<p>", { text: step.label });
+
+				stepBtn.focus(function (event) {
+					$(event.currentTarget).parents("ol").find("li.selected").removeClass("selected");
+					$(event.currentTarget).parents("li").addClass("selected");
+				});
+
+				stepBtn.keydown(function (event) {
+					switch (event.keyCode) {
+						case 38:
+							var a = $(event.currentTarget).parents("li").eq(0);
+							var b = a.prev();
+							moveUp(a, b);
+							var q = a.parents(".question");
+							saveProgress(q);
+							event.preventDefault();
+							break;
+						case 40:
+							var a = $(event.currentTarget).parents("li").eq(0);
+							var b = a.next();
+							moveDown(a, b);
+							var q = a.parents(".question");
+							saveProgress(q);
+							event.preventDefault();
+							break;
+					}
+				});
+
+				stepBtn.append(p);
+				li.append(stepBtn);
+
+				var btns = $("<div>", { class: "nav-buttons" } );
+
+				var transitionCSS = "transform .25s ease-in-out";
+
+				var up = $("<button class='btn btn-default'><i class='fa fa-2x fa-arrow-circle-o-up'></i></button>").appendTo(btns);
+				up.click(function (event) {
+					var a = $(event.currentTarget).parents("li").eq(0);
+					var b = a.prev();
+					moveUp(a, b);
+				});
+
+				var skip = $("<button class='btn btn-default'><i class='fa fa-2x fa-ban'></i></button>").appendTo(btns);
+				skip.click(function (event) {
+					var a = $(event.currentTarget).parents("li").eq(0);
+					a.toggleClass("ignored");
+					var q = a.parents(".question");
+					me.showCheckButton(q, true);
+					saveProgress(q);
+				});
+
+				var down = $("<button class='btn btn-default'><i class='fa fa-2x fa-arrow-circle-o-down'></i></button>").appendTo(btns);
+				down.click(function (event) {
+					var a = $(event.currentTarget).parents("li").eq(0);
+					var b = a.next();
+					moveDown(a, b);
+				});
+
+				li.append(btns);
+
+				var icons = $("<div>", {class: "icons"});
+				li.append(icons);
+
+				var icon_correct = $("<i>", {class: "icon correct fa fa-2x fa-check hidden"});
+				icons.append(icon_correct);
+
+				var icon_incorrect = $("<i>", {class: "icon incorrect fa fa-2x fa-times hidden"});
+				icons.append(icon_incorrect);
+
+				li.attr( { "data-index": each, "data-order": step.order } );
+
+				steps.append(li);
+			}
+
+			this.loadJqueryUIintoThisIframe(function () {
+				var iframe = me.options.iframe.iframe[0];
+				var win = iframe.contentWindow;
+				win.jQuery(".steps-holder").sortable({ cursor: "pointer", axis: "y", update: $.proxy(me.onChangedSorting, me) });
+			});
+		},
+
+		onChangedSorting: function (event) {
+			var q = $(event.target).parents(".question");
+			this.showCheckButton(q, true);
+			this.updateAndSave(q, false);
+		},
+
 		postSetupForExercise: function (params) {
 			var q = params.questionEl, q_params = params.questionData, answers = params.answersEl;
 
@@ -906,11 +1091,15 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 				}
 			}
 
-			if (showCheckButton) {
-				question.find(".checker").removeClass("inactive animated fadeOut").addClass("animated fadeInLeft").find("button").removeClass("btn-danger btn-success").addClass("btn-primary").parent().find(".checker-label").css("display", "none");
+			this.showCheckButton(question, showCheckButton);
+		},
+
+		showCheckButton: function (q, show) {
+			if (show) {
+				q.find(".checker").removeClass("inactive animated fadeOut").addClass("animated fadeInLeft").find("button").removeClass("btn-danger btn-success").addClass("btn-primary").parent().find(".checker-label").css("display", "none");
 			} else {
-				question.find(".checker").addClass("inactive");
-				question.find(".checker .btn-checker").removeClass("btn-success btn-danger").addClass("btn-primary").parent().find(".checker-label").css("display", "none");
+				q.find(".checker").addClass("inactive");
+				q.find(".checker .btn-checker").removeClass("btn-success btn-danger").addClass("btn-primary").parent().find(".checker-label").css("display", "none");
 			}
 		},
 
@@ -1214,7 +1403,7 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 			var t = this.getQuestionType(this.data.questions[index]);
 			if (t != "exercise") {
 				// ANALYTICS for "checking answer" (exercises are counted when advanced)
-				var s = this.getQuestionIDandResponses();
+				var s = this.getQuestionIDandResponses(q);
 				ga("send", "event", "interface", "quiz-check", s);
 			}
 		},
@@ -1380,9 +1569,73 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 				}
 
 				q.find(".checker-label").text(hint).css("display", "inline");
+			} else if (q.hasClass("sorting")) {
+				var index = q.attr("data-index");
+				var steps = q.find(".step");
+				var answer = steps.map(function (index, item) {
+					var order = $(item).attr("data-order");
+					if ( (order == "" && $(item).hasClass("ignored")) || (order != "" && !$(item).hasClass("ignored")) ) {
+						order = "correctly ignored";
+					} else {
+						order = "incorrectly ignored";
+					}
+					return order;
+				}).toArray();
+
+				var current_need = 1;
+				var allCorrect = true, partialCorrect = false;
+				for (var i = 0; i < answer.length; i++) {
+					var a = answer[i];
+					if (a == "correctly ignored" || a == current_need) {
+						// correct
+						q.find(".icons").eq(i).find(".correct").removeClass("hidden");
+						partialCorrect = true;
+					} else {
+						// incorrect
+						q.find(".icons").eq(i).find(".incorrect").removeClass("hidden");
+						allCorrect = false;
+					}
+
+					if (a.indexOf("ignored") == -1) {
+						current_need++;
+					}
+
+					this.showResponseText(q, allCorrect, partialCorrect, true);
+				}
+
+				q.attr("data-correct", allCorrect);
 			}
 
 			this.updateScore();
+		},
+
+		showResponseText: function (q, allCorrect, partialCorrect, animate) {
+			var responseText;
+
+			if (allCorrect) {
+				responseText = correctText;
+
+				if (animate != false) {
+					q.find(".icons").removeClass("hidden animated").hide(0).addClass("animated rollIn").show(0);
+					q.find(".checker .btn-checker").removeClass("btn-primary btn-danger").addClass("btn-success animated fadeInLeft").parent().find(".checker-label").text(responseText).css("display", "inline");
+				} else {
+					q.find(".icons").removeClass("hidden animated").show(0);
+					q.find(".checker .btn-checker").removeClass("btn-primary btn-danger").addClass("btn-success").parent().find(".checker-label").text(responseText).css("display", "inline");
+					q.find(".checker").removeClass("animated");
+				}
+			} else {
+				responseText = partialCorrect ? partialTryAgainText : tryAgainText;
+				q.find(".hint").css("display", "block");
+
+				if (animate != false) {
+					q.find(".icons").removeClass("hidden animated").hide(0).addClass("animated rollIn").show(0);
+					q.find(".checker .btn-checker").removeClass("btn-primary").addClass("btn-danger animated fadeInLeft").parent().find(".checker-label").text(responseText).css("display", "inline");
+				} else {
+					q.find(".checker .btn-checker").removeClass("btn-primary").addClass("btn-danger").parent().find(".checker-label").text(responseText).css("display", "inline");
+					q.find(".checker").removeClass("animated");
+				}
+			}
+
 		},
 
 		showCorrectResponses: function () {
@@ -1527,6 +1780,23 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 
 					this.resetExerciseControls(q);
 					break;
+				case "sorting":
+					q.find("li.step.ignored").removeClass("ignored");
+					// put back in index order
+					var steps = q.find("li.step");
+					steps.sort(function (a,b){
+						var keyA = $(a).attr("data-index");
+						var keyB = $(b).attr("data-index");
+
+						if (keyA < keyB) return -1;
+						if (keyA > keyB) return 1;
+						return 0;
+					});
+					var stepHolder = q.find(".steps-holder");
+					$.each(steps, function (index, li) {
+						stepHolder.append(li);
+					});
+					break;
 			}
 
 			q.find(".icon").addClass("hidden");
@@ -1597,6 +1867,8 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 				for (var i = 0; i < obj.responses.length; i++) {
 					var resp = obj.responses[i];
 
+					if (resp == null) break;
+
 					if (resp.length == undefined) resp = [resp];
 
 					var q = this.element.find(".question").eq(i);
@@ -1664,6 +1936,27 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 									// not done yet
 								} else {
 									q.attr("data-correct", true);
+								}
+								break;
+							case "sorting":
+								var changed = false;
+								var stepHolder = q.find(".steps-holder");
+								for (var i = 0; i < resp.length * .5; i++) {
+									var ind = resp[i * 2];
+									if (ind != i) {
+										changed = true;
+									}
+									var step = stepHolder.find("[data-index=" + ind + "]");
+									var ignore = resp[i * 2 + 1];
+									if (ignore) {
+										step.addClass("ignored");
+										changed = true;
+									}
+									stepHolder.append(step);
+								}
+								if (changed) {
+									this.checkQuestion(q, false);
+									this.showCheckButton(q, true);
 								}
 								break;
 						}
@@ -1751,6 +2044,13 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 						return [$(item).attr("data-correct")];
 					});
 					return correct;
+					break;
+				case "sorting":
+					var steps = q.find("li.step");
+					var order = $.map(steps, function (item, index) {
+						return [$(item).attr("data-index"), $(item).hasClass("ignored")];
+					});
+					return order;
 					break;
 			}
 		},
@@ -2039,6 +2339,43 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 			this.markCorrectResponses();
 
 			this.onClickSubmit();
+		},
+
+		// JQuery UI Sortable (for Sorting exercises) doesn't work in iFrames unless jquery is actually loaded in that iframe, hence:
+		loadJqueryUIintoThisIframe: function (callback) {
+			var iframe = this.options.iframe.iframe[0];
+
+			var win = iframe.contentWindow, doc = win.document, body = doc.body, jQueryLoaded = false, jQuery;
+
+			function loadLibrary() {
+				body.removeChild(jQuery);
+				jQuery = null;
+
+				win.jQuery.ajax({
+					url: baseURL + "js/jquery-ui.min.js",
+					dataType: 'script',
+					cache: true,
+					success: function () {
+						callback();
+					}
+				});
+			}
+
+			jQuery = doc.createElement('script');
+
+			// based on https://gist.github.com/getify/603980
+			jQuery.onload = jQuery.onreadystatechange = function () {
+				if ((jQuery.readyState && jQuery.readyState !== 'complete' && jQuery.readyState !== 'loaded') || jQueryLoaded) {
+					return false;
+				}
+				jQuery.onload = jQuery.onreadystatechange = null;
+				jQueryLoaded = true;
+
+				loadLibrary();
+			};
+
+			jQuery.src = baseURL + "js/jquery-2.1.3.min.js";
+			body.appendChild(jQuery);
 		}
 	});
 
