@@ -114,6 +114,16 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 	var partialTryAgainText = "That's partially correct. Keep trying.";
 	var correctText = "That's correct!";
 
+	function analytics () {
+		//ga.apply(this, arguments);
+
+		just_log.apply(this, arguments);
+	}
+
+	function just_log (a, b, c, d, e) {
+		console.log("analytics: " + a + " " + b + " " + c + " " + d + " " + e);
+	}
+
 	$.widget("que.quizzerator", {
 		options: {},
 
@@ -994,7 +1004,7 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 
 			var id = this.id + ":" + num + ":" + el.attr("data-index");
 
-			ga("send", "event", "interface", "quiz-response", id);
+			analytics("send", "event", "interface", "quiz-response", id);
 		},
 
 		onClickChoice1: function (event) {
@@ -1300,6 +1310,11 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 							answered.push(i);
 						}
 						break;
+					case "sorting":
+						if (q.attr("data-correct")) {
+							answered.push(i);
+						}
+						break;
 				}
 			}
 
@@ -1404,7 +1419,7 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 			if (t != "exercise") {
 				// ANALYTICS for "checking answer" (exercises are counted when advanced)
 				var s = this.getQuestionIDandResponses(q);
-				ga("send", "event", "interface", "quiz-check", s);
+				analytics("send", "event", "interface", "quiz-check", s);
 			}
 		},
 
@@ -1574,10 +1589,10 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 				var steps = q.find(".step");
 				var answer = steps.map(function (index, item) {
 					var order = $(item).attr("data-order");
-					if ( (order == "" && $(item).hasClass("ignored")) || (order != "" && !$(item).hasClass("ignored")) ) {
+					if (order == "" && $(item).hasClass("ignored")) {
 						order = "correctly ignored";
-					} else {
-						order = "incorrectly ignored";
+					} else if (order != "" && $(item).hasClass("ignored")) {
+						order = "incorrect";
 					}
 					return order;
 				}).toArray();
@@ -1599,9 +1614,9 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 					if (a.indexOf("ignored") == -1) {
 						current_need++;
 					}
-
-					this.showResponseText(q, allCorrect, partialCorrect, true);
 				}
+
+				this.showResponseText(q, allCorrect, partialCorrect, true);
 
 				q.attr("data-correct", allCorrect);
 			}
@@ -1683,6 +1698,29 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 						q.find(".btn-reveal").removeClass("btn-danger").addClass("btn-success").text("Go to Next Step");
 					}
 					break;
+				case "sorting":
+					q.find(".icon").addClass("hidden");
+					var steps = q.find("li.step");
+					steps.removeClass("ignored");
+					steps.sort(function (a,b) {
+						var keyA = $(a).attr("data-order");
+						keyA = keyA == "" ? "Z" : keyA;
+						var keyB = $(b).attr("data-order");
+						keyB = keyB == "" ? "Z" : keyB;
+
+						if (keyA < keyB) return -1;
+						if (keyA > keyB) return 1;
+						return 0;
+					});
+					var stepHolder = q.find(".steps-holder");
+					$.each(steps, function (index, li) {
+						stepHolder.append(li);
+						var step = $(li);
+						if (step.attr("data-order") == "") {
+							step.addClass("ignored");
+						}
+					});
+					break;
 			}
 		},
 
@@ -1694,7 +1732,7 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 
 			// ANALYTICS
 			var s = this.getQuestionIDandResponses(q);
-			ga("send", "event", "interface", "quiz-reveal", s);
+			analytics("send", "event", "interface", "quiz-reveal", s);
 		},
 
 		markCorrectResponses: function () {
@@ -1784,7 +1822,7 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 					q.find("li.step.ignored").removeClass("ignored");
 					// put back in index order
 					var steps = q.find("li.step");
-					steps.sort(function (a,b){
+					steps.sort(function (a,b) {
 						var keyA = $(a).attr("data-index");
 						var keyB = $(b).attr("data-index");
 
@@ -1820,7 +1858,7 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 			if (event) {
 				var score = this.getScore() + "%";
 				var note = this.id + ":" + score;
-				ga("send", "event", "interface", "quiz-check-all", note);
+				analytics("send", "event", "interface", "quiz-check-all", note);
 			}
 		},
 
@@ -2124,7 +2162,7 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 
 			this.adjustSummarySize();
 
-			ga("send", "event", "interface", "quiz-restart", this.id);
+			analytics("send", "event", "interface", "quiz-restart", this.id);
 		},
 
 		onClickStartOver: function () {
@@ -2257,9 +2295,8 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 
 			this.resetExerciseControls(q);
 
-			// ANALYTICS
 			var s = this.getQuestionIDandResponses(q);
-			ga("send", "event", "interface", "quiz-check", s);
+			analytics("send", "event", "interface", "quiz-check", s);
 		},
 
 		resetExerciseControls: function (q) {
