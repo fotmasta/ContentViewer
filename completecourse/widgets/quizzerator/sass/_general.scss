@@ -422,6 +422,31 @@ ol.quiz-holder {
 			padding: 10px 20px;
 			color: white;
 		}
+
+		div.incorrectX, div.correctMark {
+			position: fixed;
+			left: 50%;
+			top: 50%;
+			z-index: 1000;
+			display: none;
+			pointer-events: none;
+
+			&:after {
+				font-family: "FontAwesome";
+				content: "\f00d";
+				font-size: 50px;
+				color: red;
+				display: block;
+				transform: translateX(-50%) translateY(-50%);
+			}
+		}
+
+		div.correctMark {
+			&:after {
+				content: "\f05d";
+				color: green;
+			}
+		}
 	}
 }
 

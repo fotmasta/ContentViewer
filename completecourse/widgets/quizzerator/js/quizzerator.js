@@ -115,9 +115,9 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 	var correctText = "That's correct!";
 
 	function analytics () {
-		//ga.apply(this, arguments);
+		ga.apply(this, arguments);
 
-		just_log.apply(this, arguments);
+		//just_log.apply(this, arguments);
 	}
 
 	function just_log (a, b, c, d, e) {
@@ -777,6 +777,12 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 				step_el.append(div);
 				ol.append(step_el);
 			}
+
+			var bigX = $("<div>", { class: "incorrectX" } );
+			q.append(bigX);
+
+			var bigCheck = $("<div>", { class: "correctMark" } );
+			q.append(bigCheck);
 
 			imagesLoaded(q, function () {
 				me.onImagesLoaded();
@@ -2247,6 +2253,26 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 			$(window).off("resize.quizzerator");
 		},
 
+		showIncorrectSpot: function (event) {
+			var x = event.pageX, y = event.pageY;
+			var bigX = $(event.target).parents(".question").find(".incorrectX");
+			bigX.removeClass("shake fadeOut").hide().addClass("animated shake").css({ left: x, top: y }).show();
+			setTimeout(function () {
+				bigX.addClass("fadeOut");
+			}, 1000);
+		},
+
+		showCorrectSpot: function (event, callback) {
+			var x = event.pageX, y = event.pageY;
+			var bigX = $(event.target).parents(".question").find(".correctMark");
+			bigX.removeClass("fadeOut tada").hide().addClass("animated tada").css({ left: x, top: y }).show();
+			setTimeout(function () {
+				bigX.addClass("fadeOut");
+				if (callback)
+					callback();
+			}, 1000);
+		},
+
 		onClickHotspot: function (event) {
 			var step = $(event.currentTarget).parents("li.step");
 			var type = step.attr("data-type");
@@ -2271,7 +2297,9 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 
 				var q = step.parents(".question");
 
-				this.advanceToNextExerciseStep(q);
+				this.showCorrectSpot(event, $.proxy(this.advanceToNextExerciseStep, this, q));
+			} else {
+				this.showIncorrectSpot(event);
 			}
 
 			event.stopImmediatePropagation();
@@ -2341,6 +2369,8 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 		},
 
 		onClickIncorrectArea: function (event) {
+			this.showIncorrectSpot(event);
+
 			this.onClickCheck(event);
 		},
 

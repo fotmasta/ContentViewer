@@ -1,4 +1,3 @@
-// TODO: quizzerator: hotspots don't always seem to size correctly at first
 // TODO: compress quizzerator responses' saved data?
 // TODO: at narrow widths: notes & comments s/b 100% width
 // TODO: is there a resize event when scrolling on iOS and top buttons go away (so we can resize the TOC)?
@@ -338,3 +337,5 @@
 // DONE: quizzerator sorting: grading
 // DONE: quizzerator sorting: reveal answers
 // DONE: quizzerator sorting: fix arrow positions
+// TODONT: quizzerator: hotspots don't always seem to size correctly at first [not sure this is still happening]
+// DONE: quizzerator: hotspot exercises could use positive / negative click feedback
