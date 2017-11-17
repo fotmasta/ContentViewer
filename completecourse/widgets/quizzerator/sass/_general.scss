@@ -371,6 +371,18 @@ ol.quiz-holder {
 					span.entry {
 						padding-left: .5em;
 						padding-right: 50px;	// give it some width for clicking
+
+						&.textbox-style {
+							font-family: Tahoma, sans-serif;
+							color: black;
+							font-size: 13px;
+						}
+
+						&.textbox-style-medium {
+							font-family: Tahoma, sans-serif;
+							color: black;
+							font-size: 17px;
+						}
 					}
 
 					i.blinking-cursor {
@@ -385,6 +397,14 @@ ol.quiz-holder {
 
 						50% {
 							color: orange;
+						}
+					}
+				}
+
+				&[data-type="text"] {
+					div.hotspot {
+						&.revealed {
+							border: none !important;
 						}
 					}
 				}
@@ -660,6 +680,10 @@ li.question {
 .sorting-container {
 	margin-top: 2em;
 
+	code {
+		background-color: transparent;
+	}
+
 	ol.steps-holder.choices-holder {
 		list-style: none;
 
@@ -697,7 +721,7 @@ li.question {
 				border-radius: 10px;
 				background-color: #eeeeee;
 				padding: 10px 20px;
-				line-height: 1em;
+				line-height: 1.2em;
 				font-size: 14pt;
 				text-align: center;
 				width: 100%;

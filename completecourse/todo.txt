@@ -339,3 +339,7 @@
 // DONE: quizzerator sorting: fix arrow positions
 // TODONT: quizzerator: hotspots don't always seem to size correctly at first [not sure this is still happening]
 // DONE: quizzerator: hotspot exercises could use positive / negative click feedback
+// DONE: quizzerator hotspot: text input needs slots for instructions and "input" field and font info
+// DONE: quizzerator hotspot text options: prompt, prefill, hint, regex, class, placeholder [placeholder is questionable because of text selection issues]
+// DONE: quizzerator: remove border from hotspot text revealed answers
+// DONE: quizzerator: hotspot: show hint for clicking on text steps

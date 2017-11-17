@@ -124,6 +124,16 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 		console.log("analytics: " + a + " " + b + " " + c + " " + d + " " + e);
 	}
 
+	function showAndFadeCheckmark (checkmark, x, y, callback) {
+		checkmark.removeClass("fadeOut tada").hide().addClass("animated tada").css({ left: x, top: y }).show();
+		setTimeout(function () {
+			checkmark.addClass("fadeOut");
+			if (callback) {
+				callback();
+			}
+		}, 1000);
+	}
+
 	$.widget("que.quizzerator", {
 		options: {},
 
@@ -352,7 +362,7 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 			var btn = $("<button>", {class: "btn btn-primary btn-checker", text: "Check Answer"});
 			btn.click($.proxy(this.onClickCheck, this));
 			btn.appendTo(checker);
-			var lbl = $("<span>", { class: "checker-label", text: tryAgainText });
+			var lbl = $("<span>", { class: "checker-label", html: tryAgainText });
 			lbl.appendTo(checker);
 
 			var btnReveal = $("<button>", {
@@ -678,7 +688,7 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 
 			q.find(".description").text(this.data.title);
 
-			q.find(".instructions").text(q_params.instructions);
+			q.find(".instructions").html(q_params.instructions);
 
 			var ol = q.find("ol.answers-holder");
 
@@ -696,8 +706,16 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 						r.prompt = line.substr(7).trim();
 					} else if (line.indexOf("prefill:") == 0) {
 						r.prefill = line.substr(8).trim();
+					} else if (line.indexOf("hint:") == 0) {
+						r.hint = line.substr(5).trim();
+					} else if (line.indexOf("regex:") == 0) {
+						r.regex = line.substr(6).trim();
+					} else if (line.indexOf("placeholder:") == 0) {
+						r.placeholder = line.substr(12).trim();
+					} else if (line.indexOf("class:") == 0) {
+						r.class = line.substr(6).trim();
 					} else {
-						r.hint = line;
+						r.answer = line;
 					}
 				}
 
@@ -715,7 +733,7 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 
 				var props = parseExerciseActionField(step.action);
 
-				step_el.attr("data-hint", props.hint);
+				step_el.attr({ "data-hint": props.hint, "data-answer": props.answer, "data-regex": props.regex, "data-placeholder": props.placeholder });
 
 				var div = $("<div>", { class: "step" });
 				var lbl = $("<p>", { class: "step-label", text: step.label });
@@ -744,7 +762,7 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 							var s1a = $("<span>", {class: "prefill", text: props.prefill});
 							hotspot.append(s1a);
 
-							var s2 = $("<span>", { class: "entry", contenteditable: true });
+							var s2 = $("<span>", { class: "entry" + (props.class ? " " + props.class : ""), contenteditable: true, text: props.placeholder });
 							s2.on("focus", function (event) {
 								$(event.target).siblings(".prefill").addClass("has-focus");
 							});
@@ -757,6 +775,12 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 							s2.on("input", $.proxy(this.onExerciseInput, this));
 
 							hotspot.append(s2);
+
+							img_div.click($.proxy(this.onClickIncorrectArea, this));
+							img_div[0].oncontextmenu = function (event) {
+								me.onClickIncorrectArea(event);
+								return false;
+							}
 
 							break;
 						default:
@@ -795,7 +819,7 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 
 			q.addClass("sorting");
 
-			q.find(".instructions").text(q_params.instructions);
+			q.find(".instructions").html(q_params.instructions);
 
 			var mq = $("<div>", { class: "sorting-container" });
 			q.append(mq);
@@ -878,7 +902,7 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 
 				var stepBtn = $("<div>", { tabindex: 0, class: "sort-step" });
 
-				var p = $("<p>", { text: step.label });
+				var p = $("<p>", { html: step.label });
 
 				stepBtn.focus(function (event) {
 					$(event.currentTarget).parents("ol").find("li.selected").removeClass("selected");
@@ -1461,18 +1485,18 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 
 				if (totalRight == q.find(".choice").length) {
 					if (animate != false) {
-						q.find(".checker .btn-checker").removeClass("btn-primary btn-danger").addClass("btn-success animated fadeInLeft").parent().find(".checker-label").text(correctText).css("display", "inline");
+						q.find(".checker .btn-checker").removeClass("btn-primary btn-danger").addClass("btn-success animated fadeInLeft").parent().find(".checker-label").html(correctText).css("display", "inline");
 					} else {
-						q.find(".checker .btn-checker").removeClass("btn-primary btn-danger").addClass("btn-success").parent().find(".checker-label").text(correctText).css("display", "inline");
+						q.find(".checker .btn-checker").removeClass("btn-primary btn-danger").addClass("btn-success").parent().find(".checker-label").html(correctText).css("display", "inline");
 						q.find(".checker").removeClass("animated");
 					}
 
 					q.attr("data-correct", true);
 				} else {
 					if (animate != false) {
-						q.find(".checker .btn-checker").removeClass("btn-primary").addClass("btn-danger animated fadeInLeft").parent().find(".checker-label").text(tryAgainText).css("display", "inline");
+						q.find(".checker .btn-checker").removeClass("btn-primary").addClass("btn-danger animated fadeInLeft").parent().find(".checker-label").html(tryAgainText).css("display", "inline");
 					} else {
-						q.find(".checker .btn-checker").removeClass("btn-primary").addClass("btn-danger").parent().find(".checker-label").text(tryAgainText).css("display", "inline");
+						q.find(".checker .btn-checker").removeClass("btn-primary").addClass("btn-danger").parent().find(".checker-label").html(tryAgainText).css("display", "inline");
 						q.find(".checker").removeClass("animated");
 					}
 
@@ -1491,10 +1515,10 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 					chosenAnswer.parent("li").find(".correct").removeClass("hidden");
 					if (animate != false) {
 						chosenAnswer.parent("li").find(".icons").removeClass("hidden animated").hide(0).addClass("animated rollIn").show(0);
-						q.find(".checker .btn-checker").removeClass("btn-primary btn-danger").addClass("btn-success animated fadeInLeft").parent().find(".checker-label").text(correctText).css("display", "inline");
+						q.find(".checker .btn-checker").removeClass("btn-primary btn-danger").addClass("btn-success animated fadeInLeft").parent().find(".checker-label").html(correctText).css("display", "inline");
 					} else {
 						chosenAnswer.parent("li").find(".icons").removeClass("hidden animated").show(0);
-						q.find(".checker .btn-checker").removeClass("btn-primary btn-danger").addClass("btn-success").parent().find(".checker-label").text(correctText).css("display", "inline");
+						q.find(".checker .btn-checker").removeClass("btn-primary btn-danger").addClass("btn-success").parent().find(".checker-label").html(correctText).css("display", "inline");
 						q.find(".checker").removeClass("animated");
 					}
 
@@ -1511,10 +1535,10 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 					});
 					if (animate != false) {
 						chosenAnswer.parent("li").find(".icons").removeClass("hidden animated").hide(0).addClass("animated rollIn").show(0);
-						q.find(".checker .btn-checker").removeClass("btn-primary").addClass("btn-danger animated fadeInLeft").parent().find(".checker-label").text(responseText).css("display", "inline");
+						q.find(".checker .btn-checker").removeClass("btn-primary").addClass("btn-danger animated fadeInLeft").parent().find(".checker-label").html(responseText).css("display", "inline");
 					} else {
 						chosenAnswer.parent("li").find(".icons").removeClass("hidden animated").show(0);
-						q.find(".checker .btn-checker").removeClass("btn-primary").addClass("btn-danger").parent().find(".checker-label").text(responseText).css("display", "inline");
+						q.find(".checker .btn-checker").removeClass("btn-primary").addClass("btn-danger").parent().find(".checker-label").html(responseText).css("display", "inline");
 						q.find(".checker").removeClass("animated");
 					}
 
@@ -1561,10 +1585,10 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 
 					if (animate != false) {
 						q.find(".icons").removeClass("hidden animated").hide(0).addClass("animated rollIn").show(0);
-						q.find(".checker .btn-checker").removeClass("btn-primary btn-danger").addClass("btn-success animated fadeInLeft").parent().find(".checker-label").text(responseText).css("display", "inline");
+						q.find(".checker .btn-checker").removeClass("btn-primary btn-danger").addClass("btn-success animated fadeInLeft").parent().find(".checker-label").html(responseText).css("display", "inline");
 					} else {
 						q.find(".icons").removeClass("hidden animated").show(0);
-						q.find(".checker .btn-checker").removeClass("btn-primary btn-danger").addClass("btn-success").parent().find(".checker-label").text(responseText).css("display", "inline");
+						q.find(".checker .btn-checker").removeClass("btn-primary btn-danger").addClass("btn-success").parent().find(".checker-label").html(responseText).css("display", "inline");
 						q.find(".checker").removeClass("animated");
 					}
 				} else {
@@ -1573,9 +1597,9 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 
 					if (animate != false) {
 						q.find(".icons").removeClass("hidden animated").hide(0).addClass("animated rollIn").show(0);
-						q.find(".checker .btn-checker").removeClass("btn-primary").addClass("btn-danger animated fadeInLeft").parent().find(".checker-label").text(responseText).css("display", "inline");
+						q.find(".checker .btn-checker").removeClass("btn-primary").addClass("btn-danger animated fadeInLeft").parent().find(".checker-label").html(responseText).css("display", "inline");
 					} else {
-						q.find(".checker .btn-checker").removeClass("btn-primary").addClass("btn-danger").parent().find(".checker-label").text(responseText).css("display", "inline");
+						q.find(".checker .btn-checker").removeClass("btn-primary").addClass("btn-danger").parent().find(".checker-label").html(responseText).css("display", "inline");
 						q.find(".checker").removeClass("animated");
 					}
 				}
@@ -1586,10 +1610,10 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 			} else if (q.hasClass("exercise")) {
 				var hint = q.find("li.step.current").attr("data-hint");
 				if (!hint) {
-					hint = "Sorry, no hint available for this step.";
+					hint = q.find("li.step.current").attr("data-answer");
 				}
 
-				q.find(".checker-label").text(hint).css("display", "inline");
+				q.find(".checker-label").html(hint).css("display", "inline");
 			} else if (q.hasClass("sorting")) {
 				var index = q.attr("data-index");
 				var steps = q.find(".step");
@@ -1638,10 +1662,10 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 
 				if (animate != false) {
 					q.find(".icons").removeClass("hidden animated").hide(0).addClass("animated rollIn").show(0);
-					q.find(".checker .btn-checker").removeClass("btn-primary btn-danger").addClass("btn-success animated fadeInLeft").parent().find(".checker-label").text(responseText).css("display", "inline");
+					q.find(".checker .btn-checker").removeClass("btn-primary btn-danger").addClass("btn-success animated fadeInLeft").parent().find(".checker-label").html(responseText).css("display", "inline");
 				} else {
 					q.find(".icons").removeClass("hidden animated").show(0);
-					q.find(".checker .btn-checker").removeClass("btn-primary btn-danger").addClass("btn-success").parent().find(".checker-label").text(responseText).css("display", "inline");
+					q.find(".checker .btn-checker").removeClass("btn-primary btn-danger").addClass("btn-success").parent().find(".checker-label").html(responseText).css("display", "inline");
 					q.find(".checker").removeClass("animated");
 				}
 			} else {
@@ -1650,9 +1674,9 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 
 				if (animate != false) {
 					q.find(".icons").removeClass("hidden animated").hide(0).addClass("animated rollIn").show(0);
-					q.find(".checker .btn-checker").removeClass("btn-primary").addClass("btn-danger animated fadeInLeft").parent().find(".checker-label").text(responseText).css("display", "inline");
+					q.find(".checker .btn-checker").removeClass("btn-primary").addClass("btn-danger animated fadeInLeft").parent().find(".checker-label").html(responseText).css("display", "inline");
 				} else {
-					q.find(".checker .btn-checker").removeClass("btn-primary").addClass("btn-danger").parent().find(".checker-label").text(responseText).css("display", "inline");
+					q.find(".checker .btn-checker").removeClass("btn-primary").addClass("btn-danger").parent().find(".checker-label").html(responseText).css("display", "inline");
 					q.find(".checker").removeClass("animated");
 				}
 			}
@@ -1699,8 +1723,8 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 					var type = q.find(".step.current").attr("data-type");
 					q.find(".step.current .hotspot").addClass("revealed");
 					if (type == "text") {
-						var hint = q.find(".step.current").attr("data-hint");
-						q.find(".step.current span.entry").text(hint).focus();
+						var answer = q.find(".step.current").attr("data-answer");
+						q.find(".step.current span.entry").text(answer).focus();
 						q.find(".btn-reveal").removeClass("btn-danger").addClass("btn-success").text("Go to Next Step");
 					}
 					break;
@@ -2263,14 +2287,32 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 		},
 
 		showCorrectSpot: function (event, callback) {
-			var x = event.pageX, y = event.pageY;
-			var bigX = $(event.target).parents(".question").find(".correctMark");
-			bigX.removeClass("fadeOut tada").hide().addClass("animated tada").css({ left: x, top: y }).show();
-			setTimeout(function () {
-				bigX.addClass("fadeOut");
-				if (callback)
-					callback();
-			}, 1000);
+			var q = $(event.target).parents(".question");
+			var step = q.find("li.step.current");
+			var nextStep = step.next("li.step");
+
+			var callbackCalled = false;
+
+			if (nextStep.length) {
+				// if the next step is a "result" (ie, no action required), show it now before the checkmark animation
+				if (nextStep.eq(0).attr("data-type") == "result") {
+					if (callback) {
+						callbackCalled = true;
+						callback();
+						setTimeout(function () {
+							var x = event.pageX, y = event.pageY;
+							var bigX = q.find(".correctMark");
+							showAndFadeCheckmark(bigX, x, y);
+						}, 350);
+					}
+				}
+			}
+
+			if (!callbackCalled) {
+				var x = event.pageX, y = event.pageY;
+				var bigX = q.find(".correctMark");
+				showAndFadeCheckmark(bigX, x, y, callback);
+			}
 		},
 
 		onClickHotspot: function (event) {
@@ -2297,6 +2339,7 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 
 				var q = step.parents(".question");
 
+				// advance after short feedback
 				this.showCorrectSpot(event, $.proxy(this.advanceToNextExerciseStep, this, q));
 			} else {
 				this.showIncorrectSpot(event);
@@ -2315,6 +2358,14 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 			if (nextStep.length) {
 				nextStep.addClass("current");
 				step.removeClass("current");
+
+				// "result" steps auto-advance after 1.5 seconds
+				if (nextStep.attr("data-type") == "result") {
+					var me = this;
+					setTimeout(function () {
+						me.advanceToNextExerciseStep(q);
+					}, 1500);
+				}
 			} else {
 				q.attr("data-correct", true);
 
@@ -2344,8 +2395,10 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 				step.find("span.entry").prop("contenteditable", false);
 			} else {
 				if (step.length) {
+					step.find("span.entry").prop("contenteditable", true);
 					q.find(".btn-checker").removeClass("hidden");
-					step.find("span.entry").text("").focus();
+					var pl = step.attr("data-placeholder");
+					step.find("span.entry").text(pl ? pl : "").focus();
 				} else {
 					q.find(".btn-checker").addClass("hidden");
 				}
@@ -2379,9 +2432,25 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 			var entry = field.text();
 
 			var step = field.parents("li.step");
-			var answer = step.attr("data-hint");
+			var inputstring = step.attr("data-regex");
+			var answer = step.attr("data-answer");
 
-			if (entry == answer) {
+			var isCorrect = false;
+			if (inputstring) {
+				var flags = inputstring.replace(/.*\/([gimy]*)$/, '$1');
+				var pattern = inputstring.replace(new RegExp('^/(.*?)/'+flags+'$'), '$1');
+				var regex = new RegExp(pattern, flags);
+
+				if (entry.match(regex)) {
+					isCorrect = true;
+				}
+			} else {
+				if (entry == answer) {
+					isCorrect = true;
+				}
+			}
+
+			if (isCorrect) {
 				step.attr("data-correct", true);
 
 				this.saveResponses();
