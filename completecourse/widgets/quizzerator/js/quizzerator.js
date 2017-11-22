@@ -827,9 +827,15 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 			var steps = $("<ol>", {class: "steps-holder choices-holder"});
 			mq.append(steps);
 
+			var numIgnored = 0;
+
 			var availableAnswers = ["&#xf05e;"];
 			for (var i = 0; i < q_params.steps.length; i++) {
 				availableAnswers.push(i + 1);
+				var step = q_params.steps[i];
+				if (step.order === "") {
+					numIgnored++;
+				}
 			}
 
 			function saveProgress (q) {
@@ -944,14 +950,19 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 					moveUp(a, b);
 				});
 
-				var skip = $("<button class='btn btn-default'><i class='fa fa-2x fa-ban'></i></button>").appendTo(btns);
-				skip.click(function (event) {
-					var a = $(event.currentTarget).parents("li").eq(0);
-					a.toggleClass("ignored");
-					var q = a.parents(".question");
-					me.showCheckButton(q, true);
-					saveProgress(q);
-				});
+				if (numIgnored > 0) {
+					var skip = $("<button class='ignore-btn btn btn-default'><i class='fa fa-2x fa-ban'></i></button>");
+					stepBtn.append(skip);
+					skip.click(function (event) {
+						var a = $(event.currentTarget).parents("li").eq(0);
+						a.toggleClass("ignored");
+						var q = a.parents(".question");
+						me.showCheckButton(q, true);
+						saveProgress(q);
+					});
+					var lbl = $("<span>", {text: "Ignore"});
+					skip.append(lbl);
+				}
 
 				var down = $("<button class='btn btn-default'><i class='fa fa-2x fa-arrow-circle-o-down'></i></button>").appendTo(btns);
 				down.click(function (event) {

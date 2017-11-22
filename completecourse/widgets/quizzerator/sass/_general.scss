@@ -375,13 +375,19 @@ ol.quiz-holder {
 						&.textbox-style {
 							font-family: Tahoma, sans-serif;
 							color: black;
-							font-size: 13px;
+							font-size: 1.3rem;
 						}
 
 						&.textbox-style-medium {
 							font-family: Tahoma, sans-serif;
 							color: black;
-							font-size: 17px;
+							font-size: 1.8rem;
+						}
+
+						&.console-style {
+							color: #0cef57;
+							font-family: "Lucida Console", Courier, monospace;
+							font-size: 1.8rem;
 						}
 					}
 
@@ -709,6 +715,8 @@ li.question {
 			&.ignored {
 				.sort-step {
 					border-color: #c2d5de;
+					background-color: white;
+					opacity: .5;
 
 					p {
 						font-style: italic;
@@ -725,10 +733,14 @@ li.question {
 				font-size: 14pt;
 				text-align: center;
 				width: 100%;
+				display: flex;
+				flex-wrap: nowrap;
+				justify-content: space-between;
 
 				p {
 					white-space: normal;
 					margin: 0;
+					width: 100%;
 				}
 			}
 
@@ -751,6 +763,17 @@ li.question {
 					top: 0;
 					bottom: 0;
 					right: -25px;
+				}
+			}
+
+			.ignore-btn {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				padding: 3px 6px;
+
+				span {
+					font-size: 75%;
 				}
 			}
 

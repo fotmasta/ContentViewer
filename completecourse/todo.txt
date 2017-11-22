@@ -343,3 +343,5 @@
 // DONE: quizzerator hotspot text options: prompt, prefill, hint, regex, class, placeholder [placeholder is questionable because of text selection issues]
 // DONE: quizzerator: remove border from hotspot text revealed answers
 // DONE: quizzerator: hotspot: show hint for clicking on text steps
+// DONE: rework quizzerator ordering "ignore" UI
+// DONE: don't have "ignore" button if all steps are required
