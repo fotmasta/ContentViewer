@@ -1,3 +1,4 @@
+// TODO: randomize quizzerator sorting initial order?
 // TODO: compress quizzerator responses' saved data?
 // TODO: at narrow widths: notes & comments s/b 100% width
 // TODO: is there a resize event when scrolling on iOS and top buttons go away (so we can resize the TOC)?
@@ -345,3 +346,12 @@
 // DONE: quizzerator: hotspot: show hint for clicking on text steps
 // DONE: rework quizzerator ordering "ignore" UI
 // DONE: don't have "ignore" button if all steps are required
+// DONE: quizzerator exercise: allow for per-step instructions to be displayed [in the step label]
+// DONE: quizzerator exercise: don't count clicking on the text input area as "incorrect"
+// DONE: quizzerator: allow multiple possible answers [use regex]
+// DONE: quizzerator: allow for default "console graphic" image (stored in css directory)
+// DONE: re-think quizzerator exercise console input text layout and sizing (make sure it still works with textbox entry)
+// DONE: make a default hotspot for text inputs without a specific hotspot rectangle
+// DONE: quizzerator exercises: back button
+// DONE: quizzerator exercise: "reveal" button doesn't work for regex answers [text needs to be added explicitly as "answer"]
+// DONE: quizzerator exercise: delay & positive feedback for text entry

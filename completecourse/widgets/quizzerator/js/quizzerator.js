@@ -203,6 +203,8 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 
 		onWindowResize: function () {
 			this.redrawLines();
+
+			this.redrawHotspots();
 		},
 
 		onImagesLoaded: function () {
@@ -359,11 +361,12 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 			}
 
 			var checker = $("<div>", {class: "checker inactive"}).appendTo(q);
+			var container = $("<div>", { class: "hint-holder"}).appendTo(checker);
 			var btn = $("<button>", {class: "btn btn-primary btn-checker", text: "Check Answer"});
 			btn.click($.proxy(this.onClickCheck, this));
-			btn.appendTo(checker);
+			btn.appendTo(container);
 			var lbl = $("<span>", { class: "checker-label", html: tryAgainText });
-			lbl.appendTo(checker);
+			lbl.appendTo(container);
 
 			var btnReveal = $("<button>", {
 				class: "btn btn-primary btn-reveal btn-xs hidden",
@@ -714,6 +717,8 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 						r.placeholder = line.substr(12).trim();
 					} else if (line.indexOf("class:") == 0) {
 						r.class = line.substr(6).trim();
+					} else if (line.indexOf("instructions:") == 0) {
+						r.instructions = line.substr(13).trim();
 					} else {
 						r.answer = line;
 					}
@@ -736,10 +741,14 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 				step_el.attr({ "data-hint": props.hint, "data-answer": props.answer, "data-regex": props.regex, "data-placeholder": props.placeholder });
 
 				var div = $("<div>", { class: "step" });
-				var lbl = $("<p>", { class: "step-label", text: step.label });
+				var lbl = $("<p>", { class: "step-label", html: step.label });
 				div.append(lbl);
 
 				var img_div = $("<div>", { class: "image-holder" });
+
+				if (step.image && step.image.substr(0, 7) == "console") {
+					step.image = baseURL + "css/images/console.png";
+				}
 
 				var img = $("<img>", { class: "hotspot", src: step.image });
 
@@ -747,11 +756,21 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 
 				img.css("max-height", wh);
 				img_div.append(img);
-				if (step.hotspot) {
+
+				var css;
+
+				if (step.type == "text" && !step.hotspot) {
+					// default hotspot
+					css = { left: 20, top: 30, right: 50, bottom: 20 };
+				} else if (step.hotspot) {
 					var rect = step.hotspot.split(",");
-					var hotspot = $("<div>", {class: "hotspot"});
+					css = { left: rect[0] + "px", top: rect[1] + "px", width: rect[2] + "px", height: rect[3] + "px" }
+				}
+
+				if (css) {
+					hotspot = $("<div>", {class: "hotspot"});
 					hotspot.attr("data-rect", step.hotspot);
-					hotspot.css({ left: rect[0] + "px", top: rect[1] + "px", width: rect[2] + "px", height: rect[3] + "px" });
+					hotspot.css(css);
 					img_div.append(hotspot);
 
 					switch (step.type) {
@@ -776,7 +795,12 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 
 							hotspot.append(s2);
 
-							img_div.click($.proxy(this.onClickIncorrectArea, this));
+							img_div.click(function (event) {
+								if (!$(event.target).hasClass("entry")) {
+									me.onClickIncorrectArea(event);
+								}
+							});
+
 							img_div[0].oncontextmenu = function (event) {
 								me.onClickIncorrectArea(event);
 								return false;
@@ -1005,6 +1029,14 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 
 			q.find(".checker").removeClass("inactive").find(".btn-checker").text("Hint");
 			q.find(".checker .btn-reset").text("Reset Exercise");
+
+			var btnBack = $("<button>", {
+				class: "btn btn-info btn-back btn-xs"
+			}).css("display", "none");
+			$("<i>", { class: "fa fa-backward" }).appendTo(btnBack);
+			$("<span>", { text: " Go Back" }).appendTo(btnBack);
+			q.find(".checker .btn-reset").before(btnBack);
+			btnBack.click($.proxy(this.onClickBackStep, this));
 
 			q.find(".btn-reveal").removeClass("btn-primary").addClass("btn-danger");
 		},
@@ -1776,6 +1808,11 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 			analytics("send", "event", "interface", "quiz-reveal", s);
 		},
 
+		onClickBackStep: function (event) {
+			var q = $(event.currentTarget).parents(".question");
+			this.backToPreviousExerciseStep(q);
+		},
+
 		markCorrectResponses: function () {
 			var questions = this.element.find(".question");
 			for (var i = 0; i < questions.length; i++) {
@@ -2361,6 +2398,19 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 			return false;
 		},
 
+		backToPreviousExerciseStep: function (q) {
+			var step = q.find("li.step.current");
+
+			var prevStep = step.prev("li.step");
+
+			if (prevStep.length) {
+				prevStep.addClass("current");
+				step.removeClass("current");
+
+				this.resetExerciseControls(q);
+			}
+		},
+
 		advanceToNextExerciseStep: function (q) {
 			var step = q.find("li.step.current");
 
@@ -2399,6 +2449,9 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 			q.find(".btn-reveal").removeClass("btn-success").addClass("btn-danger").text("Reveal Answer");
 
 			var step = q.find("li.step.current");
+
+			var prevStep = step.prev("li.step");
+			q.find(".btn-back").css("display", prevStep.length ? "block" : "none");
 
 			if (q.attr("data-correct")) {
 				// all done; freeze on last step
@@ -2468,9 +2521,10 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 
 				var q = field.parents(".question");
 
-				this.advanceToNextExerciseStep(q);
+				//this.advanceToNextExerciseStep(q);
+				this.showCorrectSpot(event, $.proxy(this.advanceToNextExerciseStep, this, q));
 			} else {
-				if (entry.length >= answer.length) {
+				if (entry && answer && entry.length >= answer.length) {
 					this.onClickCheck(event);
 				}
 			}

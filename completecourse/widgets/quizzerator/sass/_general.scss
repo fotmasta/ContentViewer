@@ -257,7 +257,7 @@ ol.quiz-holder {
 
 	.checker {
 		display: flex;
-		justify-content: flex-start;
+		justify-content: flex-end;
 		align-items: center;
 
 		margin-top: .5em;
@@ -277,13 +277,25 @@ ol.quiz-holder {
 			text-indent: -8px;
 		}
 
-		.btn-reveal, .btn-reset {
-			margin-left: auto;
+		.hint-holder {
+			margin-right: auto;
+		}
 
-			/*
-				margin-top: 10px;
-				margin-left: 10px;
-			*/
+		.btn-reveal {
+			margin-left: auto;
+			margin-right: 10px;
+		}
+
+		span.checker-label {
+
+		}
+
+		.btn-reset {
+//			margin-left: auto;
+		}
+
+		.btn-back {
+			margin-right: 10px;
 		}
 	}
 
@@ -302,14 +314,19 @@ ol.quiz-holder {
 		}
 
 		p.step-label {
+			/*
 			text-transform: uppercase;
-			font-weight: bold;
+			font-weight: bold;*/
+			text-indent: -40px;
+			margin-left: 40px;
 			margin-top: 10px;
 
+			/*
 			&:after {
 				content: ":";
 				display: inline;
 			}
+			*/
 		}
 
 		ol.answers-holder {
@@ -359,6 +376,7 @@ ol.quiz-holder {
 					span.prompt {
 						user-select: none;
 						cursor: default;
+						white-space: nowrap;
 					}
 
 					span.prefill {
@@ -739,7 +757,7 @@ li.question {
 
 				p {
 					white-space: normal;
-					margin: 0;
+					margin: 0 10px 0 0;
 					width: 100%;
 				}
 			}
