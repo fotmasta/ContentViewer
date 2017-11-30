@@ -115,9 +115,9 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 	var correctText = "That's correct!";
 
 	function analytics () {
-		ga.apply(this, arguments);
+		//ga.apply(this, arguments);
 
-		//just_log.apply(this, arguments);
+		just_log.apply(this, arguments);
 	}
 
 	function just_log (a, b, c, d, e) {
@@ -719,6 +719,8 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 						r.class = line.substr(6).trim();
 					} else if (line.indexOf("instructions:") == 0) {
 						r.instructions = line.substr(13).trim();
+					} else if (line.indexOf("auto:") == 0) {
+						r.auto = line.substr(5).trim();
 					} else {
 						r.answer = line;
 					}
@@ -738,7 +740,7 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 
 				var props = parseExerciseActionField(step.action);
 
-				step_el.attr({ "data-hint": props.hint, "data-answer": props.answer, "data-regex": props.regex, "data-placeholder": props.placeholder });
+				step_el.attr({ "data-hint": props.hint, "data-answer": props.answer, "data-regex": props.regex, "data-placeholder": props.placeholder, "data-auto": props.auto });
 
 				var div = $("<div>", { class: "step" });
 				var lbl = $("<p>", { class: "step-label", html: step.label });
@@ -759,7 +761,7 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 
 				var css;
 
-				if (step.type == "text" && !step.hotspot) {
+				if ((step.type == "text" || step.type == "text_result") && !step.hotspot) {
 					// default hotspot
 					css = { left: 20, top: 30, right: 50, bottom: 20 };
 				} else if (step.hotspot) {
@@ -775,7 +777,8 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 
 					switch (step.type) {
 						case "text":
-							var s1 = $("<span>", { class: "prompt", text: props.prompt });
+						case "text_result":
+							var s1 = $("<span>", { class: "prompt", html: props.prompt });
 							hotspot.append(s1);
 
 							var s1a = $("<span>", {class: "prefill", text: props.prefill});
@@ -792,6 +795,7 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 									me.onExerciseInput(event);
 							});
 							s2.on("input", $.proxy(this.onExerciseInput, this));
+							s2.on("keydown", $.proxy(this.onExerciseKeyDown, this));
 
 							hotspot.append(s2);
 
@@ -1801,11 +1805,15 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 			var q = $(event.currentTarget).parents(".question");
 			var index = q.attr("data-index");
 
-			this.revealAnswer(q, index);
+			if ($(event.currentTarget).text() == "Go to Next Step") {
+				this.advanceToNextExerciseStep(q);
+			} else {
+				this.revealAnswer(q, index);
 
-			// ANALYTICS
-			var s = this.getQuestionIDandResponses(q);
-			analytics("send", "event", "interface", "quiz-reveal", s);
+				// ANALYTICS
+				var s = this.getQuestionIDandResponses(q);
+				analytics("send", "event", "interface", "quiz-reveal", s);
+			}
 		},
 
 		onClickBackStep: function (event) {
@@ -2343,7 +2351,8 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 
 			if (nextStep.length) {
 				// if the next step is a "result" (ie, no action required), show it now before the checkmark animation
-				if (nextStep.eq(0).attr("data-type") == "result") {
+				var nextSlideType = nextStep.eq(0).attr("data-type");
+				if (nextSlideType == "result" || nextSlideType == "text_result") {
 					if (callback) {
 						callbackCalled = true;
 						callback();
@@ -2420,12 +2429,18 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 				nextStep.addClass("current");
 				step.removeClass("current");
 
+				var delay = undefined;
+				if (nextStep.attr("data-type") == "result")
+					delay = 1500;
+				else if (nextStep.attr("data-type") == "text_result")
+					delay = 3000;
+
 				// "result" steps auto-advance after 1.5 seconds
-				if (nextStep.attr("data-type") == "result") {
+				if (delay)  {
 					var me = this;
 					setTimeout(function () {
 						me.advanceToNextExerciseStep(q);
-					}, 1500);
+					}, delay);
 				}
 			} else {
 				q.attr("data-correct", true);
@@ -2491,7 +2506,14 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 			this.onClickCheck(event);
 		},
 
-		onExerciseInput: function (event) {
+		onExerciseKeyDown: function (event) {
+			if (event.keyCode == 13) {
+				this.onExerciseInput(event, true);
+				event.preventDefault();
+			}
+		},
+
+		onExerciseInput: function (event, checkNow) {
 			var field = $(event.target);
 			var entry = field.text();
 
@@ -2499,10 +2521,12 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 			var inputstring = step.attr("data-regex");
 			var answer = step.attr("data-answer");
 
+			var advanceWithoutReturn = step.attr("data-auto");
+
 			var isCorrect = false;
 			if (inputstring) {
 				var flags = inputstring.replace(/.*\/([gimy]*)$/, '$1');
-				var pattern = inputstring.replace(new RegExp('^/(.*?)/'+flags+'$'), '$1');
+				var pattern = inputstring.replace(new RegExp('^/(.*?)/' + flags + '$'), '$1');
 				var regex = new RegExp(pattern, flags);
 
 				if (entry.match(regex)) {
@@ -2514,19 +2538,30 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 				}
 			}
 
-			if (isCorrect) {
-				step.attr("data-correct", true);
+			if (checkNow || advanceWithoutReturn) {
+				if (isCorrect) {
+					step.attr("data-correct", true);
 
-				this.saveResponses();
+					this.saveResponses();
 
-				var q = field.parents(".question");
+					var q = field.parents(".question");
 
-				//this.advanceToNextExerciseStep(q);
-				this.showCorrectSpot(event, $.proxy(this.advanceToNextExerciseStep, this, q));
-			} else {
-				if (entry && answer && entry.length >= answer.length) {
-					this.onClickCheck(event);
+					this.showCorrectSpot(event, $.proxy(this.advanceToNextExerciseStep, this, q));
 				}
+			}
+
+			if (!isCorrect) {
+				if (entry && answer && ( checkNow || (entry.length >= answer.length) )) {
+					this.onClickCheck(event);
+
+					if (checkNow) {
+						this.showIncorrectSpot(event);
+					}
+				}
+			}
+
+			if (checkNow) {
+				return isCorrect;
 			}
 		},
 

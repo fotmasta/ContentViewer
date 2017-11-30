@@ -355,3 +355,7 @@
 // DONE: quizzerator exercises: back button
 // DONE: quizzerator exercise: "reveal" button doesn't work for regex answers [text needs to be added explicitly as "answer"]
 // DONE: quizzerator exercise: delay & positive feedback for text entry
+// DONE: quizzerator exercise: allow for text step "result" screens
+// DONE: quizzerator exercise: require Return for text (by default)? [but have 'auto' option for text completion without return]
+// DONE: quizzerator: "go on to next step" button isn't working anymore [required Return]
+// DONE: quizzerator: blinky cursor arrow has gone missing [clipped by overflow-y]

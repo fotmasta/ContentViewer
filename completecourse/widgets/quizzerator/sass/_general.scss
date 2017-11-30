@@ -359,6 +359,7 @@ ol.quiz-holder {
 					div.hotspot {
 						position: absolute;
 						box-sizing: border-box;
+						overflow-y: hidden;
 
 						&.revealed {
 							border: 3px dashed red;
@@ -376,7 +377,6 @@ ol.quiz-holder {
 					span.prompt {
 						user-select: none;
 						cursor: default;
-						white-space: nowrap;
 					}
 
 					span.prefill {
@@ -439,12 +439,12 @@ ol.quiz-holder {
 			span.prefill {
 				// NOTE: placed icon pointer here because when it was on span.entry it somehow blocked the text cursor
 				&:not(.has-focus):after {
-					content: "\f063";
+					content: "\f062";
 					font-family: "FontAwesome";
 					display: inline;
 					position: absolute;
 					top: 0;
-					transform: translateY(-75%);
+					transform: translateY(75%);
 					animation: 1s blinkie step-end infinite;
 				}
 			}
