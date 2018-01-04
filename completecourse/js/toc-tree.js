@@ -230,6 +230,10 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 		_create: function () {
 			this.holder = this.element.find(".toc-holder");
 
+			var me = this;
+
+			this.holder.on("keydown", $.proxy(this.onKeyboardNavigation, this));
+
 			this.refresh();
 
 			if (this.options.expander)
@@ -319,7 +323,7 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 				d.node.depth = depth;
 				d.node.index = index;
 
-				li = $("<li>", { class: "toc-tabstop", tabindex: 10, role: "treeitem" });
+				li = $("<li>", { class: "toc-tabstop", tabindex: -1, role: "treeitem" });
 				dest.append(li);
 
 				if (d && d.children && d.children.length > 0) {
@@ -327,7 +331,7 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 					li.append(lbl);
 					linkholder = lbl;
 
-					var dropper = $("<i>", { class: "dropper opened fa fa-caret-down", tabindex: 10 });
+					var dropper = $("<i>", { class: "dropper opened fa fa-caret-down" });
 					dropper.click(toggleDropper);
 					dropper.keydown(function (event) {
 						if (event.keyCode == 13 || event.keyCode == 32) {
@@ -336,7 +340,7 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 					});
 					linkholder.append(dropper);
 
-					dropper = $("<i>", { class: "dropper closed fa fa-caret-right", tabindex: 10 });
+					dropper = $("<i>", { class: "dropper closed fa fa-caret-right" });
 					dropper.click(toggleDropper);
 					dropper.keydown(function (event) {
 						if (event.keyCode == 13 || event.keyCode == 32) {
@@ -359,7 +363,7 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 
 				li.attr("data-index", index);
 
-				var a = $("<a>").attr( { href: d.node.href, "aria-describedby": "progress" + index });
+				var a = $("<a>").attr( { href: d.node.href });
 
 				var entry_text = d.node.desc;
 
@@ -794,6 +798,8 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 			var checked = el.find("> i.checked");
 			checked.remove();
 
+			el.find("a").first().attr("aria-describedby", "progress" + index);
+
 			el.append("<i id='progress" + index + "' class='checked fa fa-adjust fa-flip-horizontal' title='Progress started.' aria-label='Section started' role='status'></i>");
 		},
 
@@ -809,6 +815,8 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 			//var checked = a.find("i.checked");
 			var checked = el.find("> i.checked");
 			checked.remove();
+
+			el.find("a").first().attr("aria-describedby", "progress" + index);
 
 			// use half-circle to show that some children still need to be completed
 			if (el.find("ul li").length) {
@@ -850,6 +858,8 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 			var checked = el.find("> i.checked");
 			checked.remove();
 
+			el.find("a").first().attr("aria-describedby", "progress" + index);
+
 			el.append("<i id='progress" + index + "' class='checked fa fa-adjust fa-flip-horizontal' title='Progress started.' aria-label='Section started' role='status'></i>");
 
 			a.removeClass("completed");
@@ -859,6 +869,8 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 			var el = this.holder.find("[data-index=" + index + "]");
 			var checked = el.find("> i.checked");
 			checked.remove();
+
+			el.find("a").first().attr("aria-describedby", null);
 
 			var a = el.find("> label a span.desc, > a span.desc, a span.desc");
 			a.removeClass("completed");
@@ -1011,6 +1023,79 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 			var t = s.scrollTop() + s.innerHeight();
 			var h = s[0].scrollHeight;
 			if ( (t >= h && event.originalEvent.deltaY > 0) || (s.scrollTop() <= 0 && event.originalEvent.deltaY < 0) ) {
+				event.preventDefault();
+			}
+		},
+
+		// go to next visible child, sibling, or uncle (in that order)
+		getNextVisibleTreeItem: function (link) {
+			var index = parseInt(link.attr("data-index"));
+			var holder = link.parents(".toc-holder");
+
+			for (var i = index + 1; i < this.options.data.length; i++) {
+				var next = holder.find("[data-index=" + i + "]");
+				if (next.length && next.is(":visible")) {
+					return next;
+				}
+			}
+		},
+
+		getPrevVisibleTreeItem: function (link) {
+			var index = parseInt(link.attr("data-index"));
+			var holder = link.parents(".toc-holder");
+
+			if (index == 0) index = this.options.data.length;
+
+			for (var i = index - 1; i >= 0; i--) {
+				var prev = holder.find("[data-index=" + i + "]");
+				if (prev.length && prev.is(":visible")) {
+					return prev;
+				}
+			}
+		},
+
+		onKeyboardNavigation: function (event) {
+			var handled = false;
+			var link = $(event.currentTarget).find("li:focus");
+
+			switch (event.keyCode) {
+				case 38:
+					var prev = this.getPrevVisibleTreeItem(link);
+					if (prev) prev.focus();
+					else {
+						var a = $(event.currentTarget).find("li").first();
+						a.focus();
+					}
+
+					handled = true;
+					break;
+				case 40:
+					var next = this.getNextVisibleTreeItem(link);
+					if (next) next.focus();
+					else {
+						var a = $(event.currentTarget).find("li").first();
+						a.focus();
+					}
+
+					handled = true;
+					break;
+				case 37:
+					var tree = link.children("ul.tree");
+					tree.hide(0);
+					refreshDropperStatus(link, false);
+
+					handled = true;
+					break;
+				case 39:
+					var tree = link.children("ul.tree");
+					tree.show(0);
+					refreshDropperStatus(link, false);
+
+					handled = true;
+					break;
+			}
+
+			if (handled) {
 				event.preventDefault();
 			}
 		}

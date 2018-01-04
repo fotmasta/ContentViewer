@@ -584,11 +584,11 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 		if (contentsVisible) {
 			$("#contents").removeClass("col-xs-0").addClass("col-xs-" + contentsSize);
 			$("#contents-pane").attr( { "aria-hidden": false }).css( { "visibility": "visible", display: "block",  } );
-			$("#contents .toc-tabstop").attr("tabindex", 10);
+			//$("#contents .toc-tabstop").attr("tabindex", 10);
 		} else {
 			$("#contents").removeClass("col-xs-3").addClass("col-xs-0");
 			$("#contents-pane").attr( { "aria-hidden": true }).css( { visibility: "hidden", display: "none" } );
-			$("#contents .toc-tabstop").attr("tabindex", -1);
+			//$("#contents .toc-tabstop").attr("tabindex", -1);
 
 			//$(".toc#contents-pane").TOCTree("closeSearch");
 		}
