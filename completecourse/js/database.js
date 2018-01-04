@@ -2,6 +2,20 @@ define(["common"], function (Common) {
 	var masterURL = "https://memberservices.informit.com/";
 
 	function shrink (itemsArray) {
+		// bitwise method:
+		var s = number_to_32bits(itemsArray.length);
+		for (var i = 0; i < itemsArray.length; i++) {
+			var it = itemsArray[i];
+			if (it.completed) s.push(1, 1);
+			else if (it.started) s.push(0, 1);
+			else s.push(0, 0);
+		}
+
+		st = "~" + bitwise_compress(s);
+
+		return st;
+
+		/* lzw method:
 		var s = [];
 		for (var i = 0; i < itemsArray.length; i++) {
 			var it = itemsArray[i];
@@ -18,9 +32,12 @@ define(["common"], function (Common) {
 		st = "*" + lzw_encode(st);
 
 		return st;
+		*/
 	}
 
 	function unshrink (st) {
+		var itemsArray = [];
+
 		// * = lzw-compressed
 		if (st[0] === "*") {
 			console.log("items compressed " + st.length);
@@ -28,16 +45,88 @@ define(["common"], function (Common) {
 			console.log("items uncompressed " + st.length);
 		}
 
-		var itemsArray = [];
-		var n = st.length / 2;
-		for (var i = 0; i < n; i++) {
-			var obj = {
-				started: st[i*2] == "s",
-				completed: st[i*2+1] == "c"
-			};
-			itemsArray[i] = obj;
+		// ~ = bitwised
+		if (st[0] === "~") {
+			console.log("items bitwised " + st.length);
+			st = bitwise_expand(st.substr(1));
+			console.log("items unbitwised " + st.length);
+			var length = bits32_to_number(st.splice(0, 32));
+			for (var i = 0; i < length; i++) {
+				var n = st.splice(0, 2);
+				obj = { started: false, completed: false };
+				if (n[0] == 1) {
+					obj.started = obj.completed = true;
+				} else if (n[1] == 1) {
+					obj.started = true;
+				}
+				itemsArray[i] = obj;
+			}
+		} else {
+			var n = st.length / 2;
+			for (var i = 0; i < n; i++) {
+				var obj = {
+					started: st[i * 2] == "s",
+					completed: st[i * 2 + 1] == "c"
+				};
+				itemsArray[i] = obj;
+			}
 		}
+
 		return itemsArray;
+	}
+
+	function number_to_32bits (n) {
+		var r = [];
+		for (var i = 31; i >= 0; i--) {
+			if (n & Math.pow(2, i))
+				r.push(1);
+			else
+				r.push(0);
+		}
+		return r;
+	}
+
+	function bits32_to_number (s) {
+		var n = 0;
+		for (var i = 0; i < 32; i++) {
+			var c = s[i];
+			if (c) n += Math.pow(2, 31 - i);
+		}
+		return n;
+	}
+
+	function bitwise_compress (s) {
+		var st = "";
+		var c = 0;
+		var n = 7;
+		for (var i = 0; i < s.length; i++) {
+			var d = s[i];
+			if (d)
+				c += (d * Math.pow(2, n));
+			n--;
+			if (n < 0 || i === s.length - 1) {
+				st += String.fromCharCode(c);
+				n = 7;
+				c = 0;
+			}
+		}
+		return st;
+	}
+
+	function bitwise_expand (s) {
+		var ar = [];
+		for (var i = 0; i < s.length; i++) {
+			for (var j = 7; j >= 0; j--) {
+				var c = s.charCodeAt(i);
+				if (c & Math.pow(2, j)) {
+					ar.push(1);
+				} else {
+					ar.push(0);
+				}
+			}
+		}
+
+		return ar;
 	}
 
 	// FROM: https://gist.github.com/revolunet/843889
