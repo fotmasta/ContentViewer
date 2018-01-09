@@ -6,8 +6,8 @@ define(["common"], function (Common) {
 		var s = number_to_32bits(itemsArray.length);
 		for (var i = 0; i < itemsArray.length; i++) {
 			var it = itemsArray[i];
-			if (it.completed) s.push(1, 1);
-			else if (it.started) s.push(0, 1);
+			if (it && it.completed) s.push(1, 1);
+			else if (it && it.started) s.push(0, 1);
 			else s.push(0, 0);
 		}
 
