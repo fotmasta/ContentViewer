@@ -738,6 +738,10 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 
 				step_el.attr("data-type", step.type);
 
+				if (step.type == "result" || step.type == "text_result") {
+					step_el.attr("data-correct", true);
+				}
+
 				var props = parseExerciseActionField(step.action);
 
 				step_el.attr({ "data-hint": props.hint, "data-answer": props.answer, "data-regex": props.regex, "data-placeholder": props.placeholder, "data-auto": props.auto });
@@ -2057,9 +2061,11 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 								break;
 							case "exercise":
 								if (resp.indexOf(null) !== -1) {
-									// not done yet
+									// not done yet, have to start from the beginning
 								} else {
 									q.attr("data-correct", true);
+									this.setExerciseStepsToCorrect(q);
+									this.gotoLastExerciseStep(q);
 								}
 								break;
 							case "sorting":
@@ -2418,6 +2424,24 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 
 				this.resetExerciseControls(q);
 			}
+		},
+
+		gotoLastExerciseStep: function (q) {
+			var step = q.find("li.step.current");
+
+			var lastStep = q.find("li.step").last();
+
+			if (lastStep.length) {
+				lastStep.addClass("current");
+				step.removeClass("current");
+
+				this.resetExerciseControls(q);
+			}
+		},
+
+		setExerciseStepsToCorrect: function (q) {
+			var steps = q.find("li.step");
+			steps.attr("data-correct", true);
 		},
 
 		advanceToNextExerciseStep: function (q) {

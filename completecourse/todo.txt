@@ -359,3 +359,5 @@
 // DONE: quizzerator exercise: require Return for text (by default)? [but have 'auto' option for text completion without return]
 // DONE: quizzerator: "go on to next step" button isn't working anymore [required Return]
 // DONE: quizzerator: blinky cursor arrow has gone missing [clipped by overflow-y]
+// DONE: quizzerator exercise: result steps automatically count as correct [to help mark re-loaded attempts as correct]
+// DONE: quizzerator exercise: for correct reloaded attempts, show the last step
