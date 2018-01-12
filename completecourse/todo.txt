@@ -1,3 +1,4 @@
+// TODO: quizzerator exercise: going to a "result" type advances a little too quickly
 // TODO: randomize quizzerator sorting initial order?
 // TODO: compress quizzerator responses' saved data?
 // TODO: at narrow widths: notes & comments s/b 100% width

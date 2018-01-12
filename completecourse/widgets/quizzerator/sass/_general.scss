@@ -237,12 +237,19 @@ $incorrect-color: #d9534f;
 		margin-right: 7px;
 		margin-left: 7px;
 	}
+
+	table#intro {
+		&, th, td {
+			border: 1px solid black;
+			padding: 8px;
+		}
+
+		margin-bottom: 30px;
+	}
 }
 
 ol.quiz-holder {
-	li {
-		font-size: 1.5em;
-	}
+	font-size: 1.5em;
 
 	li:not(.single-view) {
 		// don't number quizzes with only 1 question
@@ -400,6 +407,19 @@ ol.quiz-holder {
 							font-family: Tahoma, sans-serif;
 							color: black;
 							font-size: 1.8rem;
+						}
+
+						&.textbox-style-windows {
+							font-family: Verdana, sans-serif;
+							color: black;
+							font-size: 1.0rem;
+						}
+
+						&.textbox-style-password {
+							font-family: Verdana, sans-serif;
+							color: black;
+							font-size: 1.0rem;
+							-webkit-text-security: disc;
 						}
 
 						&.console-style {

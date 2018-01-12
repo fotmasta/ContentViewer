@@ -2458,6 +2458,8 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 					delay = 1500;
 				else if (nextStep.attr("data-type") == "text_result")
 					delay = 3000;
+				else if (nextStep.attr("data-type") == "delay")
+					delay = 6000;
 
 				// "result" steps auto-advance after 1.5 seconds
 				if (delay)  {
