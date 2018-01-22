@@ -67,7 +67,7 @@ body.skin-Microsoft {
     body.skin-Microsoft .btn-primary:hover, body.skin-Microsoft .btn-primary:active, body.skin-Microsoft .btn-info:hover, body.skin-Microsoft .btn-info:active {
       background-color: #0096ff; }
   body.skin-Microsoft .nav-list li:focus {
-    outline: auto; }
+    outline: thin solid invert; }
   body.skin-Microsoft #query {
     height: 32px;
     border: none; }

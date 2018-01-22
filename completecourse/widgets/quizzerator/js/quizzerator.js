@@ -216,11 +216,16 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 		onLoadedData: function (data) {
 			this.data = data;
 
-			if (this.options.desc) {
-				this.element.find("h3.quiz-title .contents").text(this.options.desc);
-			} else if (this.data.title) {
-				this.element.find("h3.quiz-title .contents").text(this.data.title);
+			var preferredTitle = "";
+
+			// not sure if we always want to grab the data.title first ...
+			if (data.questionType == "matching") {
+				preferredTitle = this.data.title ? this.data.title : this.options.desc;
+			} else {
+				preferredTitle = this.options.desc ? this.options.desc : this.data.title;
 			}
+
+			this.element.find("h3.quiz-title .contents").text(preferredTitle);
 
 			if (this.data.reviewableAfterEach !== undefined) {
 				this.options.settings.reviewableAfterEach = (String(this.data.reviewableAfterEach) == "true");
