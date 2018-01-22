@@ -321,7 +321,7 @@ define(["database", "jquery.ui", "bootstrap-confirmation"], function (Database) 
 		getTitleForISBN: function (isbn, callback) {
 			var t = lookForTitleLocally(isbn);
 
-			if (t === undefined) {
+			if (t === undefined || t === "pending") {
 				saveTitleLocally(isbn, "pending");
 				callback("pending");
 
