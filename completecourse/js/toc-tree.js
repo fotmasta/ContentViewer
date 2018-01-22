@@ -208,6 +208,15 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 		});
 	}
 
+	function makeSelected (el) {
+		var prev = $(".hit.selected");
+		if (prev.length) {
+			prev.removeClass("selected").attr("aria-label", prev.data("label"));
+		}
+
+		$(el).addClass("selected").attr("aria-label", $(el).data("label") + " selected");
+	}
+
 	function MakeAShortLabelForSearchResults (node) {
 		var depths = node.node.depth.slice();
 		var short = getShortLabel(node.node);
@@ -643,20 +652,18 @@ define(["lunr", "jquery.ui", "jquery.highlight"], function (lunr) {
 					var label = MakeAShortLabelForSearchResults(node);
 					var section_label = " <p class='section-label'>" + label + "</p>";
 					var hit_label = "<p class='hit-label'>" + hit.desc + "</p>";
-					var hitResult = $("<div>", {class: "hit", tabindex: 0, html: section_label + hit_label}).data("index", index).attr("role", "link");
+					var hitResult = $("<div>", {class: "hit", tabindex: 0, html: section_label + hit_label}).data( { "index": index, label: hit.desc } ).attr( { "role": "link", "aria-label": hit.desc } );
 					var me = this;
 					hitResult.click(function (event) {
 						var index = $(this).data("index");
 						me.launchVideo(index, { highlight: term }, event);
-						$(".hit.selected").removeClass("selected");
-						$(this).addClass("selected");
+						makeSelected(this);
 					});
 					hitResult.keypress(function (event) {
 						if (event.keyCode != 9) {
 							var index = $(this).data("index");
 							me.launchVideo(index, {highlight: term}, event);
-							$(".hit.selected").removeClass("selected");
-							$(this).addClass("selected");
+							makeSelected(this);
 						}
 					});
 					$(".search-result-list").append(hitResult);

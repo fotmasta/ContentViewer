@@ -250,9 +250,17 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 		if ($("#contents").hasClass("col-xs-0") || $("#contents-pane").css("visibility") === "hidden") {
 			$("#toc-toggler").removeClass("open").attr("aria-expanded", false);
 			$("#contents").attr("aria-expanded", false);
+
+			if (manifest.skin == "Microsoft") {
+				$(".search-button").attr("aria-expanded", $("#search-results-panel").data("state-open"));
+			}
 		} else {
 			$("#toc-toggler").addClass("open").attr("aria-expanded", true);
 			$("#contents").attr("aria-expanded", true);
+
+			if (manifest.skin == "Microsoft") {
+				$(".search-button").attr("aria-expanded", $("#search-results-panel").data("state-open"));
+			}
 		}
 	}
 
@@ -615,6 +623,8 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 		//var contentsVisible = !$("#contents").hasClass("col-xs-0");
 		var resourcesVisible = $("#sidebar").is(":visible");
 
+		$("#search-results-panel").data("state-open", false);
+
 		resizePanes(contentsPaneDesiredVisible, resourcesVisible);
 
 		//$("#contents .scroller").toggle("slide");
@@ -670,34 +680,47 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 
 			$(".toc#contents-pane").TOCTree("search", term);
 		} else {
-			$("#toc-toggler").removeClass("open").attr("aria-expanded", false);
+			var isOpen = $("#search-results-panel").attr("aria-expanded");
 
-			contentsPaneDesiredVisible = true;
+			if (manifest.skin != "Microsoft" || isOpen != "true") {
+				$("#search-results-panel").data("state-open", true);
 
-			resizePanes(false, false);
+				$("#toc-toggler").removeClass("open").attr("aria-expanded", false);
 
-			$("#contents-pane").attr({"aria-hidden": true}).css({visibility: "hidden", display: "none"});
-			$("#contents .toc-tabstop").attr("tabindex", -1);
+				if (manifest.skin == "Microsoft") {
+					$(".search-button").attr("aria-expanded", true);
+				}
 
-			onResize();
+				contentsPaneDesiredVisible = true;
 
-			var term = $("#query").val();
+				resizePanes(false, false);
 
-			$("#query-too").val(term);
+				$("#contents-pane").attr({"aria-hidden": true}).css({visibility: "hidden", display: "none"});
+				$("#contents .toc-tabstop").attr("tabindex", -1);
 
-			$(".toc#contents-pane").TOCTree("showSearchPane");
+				onResize();
 
-			var reservedTop = 50;
+				var term = $("#query").val();
 
-			if (manifest.navbar == false) {
-				reservedTop = 0;
+				$("#query-too").val(term);
+
+				$(".toc#contents-pane").TOCTree("showSearchPane");
+
+				var reservedTop = 50;
+
+				if (manifest.navbar == false) {
+					reservedTop = 0;
+				}
+
+				setTimeout(function () {
+					var wh = $(window).outerHeight();
+					var hh_search = reservedTop + $("#search-header").outerHeight();
+					$("#search-results-panel .scroller").height(wh - hh_search);
+				}, 500);
+			} else if (manifest.skin == "Microsoft") {
+				$("#search-results-panel").data("state-open", false);
+				onCloseSearch();
 			}
-
-			setTimeout(function () {
-				var wh = $(window).outerHeight();
-				var hh_search = reservedTop + $("#search-header").outerHeight();
-				$("#search-results-panel .scroller").height(wh - hh_search);
-			}, 500);
 		}
 	}
 
@@ -716,6 +739,14 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 	function onCloseSearch () {
 		$(".toc#contents-pane").TOCTree("closeSearch");
 
+		$("#search-results-panel").data("state-open", false);
+
+		/*
+		if (manifest.skin == "Microsoft") {
+			$(".search-button").attr("aria-expanded", false);
+		}
+		*/
+
 		//$(".toc").show("slide");
 
 		if ($("#toc-toggler").hasClass("open")) {
@@ -726,6 +757,8 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 		}
 
 		onResize();
+
+		$("#search-results-panel").data("state-open", false);
 	}
 
 	function onClearSearch () {
@@ -813,6 +846,7 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 				$("#show-comments-button").hide(0).attr( { "aria-hidden": true, "hidden": true  });
 				$("#show-notes-button").hide(0).attr( { "aria-hidden": true, "hidden": true  });
 				$("#account-button").hide(0).attr( { "aria-hidden": true, "hidden": true  });
+				$(".search-button").attr( { "aria-expanded": false });
 				$("#clear-search-button").hide(0).attr( { "aria-hidden": true, "hidden": true  });
 				$("#query").hide(0).attr( { "aria-hidden": true, "hidden": true  });
 				$("#comments-panel").attr( { "aria-hidden": true, "hidden": true  });

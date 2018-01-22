@@ -45,7 +45,7 @@
 				<div class="course-progress">
 					<button id="collapse-button" tabindex=3 title="Expand or collapse contents list." class="btn btn-primary btn-xs pull-left"><i class="fa fa-lg fa-caret-up"></i></button>
 					<div class="progress" data-progress="0% Complete">
-						<div id="completed-progress" class="progress-bar progress-bar-warning" role="progressbar" role="status" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%">
+						<div id="completed-progress" class="progress-bar progress-bar-warning" role="progressbar" role="status" style="width: 0%">
 						</div>
 						<div id="accessible-progress" class="off-screen">0% Complete</div>
 					</div>
@@ -72,7 +72,7 @@
 						<div class="input-group form-control">
 						<div class="btn-toolbar pull-right" role="toolbar">
 							<div class="btn-group" role="group">
-								<span title="Number of search results" id="hit-count">15 results</span>
+								<span title="Number of search results" id="hit-count" aria-live="polite">15 results</span>
 							</div>
 							<div class="btn-group btn-group-sm" role="group">
 								<button type="button" title="Go to the previous search result." id="search-previous" class="btn btn-info">

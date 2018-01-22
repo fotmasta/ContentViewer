@@ -971,7 +971,7 @@ define(["bootstrap-dialog", "database", "imagesloaded", "common", "bootstrap-not
 
 		updateProgress: function () {
 			var pct = Math.round(Database.getPercentageComplete() * 100);
-			$("#completed-progress").css("width", pct + "%").attr("aria-valuenow", pct);
+			$("#completed-progress").css("width", pct + "%");//.attr("aria-valuenow", pct);
 			// this is used by .progress::after (works on all browsers?)
 			$(".progress").attr("data-progress", pct + "% Complete");
 			$("#accessible-progress").text(pct + "% Complete");
