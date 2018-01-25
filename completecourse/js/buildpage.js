@@ -693,7 +693,7 @@ define(["jquery", "video-manager", "video-overlay", "toc-tree", "videojs", "popc
 
 				contentsPaneDesiredVisible = true;
 
-				resizePanes(false, false);
+				resizePanes(true, false);
 
 				$("#contents-pane").attr({"aria-hidden": true}).css({visibility: "hidden", display: "none"});
 				$("#contents .toc-tabstop").attr("tabindex", -1);
