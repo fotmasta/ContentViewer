@@ -1,3 +1,4 @@
+// TODO: quizzerator exercise: allow images to be referenced (ie, reuse "slide3" instead of a new bitmap)
 // TODO: quizzerator exercise: going to a "result" type advances a little too quickly
 // TODO: randomize quizzerator sorting initial order?
 // TODO: compress quizzerator responses' saved data?
@@ -362,3 +363,6 @@
 // DONE: quizzerator: blinky cursor arrow has gone missing [clipped by overflow-y]
 // DONE: quizzerator exercise: result steps automatically count as correct [to help mark re-loaded attempts as correct]
 // DONE: quizzerator exercise: for correct reloaded attempts, show the last step
+// DONE: quizzerator exercise: if the exercise is complete, don't accept input
+// DONE: quizzerator exercise: accept TAB (the same as ENTER)
+// DONE: quizzerator exercise: pressing ENTER puts "correct" circle in the most-recent place (maybe center it?)

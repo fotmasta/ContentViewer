@@ -14,6 +14,13 @@ else {
 
 //baseURL = "../../../completecourse/";
 
+function decode_tabs (s) {
+	if (s) {
+		s = s.replace(/\\t/g, "\t");
+	}
+	return s;
+}
+
 requirejs.config({
 	baseUrl: baseURL + "js/",
 	paths: {
@@ -787,10 +794,10 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 					switch (step.type) {
 						case "text":
 						case "text_result":
-							var s1 = $("<span>", { class: "prompt", html: props.prompt });
+							var s1 = $("<span>", { class: "prompt" + (props.class ? " " + props.class : ""), html: decode_tabs(props.prompt) });
 							hotspot.append(s1);
 
-							var s1a = $("<span>", {class: "prefill", text: props.prefill});
+							var s1a = $("<span>", {class: "prefill" + (props.class ? " " + props.class : ""), text: decode_tabs(props.prefill)});
 							hotspot.append(s1a);
 
 							var s2 = $("<span>", { class: "entry" + (props.class ? " " + props.class : ""), contenteditable: true, text: props.placeholder });
@@ -2377,7 +2384,16 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 			}
 
 			if (!callbackCalled) {
-				var x = event.pageX, y = event.pageY;
+				var x, y;
+				if (event.pageX) {
+					x = event.pageX;
+					y = event.pageY;
+				} else {
+					var rect = step.find("div.hotspot");
+					var domRect = rect[0].getBoundingClientRect();
+					x = domRect.left + domRect.width * .5;
+					y = domRect.top + domRect.height * .5;
+				}
 				var bigX = q.find(".correctMark");
 				showAndFadeCheckmark(bigX, x, y, callback);
 			}
@@ -2532,13 +2548,21 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 		},
 
 		onClickIncorrectArea: function (event) {
+			var field = $(event.target);
+
+			var q = field.parents(".question");
+
+			if (q.attr("data-correct")) {
+				return;
+			}
+
 			this.showIncorrectSpot(event);
 
 			this.onClickCheck(event);
 		},
 
 		onExerciseKeyDown: function (event) {
-			if (event.keyCode == 13) {
+			if (event.keyCode == 13 || event.keyCode == 9) {
 				this.onExerciseInput(event, true);
 				event.preventDefault();
 			}
@@ -2547,6 +2571,12 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 		onExerciseInput: function (event, checkNow) {
 			var field = $(event.target);
 			var entry = field.text();
+
+			var q = field.parents(".question");
+
+			if (q.attr("data-correct")) {
+				return;
+			}
 
 			var step = field.parents("li.step");
 			var inputstring = step.attr("data-regex");
@@ -2574,8 +2604,6 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 					step.attr("data-correct", true);
 
 					this.saveResponses();
-
-					var q = field.parents(".question");
 
 					this.showCorrectSpot(event, $.proxy(this.advanceToNextExerciseStep, this, q));
 				}

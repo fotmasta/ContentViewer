@@ -366,7 +366,7 @@ ol.quiz-holder {
 					div.hotspot {
 						position: absolute;
 						box-sizing: border-box;
-						overflow-y: hidden;
+						overflow: hidden;
 
 						&.revealed {
 							border: 3px dashed red;
@@ -395,8 +395,10 @@ ol.quiz-holder {
 
 					span.entry {
 						padding-left: .5em;
-						padding-right: 50px;	// give it some width for clicking
+						padding-right: 50px; // give it some width for clicking
+					}
 
+					span.entry, span.prefill, span.prompt {
 						&.textbox-style {
 							font-family: Tahoma, sans-serif;
 							color: black;
@@ -426,6 +428,7 @@ ol.quiz-holder {
 							color: #0cef57;
 							font-family: "Lucida Console", Courier, monospace;
 							font-size: 1.8rem;
+							white-space: pre;
 						}
 					}
 
