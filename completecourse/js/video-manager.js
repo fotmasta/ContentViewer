@@ -745,8 +745,6 @@ define(["bootstrap-dialog", "database", "imagesloaded", "common", "bootstrap-not
 			this.waitingForAutoAdvance = false;
 			this.waitingForIFrameToLoad = false;
 
-			$(".loading-indicator").hide();
-
 			this.onNewContentShowing(iframe);
 		},
 
@@ -755,9 +753,31 @@ define(["bootstrap-dialog", "database", "imagesloaded", "common", "bootstrap-not
 			$("#notes-panel").Notes("showNoteIconsInIframe", iframe);
 		},
 
-		addIFrame: function (params) {
-			$(".loading-indicator").show();
+		showLoading: function (note) {
+			//console.log("+1 " + note);
+			var d = $(".loading-indicator").data("show-count");
+			if (d == undefined) d = 1;
+			else d += 1;
 
+			$(".loading-indicator").data("show-count", d);
+
+			if (d > 0) $(".loading-indicator").show();
+			else $(".loading-indicator").hide();
+		},
+
+		hideLoading: function (note) {
+			//console.log("-1 " + note);
+			var d = $(".loading-indicator").data("show-count");
+			if (d == undefined || d < 0) d = 0;
+			else d -= 1;
+
+			$(".loading-indicator").data("show-count", d);
+
+			if (d > 0) $(".loading-indicator").show();
+			else $(".loading-indicator").hide();
+		},
+
+		addIFrame: function (params) {
 			var src = this.toc[params.index].src;
 
 			if (this.toc[params.index].disabled) {
@@ -846,6 +866,8 @@ define(["bootstrap-dialog", "database", "imagesloaded", "common", "bootstrap-not
 						// scroll to top
 						this.scrollToHash(this.iframe, {}, true);
 					}
+
+					this.showLoading("new content");
 
 					this.addIFrame({
 						index: index,

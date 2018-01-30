@@ -148,10 +148,9 @@ define(["bootstrap-dialog", "imagesloaded", "database", "jquery.ui"], function (
 			this.iframe.removeClass("pdf");
 
 			if (IsWidget(src)) {
-
 				// clear out the old content
 				this.iframe.contents().find("html,body").scrollTop(0);
-				this.iframe.attr("src", "index.html").attr("src", "").height("100%");
+				this.clearContent();
 
 				var widget = ParseWidget(src);
 				this.injectWidget(widget.src, widget.params);
@@ -166,7 +165,7 @@ define(["bootstrap-dialog", "imagesloaded", "database", "jquery.ui"], function (
 		},
 
 		clearContent: function () {
-			this.iframe.attr("src", "index.html").attr("src", "");
+			this.iframe.attr("src", "index.html").attr("src", "").height("100%");
 		},
 
 		sizePDFToFit: function () {
@@ -239,6 +238,8 @@ define(["bootstrap-dialog", "imagesloaded", "database", "jquery.ui"], function (
 		},
 
 		onLoaded: function (event)  {
+			this.options.manager.hideLoading("iframe.onloaded");
+
 			this.addStylesheet();
 
 			this.showSelectedUpdates();
@@ -306,14 +307,17 @@ define(["bootstrap-dialog", "imagesloaded", "database", "jquery.ui"], function (
 
 					// if there's a widget on this page, let it know when it's done loading
 					var me = this;
+					me.options.manager.showLoading("for images loaded");
 					imagesLoaded(this.iframe.contents().find("body"), function () {
 						var widget = me.getWidget();
 						if (widget && widget.onImagesLoaded) widget.onImagesLoaded();
+						me.options.manager.hideLoading("iframe.imagesLoaded");
 					});
 
 					this.options.manager.onIFrameLoaded(me);
 					break;
 				default:    // epub, habitat
+					this.options.manager.showLoading("for images loaded");
 					imagesLoaded(this.iframe.contents().find("body"), $.proxy(this.onIframeContentsLoaded, this));
 
 					break;
@@ -337,6 +341,8 @@ define(["bootstrap-dialog", "imagesloaded", "database", "jquery.ui"], function (
 		},
 
 		onIframeContentsLoaded: function () {
+			this.options.manager.hideLoading("iframe.onIframeContentsLoaded");
+
 			this.sizeToBottom();
 
 			var me = this;
@@ -576,8 +582,9 @@ define(["bootstrap-dialog", "imagesloaded", "database", "jquery.ui"], function (
 
 		injectWidget: function (src, params) {
 			var base = window.getInformITBaseURL();
+			// NOTE: this showLoading may be balanced out by the "load" event; not sure
+			this.options.manager.showLoading("iframe.injectWidget");
 			$.get(base + src, $.proxy(this.onWidgetLoaded, this, { src: src, params: params } ));
-
 		},
 
 		onWidgetLoaded: function (obj, data) {
