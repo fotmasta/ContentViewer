@@ -122,9 +122,9 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 	var correctText = "That's correct!";
 
 	function analytics () {
-		//ga.apply(this, arguments);
+		ga.apply(this, arguments);
 
-		just_log.apply(this, arguments);
+		//just_log.apply(this, arguments);
 	}
 
 	function just_log (a, b, c, d, e) {
@@ -206,6 +206,9 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 			this.onLoadedData(this.options.paramData);
 
 			$(window).on("resize.quizzerator", $.proxy(this.onWindowResize, this));
+
+			var iframe = this.options.iframe.iframe[0], win = iframe.contentWindow, doc = win.document;
+			doc.addEventListener("keydown", $.proxy(this.onWindowKeydown, this));
 		},
 
 		onWindowResize: function () {
@@ -777,7 +780,7 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 
 				var css;
 
-				if ((step.type == "text" || step.type == "text_result") && !step.hotspot) {
+				if ((step.type == "text" || step.type == "text_result" || step.type == "keydown") && !step.hotspot) {
 					// default hotspot
 					css = { left: 20, top: 30, right: 50, bottom: 20 };
 				} else if (step.hotspot) {
@@ -794,26 +797,36 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 					switch (step.type) {
 						case "text":
 						case "text_result":
+						case "keydown":
 							var s1 = $("<span>", { class: "prompt" + (props.class ? " " + props.class : ""), html: decode_tabs(props.prompt) });
 							hotspot.append(s1);
 
-							var s1a = $("<span>", {class: "prefill" + (props.class ? " " + props.class : ""), text: decode_tabs(props.prefill)});
-							hotspot.append(s1a);
+							if (step.type != "keydown") {
+								var s1a = $("<span>", {
+									class: "prefill" + (props.class ? " " + props.class : ""),
+									text: decode_tabs(props.prefill)
+								});
+								hotspot.append(s1a);
 
-							var s2 = $("<span>", { class: "entry" + (props.class ? " " + props.class : ""), contenteditable: true, text: props.placeholder });
-							s2.on("focus", function (event) {
-								$(event.target).siblings(".prefill").addClass("has-focus");
-							});
-							s2.blur(function (event) {
-								$(event.target).siblings(".prefill").removeClass("has-focus");
-								var h = $(event.target).parents(".hotspot");
-								if (h.hasClass("revealed"))
-									me.onExerciseInput(event);
-							});
-							s2.on("input", $.proxy(this.onExerciseInput, this));
-							s2.on("keydown", $.proxy(this.onExerciseKeyDown, this));
+								var s2 = $("<span>", {
+									class: "entry" + (props.class ? " " + props.class : ""),
+									contenteditable: true,
+									text: props.placeholder
+								});
+								s2.on("focus", function (event) {
+									$(event.target).siblings(".prefill").addClass("has-focus");
+								});
+								s2.blur(function (event) {
+									$(event.target).siblings(".prefill").removeClass("has-focus");
+									var h = $(event.target).parents(".hotspot");
+									if (h.hasClass("revealed"))
+										me.onExerciseInput(event);
+								});
+								s2.on("input", $.proxy(this.onExerciseInput, this));
+								s2.on("keydown", $.proxy(this.onExerciseKeyDown, this));
 
-							hotspot.append(s2);
+								hotspot.append(s2);
+							}
 
 							img_div.click(function (event) {
 								if (!$(event.target).hasClass("entry")) {
@@ -1490,8 +1503,9 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 			}
 		},
 
-		onClickCheck: function (event) {
-			var q = $(event.currentTarget).parents(".question");
+		onClickCheck: function (event, q) {
+			if (q == undefined)
+				q = $(event.currentTarget).parents(".question");
 
 			var questionAttempts = q.attr("data-attempts");
 			if (questionAttempts === undefined) {
@@ -1785,7 +1799,7 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 				case "exercise":
 					var type = q.find(".step.current").attr("data-type");
 					q.find(".step.current .hotspot").addClass("revealed");
-					if (type == "text") {
+					if (type == "text" || type == "keydown") {
 						var answer = q.find(".step.current").attr("data-answer");
 						q.find(".step.current span.entry").text(answer).focus();
 						q.find(".btn-reveal").removeClass("btn-danger").addClass("btn-success").text("Go to Next Step");
@@ -2351,17 +2365,33 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 			$(window).off("resize.quizzerator");
 		},
 
-		showIncorrectSpot: function (event) {
-			var x = event.pageX, y = event.pageY;
-			var bigX = $(event.target).parents(".question").find(".incorrectX");
+		showIncorrectSpot: function (event, q) {
+			if (q == undefined)
+				q = $(event.target).parents(".question");
+			var bigX = q.find(".incorrectX");
+
+			var x, y;
+			if (event.pageX) {
+				x = event.pageX;
+				y = event.pageY;
+			} else {
+				var step = q.find("li.step.current");
+				var rect = step.find("div.hotspot");
+				var domRect = rect[0].getBoundingClientRect();
+				x = domRect.left + domRect.width * .5;
+				y = domRect.top + domRect.height * .5;
+			}
+
 			bigX.removeClass("shake fadeOut").hide().addClass("animated shake").css({ left: x, top: y }).show();
 			setTimeout(function () {
 				bigX.addClass("fadeOut");
 			}, 1000);
 		},
 
-		showCorrectSpot: function (event, callback) {
-			var q = $(event.target).parents(".question");
+		showCorrectSpot: function (event, callback, q) {
+			if (q == undefined) {
+				q = $(event.target).parents(".question");
+			}
 			var step = q.find("li.step.current");
 			var nextStep = step.next("li.step");
 
@@ -2565,6 +2595,50 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 			if (event.keyCode == 13 || event.keyCode == 9) {
 				this.onExerciseInput(event, true);
 				event.preventDefault();
+			}
+		},
+
+		onWindowKeydown: function (event) {
+			// NOTE: this won't work if there's more than one 'keydown' step that's current (ie, from multiple questions on a page)
+			var step = this.element.find("li.step.current");
+
+			var q = step.parents(".question");
+
+			if (q.attr("data-correct")) {
+				return;
+			}
+
+			var type = step.attr("data-type");
+			if (type == "keydown" && event.key && event.key.length == 1) {
+				var isCorrect = true;
+				var answers = step.attr("data-answer").split(" ");
+
+				for (var i = 0; i < answers.length; i++) {
+					var answer = answers[i];
+					switch (answer) {
+						case "control":
+							break;
+						default:
+							if (event.key != answer) isCorrect = false;
+					}
+				}
+
+				if (answers.indexOf("control") != -1) {
+					if (!event.ctrlKey) isCorrect = false;
+				} else {
+					if (event.ctrlKey) isCorrect = false;
+				}
+
+				if (isCorrect) {
+					step.attr("data-correct", true);
+
+					this.saveResponses();
+
+					this.showCorrectSpot(event, $.proxy(this.advanceToNextExerciseStep, this, q), q);
+				} else {
+					this.onClickCheck(event, q);
+					this.showIncorrectSpot(event, q);
+				}
 			}
 		},
 

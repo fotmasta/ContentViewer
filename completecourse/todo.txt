@@ -1,3 +1,4 @@
+// TODO: quizzerator: exercises (only?) aren't marked complete in the TOC until you navigate away from the page
 // TODO: quizzerator exercise: allow images to be referenced (ie, reuse "slide3" instead of a new bitmap)
 // TODO: quizzerator exercise: going to a "result" type advances a little too quickly
 // TODO: randomize quizzerator sorting initial order?
@@ -367,3 +368,5 @@
 // DONE: quizzerator exercise: accept TAB (the same as ENTER)
 // DONE: quizzerator exercise: pressing ENTER puts "correct" circle in the most-recent place (maybe center it?)
 // DONE: quizzerator: add a loading message (for those obnoxiously big exercise modules) [doesn't work if starting directly at large-file URL -- because of the page rendering order]
+// DONE: quizzerator exercise: can we do ctrl-c (ie, keypress events)? [yes: keydown]
+// DONE: quizzerator exercise: keydown events don't need a blinking cursor

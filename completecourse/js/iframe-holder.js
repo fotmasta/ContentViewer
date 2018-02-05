@@ -287,8 +287,10 @@ define(["bootstrap-dialog", "imagesloaded", "database", "jquery.ui"], function (
 					// added this back in for Captivates
 					this.iframe.css("min-height", wh - 50);
 
+					/*
 					this.iframe.removeClass("fadeIn animated").hide(0);
 					this.iframe.addClass("fadeIn animated").show(0);
+					*/
 
 					this.iframe[0].contentWindow.addEventListener("moduleReadyEvent", function (evt) {
 						var interfaceObj = evt.Data;
@@ -363,6 +365,7 @@ define(["bootstrap-dialog", "imagesloaded", "database", "jquery.ui"], function (
 
 				this.element.show(0);
 
+				/*
 				// NOTE: I think this was disrupting the render and touch-scrolling of the iframe on iOS (probably because of 3D rendering "optimizations")
 				var is_iOS = /iPad|iPhone|iPod/.test(navigator.platform);
 				if  (!is_iOS) {
@@ -371,6 +374,7 @@ define(["bootstrap-dialog", "imagesloaded", "database", "jquery.ui"], function (
 				} else {
 					this.element.addClass("ios");   // .the-iframe-holder (custom iOS attributes to correct scrolling problems)
 				}
+				*/
 
 				// NOTE: if we're auto-advancing, don't scroll to any hashtags
 

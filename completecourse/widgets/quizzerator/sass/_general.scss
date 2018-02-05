@@ -361,6 +361,7 @@ ol.quiz-holder {
 				div.step {
 					div.image-holder {
 						position: relative;
+						overflow: hidden;
 					}
 
 					div.hotspot {
@@ -429,6 +430,15 @@ ol.quiz-holder {
 							font-family: "Lucida Console", Courier, monospace;
 							font-size: 1.8rem;
 							white-space: pre;
+							line-height: 1rem;
+						}
+
+						&.linux-style {
+							color: #ccc;
+							font-family: Courier, monospace;
+							font-size: 1.3rem;
+							white-space: pre-wrap;
+							line-height: 1rem;
 						}
 					}
 
@@ -466,8 +476,7 @@ ol.quiz-holder {
 					font-family: "FontAwesome";
 					display: inline;
 					position: absolute;
-					top: 0;
-					transform: translateY(75%);
+					top: 2rem;
 					animation: 1s blinkie step-end infinite;
 				}
 			}
