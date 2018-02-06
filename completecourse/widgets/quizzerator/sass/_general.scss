@@ -644,6 +644,7 @@ li.question {
 				vertical-align: top;
 				color: black;
 				border: 1px solid black;
+				white-space: normal;
 
 				&:not(:hover):not(.selected) {
 					background: none;
