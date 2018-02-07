@@ -115,6 +115,11 @@ function removeMatchColors (el) {
 	el.removeClass(s);
 }
 
+function addStamp (hotspot, stamp) {
+	var img = $("<img>", { class: "stamp", src: stamp });
+	hotspot.append(img);
+}
+
 define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jquery.json"], function (database, imagesLoaded) {
 
 	var tryAgainText = "That's not correct. Try a different response.";
@@ -122,9 +127,9 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 	var correctText = "That's correct!";
 
 	function analytics () {
-		ga.apply(this, arguments);
+		//ga.apply(this, arguments);
 
-		//just_log.apply(this, arguments);
+		just_log.apply(this, arguments);
 	}
 
 	function just_log (a, b, c, d, e) {
@@ -736,6 +741,8 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 						r.instructions = line.substr(13).trim();
 					} else if (line.indexOf("auto:") == 0) {
 						r.auto = line.substr(5).trim();
+					} else if (line.indexOf("stamp:") == 0) {
+						r.stamp = line.substr(6).trim();
 					} else {
 						r.answer = line;
 					}
@@ -759,7 +766,7 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 
 				var props = parseExerciseActionField(step.action);
 
-				step_el.attr({ "data-hint": props.hint, "data-answer": props.answer, "data-regex": props.regex, "data-placeholder": props.placeholder, "data-auto": props.auto });
+				step_el.attr({ "data-hint": props.hint, "data-answer": props.answer, "data-regex": props.regex, "data-placeholder": props.placeholder, "data-auto": props.auto, "data-stamp": props.stamp });
 
 				var div = $("<div>", { class: "step" });
 				var lbl = $("<p>", { class: "step-label", html: step.label });
@@ -778,19 +785,46 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 				img.css("max-height", wh);
 				img_div.append(img);
 
-				var css;
+				switch (step.type) {
+					case "text":
+					case "text_result":
+					case "keydown":
+						img_div.click(function (event) {
+							if (!$(event.target).hasClass("entry")) {
+								me.onClickIncorrectArea(event);
+							}
+						});
 
-				if ((step.type == "text" || step.type == "text_result" || step.type == "keydown") && !step.hotspot) {
-					// default hotspot
-					css = { left: 20, top: 30, right: 50, bottom: 20 };
-				} else if (step.hotspot) {
-					var rect = step.hotspot.split(",");
-					css = { left: rect[0] + "px", top: rect[1] + "px", width: rect[2] + "px", height: rect[3] + "px" }
+						img_div[0].oncontextmenu = function (event) {
+							me.onClickIncorrectArea(event);
+							return false;
+						}
+						break;
+
+					default:
+						img_div.click($.proxy(this.onClickIncorrectArea, this));
+						img_div[0].oncontextmenu = function (event) {
+							me.onClickIncorrectArea(event);
+							return false;
+						}
+
+						break;
 				}
 
-				if (css) {
+				var rects = [];
+
+				if ((step.type == "text" || step.type == "text_result" || step.type == "keydown") && !step.hotspot) {
+					rects = ["20,30,50,20"];
+				} else if (step.hotspot) {
+					var rects = step.hotspot.split(";");
+				}
+
+				for (var j = 0; j < rects.length; j++) {
+					var rect = rects[j].split(",");
+					css = { left: rect[0] + "px", top: rect[1] + "px", width: rect[2] + "px", height: rect[3] + "px" }
+
 					hotspot = $("<div>", {class: "hotspot"});
-					hotspot.attr("data-rect", step.hotspot);
+					hotspot.attr("data-rect", rect);
 					hotspot.css(css);
 					img_div.append(hotspot);
 
@@ -828,27 +862,10 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 								hotspot.append(s2);
 							}
 
-							img_div.click(function (event) {
-								if (!$(event.target).hasClass("entry")) {
-									me.onClickIncorrectArea(event);
-								}
-							});
-
-							img_div[0].oncontextmenu = function (event) {
-								me.onClickIncorrectArea(event);
-								return false;
-							}
-
 							break;
 						default:
 							hotspot[0].oncontextmenu = $.proxy(this.onClickHotspot, this);
 							hotspot.click($.proxy(this.onClickHotspot, this));
-
-							img_div.click($.proxy(this.onClickIncorrectArea, this));
-							img_div[0].oncontextmenu = function (event) {
-								me.onClickIncorrectArea(event);
-								return false;
-							}
 
 							break;
 					}
@@ -1277,14 +1294,14 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 			var scale = hotspot.width() / hotspot[0].naturalWidth;
 
 			var rect = hotspot.parent().find("div.hotspot");
-			if (rect.length) {
-				var r = rect.attr("data-rect");
+			rect.each(function (index, this_rect) {
+				var r = $(this_rect).attr("data-rect");
 				if (r) {
 					var r_rect = r.split(",");
-					rect.css({ left: r_rect[0] * scale + "px", top: r_rect[1] * scale + "px", width: r_rect[2] * scale + "px", height: r_rect[3] * scale + "px" });
-					rect.attr("data-scale", scale);
+					$(this_rect).css({ left: r_rect[0] * scale + "px", top: r_rect[1] * scale + "px", width: r_rect[2] * scale + "px", height: r_rect[3] * scale + "px" });
+					$(this_rect).attr("data-scale", scale);
 				}
-			}
+			});
 		},
 
 		redrawHotspots: function () {
@@ -2430,12 +2447,38 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 		},
 
 		onClickHotspot: function (event) {
+
 			var step = $(event.currentTarget).parents("li.step");
 			var type = step.attr("data-type");
 
+			var q = step.parents(".question");
+			if (q.attr("data-correct")) {
+				return;
+			}
+			
 			var correct = false;
 
 			switch (type) {
+				case "clicks":
+					var hotspot = $(event.currentTarget);
+					if (hotspot.attr("data-correct") != "true") {
+						var stamp = step.attr("data-stamp");
+						addStamp(hotspot, stamp);
+
+						hotspot.attr("data-correct", true);
+
+						var hotspots = step.find("div.hotspot");
+						var incorrect = hotspots.filter(function (index, item) {
+							if ($(item).attr("data-correct") != "true") return item;
+						});
+
+						// correct = undefined means: don't show an "incorrect spot"
+						if (incorrect.length == 0) correct = true;
+						else correct = undefined;
+
+						this.showCorrectSpot(event);
+					}
+					break;
 				case "click":
 					if (event.which == 1)
 						correct = true;
@@ -2446,7 +2489,7 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 					break;
 			}
 
-			if (correct) {
+			if (correct == true) {
 				step.attr("data-correct", true);
 
 				this.saveResponses();
@@ -2455,7 +2498,7 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 
 				// advance after short feedback
 				this.showCorrectSpot(event, $.proxy(this.advanceToNextExerciseStep, this, q));
-			} else {
+			} else if (correct == false) {
 				this.showIncorrectSpot(event);
 			}
 
@@ -2541,6 +2584,9 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 			q.find(".btn-reveal").removeClass("btn-success").addClass("btn-danger").text("Reveal Answer");
 
 			var step = q.find("li.step.current");
+
+			step.find("div.hotspot").attr("data-correct", false);
+			step.find("img.stamp").remove();
 
 			var prevStep = step.prev("li.step");
 			q.find(".btn-back").css("display", prevStep.length ? "block" : "none");

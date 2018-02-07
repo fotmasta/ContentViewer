@@ -370,3 +370,4 @@
 // DONE: quizzerator: add a loading message (for those obnoxiously big exercise modules) [doesn't work if starting directly at large-file URL -- because of the page rendering order]
 // DONE: quizzerator exercise: can we do ctrl-c (ie, keypress events)? [yes: keydown]
 // DONE: quizzerator exercise: keydown events don't need a blinking cursor
+// DONE: quizzerator exercise: "clicks" option for multiple hotspots on one slide, with optional "stamp" image

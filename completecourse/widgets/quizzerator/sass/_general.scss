@@ -433,10 +433,18 @@ ol.quiz-holder {
 							line-height: 1rem;
 						}
 
-						&.linux-style {
+						&.dos-style {
 							color: #ccc;
 							font-family: Courier, monospace;
-							font-size: 1.3rem;
+							font-size: 1.2rem;
+							white-space: pre;
+							line-height: 1rem;
+						}
+
+						&.linux-style {
+							color: #fff;
+							font-family: Courier, monospace;
+							font-size: 1rem;
 							white-space: pre-wrap;
 							line-height: 1rem;
 						}
