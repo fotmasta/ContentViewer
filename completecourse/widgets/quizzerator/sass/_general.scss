@@ -368,6 +368,7 @@ ol.quiz-holder {
 						position: absolute;
 						box-sizing: border-box;
 						overflow: hidden;
+						line-height: 1;
 
 						&.revealed {
 							border: 3px dashed red;
@@ -430,7 +431,6 @@ ol.quiz-holder {
 							font-family: "Lucida Console", Courier, monospace;
 							font-size: 1.8rem;
 							white-space: pre;
-							line-height: 1rem;
 						}
 
 						&.dos-style {
@@ -438,7 +438,13 @@ ol.quiz-holder {
 							font-family: Courier, monospace;
 							font-size: 1.2rem;
 							white-space: pre;
-							line-height: 1rem;
+						}
+
+						&.invert-dos-style {
+							color: black;
+							font-family: Courier, monospace;
+							font-size: 1.2rem;
+							white-space: pre;
 						}
 
 						&.linux-style {
@@ -446,7 +452,13 @@ ol.quiz-holder {
 							font-family: Courier, monospace;
 							font-size: 1rem;
 							white-space: pre-wrap;
-							line-height: 1rem;
+						}
+
+						&.vim-style {
+							color: #de654f;
+							font-family: Courier, monospace;
+							font-size: 1rem;
+							white-space: pre;
 						}
 					}
 
