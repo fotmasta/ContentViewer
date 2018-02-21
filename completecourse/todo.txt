@@ -1,3 +1,4 @@
+// TODO: quizzerator: completed exercises aren't always reloading on the last slide [ones without any "result" slides?]
 // TODO: quizzerator: exercises (only?) aren't marked complete in the TOC until you navigate away from the page
 // TODO: quizzerator exercise: allow images to be referenced (ie, reuse "slide3" instead of a new bitmap)
 // TODO: quizzerator exercise: going to a "result" type advances a little too quickly
@@ -371,3 +372,6 @@
 // DONE: quizzerator exercise: can we do ctrl-c (ie, keypress events)? [yes: keydown]
 // DONE: quizzerator exercise: keydown events don't need a blinking cursor
 // DONE: quizzerator exercise: "clicks" option for multiple hotspots on one slide, with optional "stamp" image
+// DONE: quizzerator exercise: spacing needs to be worked out for console prompts (or no-padding option?) [got rid of right-trim]
+// DONE: quizzerator exercise: cursor isn't in the right place for multi-line prompts [seemed to work ok with cursor @ .entry, whereas it didn't before?]
+// DONE: quizzerator exercise: can't type in text fields without text near left edge? [switched .entry from inline to inline-block; which causes some wrapping glitches with long lines, but oh well]

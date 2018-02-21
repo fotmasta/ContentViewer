@@ -386,21 +386,29 @@ ol.quiz-holder {
 					span.prompt {
 						user-select: none;
 						cursor: default;
+
+						/*
+						&:not(:empty) {
+							padding-right: .5em;
+						}
+						*/
 					}
 
 					span.prefill {
 
 						&:not(:empty) {
-							padding-left: .5em;
+							/*padding-left: .5em;*/
 						}
 					}
 
 					span.entry {
-						padding-left: .5em;
+						/*padding-left: .5em;*/
 						padding-right: 50px; // give it some width for clicking
+						position: relative;
+						display: inline-block;
 					}
 
-					span.entry, span.prefill, span.prompt {
+					span.entry, span.prefill, span.prompt, span.postfill {
 						&.textbox-style {
 							font-family: Tahoma, sans-serif;
 							color: black;
@@ -430,6 +438,13 @@ ol.quiz-holder {
 							color: #0cef57;
 							font-family: "Lucida Console", Courier, monospace;
 							font-size: 1.8rem;
+							white-space: pre;
+						}
+
+						&.console-style-smaller {
+							color: #0cef57;
+							font-family: "Lucida Console", Courier, monospace;
+							font-size: 1.2rem;
 							white-space: pre;
 						}
 
@@ -489,14 +504,14 @@ ol.quiz-holder {
 		}
 
 		&:not([data-correct=true]) {
-			span.prefill {
+			span.entry {
 				// NOTE: placed icon pointer here because when it was on span.entry it somehow blocked the text cursor
 				&:not(.has-focus):after {
 					content: "\f062";
 					font-family: "FontAwesome";
 					display: inline;
 					position: absolute;
-					top: 2rem;
+					top: 1.5rem;
 					animation: 1s blinkie step-end infinite;
 				}
 			}

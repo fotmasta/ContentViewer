@@ -120,6 +120,15 @@ function addStamp (hotspot, stamp) {
 	hotspot.append(img);
 }
 
+function left_trim (s) {
+	for (var i = 0; i < s.length; i++) {
+		if (s.charCodeAt(i) == 32)
+			continue;
+		else
+			return s.substr(i);
+	}
+}
+
 define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jquery.json"], function (database, imagesLoaded) {
 
 	var tryAgainText = "That's not correct. Try a different response.";
@@ -127,9 +136,11 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 	var correctText = "That's correct!";
 
 	function analytics () {
-		//ga.apply(this, arguments);
-
-		just_log.apply(this, arguments);
+		if (window.location.hostname == "localhost") {
+			just_log.apply(this, arguments);
+		} else {
+			ga.apply(this, arguments);
+		}
 	}
 
 	function just_log (a, b, c, d, e) {
@@ -726,7 +737,7 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 				for (var i = 0; i < lines.length; i++) {
 					var line = lines[i];
 					if (line.indexOf("prompt:") == 0) {
-						r.prompt = line.substr(7).trim();
+						r.prompt = left_trim(line.substr(7));
 					} else if (line.indexOf("prefill:") == 0) {
 						r.prefill = line.substr(8).trim();
 					} else if (line.indexOf("hint:") == 0) {
@@ -743,6 +754,8 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 						r.auto = line.substr(5).trim();
 					} else if (line.indexOf("stamp:") == 0) {
 						r.stamp = line.substr(6).trim();
+					} else if (line.indexOf("post:") == 0) {
+						r.postfill = line.substr(5).trim();
 					} else {
 						r.answer = line;
 					}
@@ -849,9 +862,11 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 								});
 								s2.on("focus", function (event) {
 									$(event.target).siblings(".prefill").addClass("has-focus");
+									$(event.target).addClass("has-focus");
 								});
 								s2.blur(function (event) {
 									$(event.target).siblings(".prefill").removeClass("has-focus");
+									$(event.target).removeClass("has-focus");
 									var h = $(event.target).parents(".hotspot");
 									if (h.hasClass("revealed"))
 										me.onExerciseInput(event);
@@ -860,6 +875,11 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 								s2.on("keydown", $.proxy(this.onExerciseKeyDown, this));
 
 								hotspot.append(s2);
+							}
+
+							if (props.postfill) {
+								var s3 = $("<span>", { class: "postfill" + (props.class ? " " + props.class : ""), html: decode_tabs(props.postfill) });
+								hotspot.append(s3);
 							}
 
 							break;
@@ -1946,6 +1966,7 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 					q.find(".hidden-answer").addClass("hidden");
 					break;
 				case "exercise":
+					q.find("li.step").attr("data-correct", null);
 					q.find("li.step.current").removeClass("current");
 					q.find("li.step").eq(0).addClass("current");
 
@@ -2455,7 +2476,7 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 			if (q.attr("data-correct")) {
 				return;
 			}
-			
+
 			var correct = false;
 
 			switch (type) {
@@ -2698,7 +2719,8 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 				return;
 			}
 
-			var step = field.parents("li.step");
+			//var step = field.parents("li.step");
+			var step = q.find("li.step.current");
 			var inputstring = step.attr("data-regex");
 			var answer = step.attr("data-answer");
 
