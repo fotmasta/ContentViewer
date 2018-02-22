@@ -765,6 +765,8 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 			}
 
 			for (var i = 0; i < q_params.steps.length; i++) {
+				var isConsoleType = false;
+				var css = {};
 				var step = q_params.steps[i];
 				var step_el = $("<li>", { class: "step" });
 				if (i == 0) {
@@ -788,15 +790,17 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 				var img_div = $("<div>", { class: "image-holder" });
 
 				if (step.image && step.image.substr(0, 7) == "console") {
-					step.image = baseURL + "css/images/console.png";
+					css.padding = "5px";
+					img_div.css("background-image", "url(" + baseURL + "css/images/console.png" + ")");
+					isConsoleType = true;
+				} else {
+					var img = $("<img>", {class: "hotspot", src: step.image});
+
+					//img[0].oncontextmenu = function () { return false; };
+
+					img.css("max-height", wh);
+					img_div.append(img);
 				}
-
-				var img = $("<img>", { class: "hotspot", src: step.image });
-
-				//img[0].oncontextmenu = function () { return false; };
-
-				img.css("max-height", wh);
-				img_div.append(img);
 
 				switch (step.type) {
 					case "text":
@@ -834,7 +838,14 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 
 				for (var j = 0; j < rects.length; j++) {
 					var rect = rects[j].split(",");
-					css = { left: rect[0] + "px", top: rect[1] + "px", width: rect[2] + "px", height: rect[3] + "px" }
+					if (isConsoleType) {
+						// size to fit text
+						css.minWidth = rect[2] + "px", css.minHeight = rect[3] + "px";
+						css.position = "relative";
+					} else {
+						css.left = rect[0] + "px", css.top = rect[1] + "px", css.width = rect[2] + "px", css.height = rect[3] + "px";
+						css.position = "absolute";
+					}
 
 					hotspot = $("<div>", {class: "hotspot"});
 					hotspot.attr("data-rect", rect);
@@ -1541,6 +1552,8 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 		},
 
 		onClickCheck: function (event, q) {
+			this.redrawHotspots();
+
 			if (q == undefined)
 				q = $(event.currentTarget).parents(".question");
 
@@ -1873,7 +1886,13 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 			var index = q.attr("data-index");
 
 			if ($(event.currentTarget).text() == "Go to Next Step") {
-				this.advanceToNextExerciseStep(q);
+				var step = q.find("li.step.current");
+				var autoAdvance = step.attr("data-auto");
+				if (!autoAdvance) {
+					this.advanceCorrectly(event, step)
+				} else {
+					// losing focus should be enough to advance us past "auto" sections (unless the user has inadvertently edited the "correct" response)
+				}
 			} else {
 				this.revealAnswer(q, index);
 
@@ -2511,14 +2530,7 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 			}
 
 			if (correct == true) {
-				step.attr("data-correct", true);
-
-				this.saveResponses();
-
-				var q = step.parents(".question");
-
-				// advance after short feedback
-				this.showCorrectSpot(event, $.proxy(this.advanceToNextExerciseStep, this, q));
+				this.advanceCorrectly(event, step);
 			} else if (correct == false) {
 				this.showIncorrectSpot(event);
 			}
@@ -2526,6 +2538,17 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 			event.stopImmediatePropagation();
 
 			return false;
+		},
+
+		advanceCorrectly: function (event, step) {
+			step.attr("data-correct", true);
+
+			this.saveResponses();
+
+			var q = step.parents(".question");
+
+			// advance after short feedback
+			this.showCorrectSpot(event, $.proxy(this.advanceToNextExerciseStep, this, q));
 		},
 
 		backToPreviousExerciseStep: function (q) {
@@ -2580,6 +2603,7 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 				if (delay)  {
 					var me = this;
 					setTimeout(function () {
+						nextStep.attr("data-correct", true);
 						me.advanceToNextExerciseStep(q);
 					}, delay);
 				}
@@ -2641,7 +2665,7 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 			}, 0);
 
 			// leave room for biggest image (plus padding/round border):
-			q.find(".answers-holder").height(max + 10);
+			q.find(".answers-holder").height(max + 20);
 		},
 
 		onClickIncorrectArea: function (event) {
@@ -2697,11 +2721,7 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 				}
 
 				if (isCorrect) {
-					step.attr("data-correct", true);
-
-					this.saveResponses();
-
-					this.showCorrectSpot(event, $.proxy(this.advanceToNextExerciseStep, this, q), q);
+					this.advanceCorrectly(event, step);
 				} else {
 					this.onClickCheck(event, q);
 					this.showIncorrectSpot(event, q);
@@ -2711,6 +2731,11 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 
 		onExerciseInput: function (event, checkNow) {
 			var field = $(event.target);
+
+			// doesn't count if there's input on a non-current step (ie, advancing with a "next" button)
+			if (!field.parents("li.step").hasClass("current"))
+				return;
+
 			var entry = field.text();
 
 			var q = field.parents(".question");
@@ -2743,11 +2768,7 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 
 			if (checkNow || advanceWithoutReturn) {
 				if (isCorrect) {
-					step.attr("data-correct", true);
-
-					this.saveResponses();
-
-					this.showCorrectSpot(event, $.proxy(this.advanceToNextExerciseStep, this, q));
+					this.advanceCorrectly(event, step);
 				}
 			}
 
