@@ -376,3 +376,4 @@
 // DONE: quizzerator exercise: can't type in text fields without text near left edge? [switched .entry from inline to inline-block; which causes some wrapping glitches with long lines, but oh well]
 // DONE: quizzerator: "go to next" is skipping steps (because of the timer from the checkmark)
 // DONE: quizzerator: completed exercises aren't always reloading on the last slide [ones with results on the last slide + ones with "auto" steps advancing too far with "Goto Next" button]
+// DONE: quizzerator exercises: redo the "correct spot" logic

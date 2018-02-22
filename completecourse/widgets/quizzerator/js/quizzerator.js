@@ -2454,6 +2454,28 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 
 			var callbackCalled = false;
 
+			var x, y;
+
+			var type = step.attr("data-type");
+			switch (type) {
+				case "text":
+				case "text_result":
+					var domRect = step.find("span.entry")[0].getBoundingClientRect();
+					x = domRect.left + domRect.width * .5;
+					y = domRect.top + domRect.height * .5;
+					break;
+				case "click":
+				case "right-click":
+				case "clicks":
+				case "result":
+				case "keydown":
+					var rect = step.find("div.hotspot");
+					var domRect = rect[0].getBoundingClientRect();
+					x = domRect.left + domRect.width * .5;
+					y = domRect.top + domRect.height * .5;
+					break;
+			}
+
 			if (nextStep.length) {
 				// if the next step is a "result" (ie, no action required), show it now before the checkmark animation
 				var nextSlideType = nextStep.eq(0).attr("data-type");
@@ -2462,7 +2484,6 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 						callbackCalled = true;
 						callback();
 						setTimeout(function () {
-							var x = event.pageX, y = event.pageY;
 							var bigX = q.find(".correctMark");
 							showAndFadeCheckmark(bigX, x, y);
 						}, 350);
@@ -2471,16 +2492,6 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 			}
 
 			if (!callbackCalled) {
-				var x, y;
-				if (event.pageX) {
-					x = event.pageX;
-					y = event.pageY;
-				} else {
-					var rect = step.find("div.hotspot");
-					var domRect = rect[0].getBoundingClientRect();
-					x = domRect.left + domRect.width * .5;
-					y = domRect.top + domRect.height * .5;
-				}
 				var bigX = q.find(".correctMark");
 				showAndFadeCheckmark(bigX, x, y, callback);
 			}
