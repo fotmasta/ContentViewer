@@ -337,6 +337,21 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 			}
 		},
 
+		parseOptions: function (q, elString) {
+			var regex = /(\/\/.*\n)/;
+			var match = elString.match(regex);
+			if (match) {
+				var opt = match[0];
+
+				if (opt.substr(0, 9) === "// class:") {
+					var klass = opt.substr(10);
+					q.addClass(klass);
+				}
+				elString = elString.replace(regex, "");
+			}
+			return elString;
+		},
+
 		addQuestion: function (q_params) {
 			var n = this.element.find(".quiz-holder li.question").length;
 
@@ -349,7 +364,9 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 			var q = $("<li>", {class: classes, "data-number": (n + 1) + "." });
 			q.attr("data-index", q_params.index);
 
-			var p_question = $("<p>", {class: "description", html: q_params.q});
+			var htmlString = this.parseOptions(q, q_params.q)
+
+			var p_question = $("<p>", {class: "description", html: htmlString});
 
 			var me = this;
 

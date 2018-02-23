@@ -770,6 +770,13 @@ li.question {
 		font-size: small;
 		font-style: italic;
 	}
+
+	&.no-labels {
+		ol.answers-holder {
+			display: flex;
+			list-style-type: none;
+		}
+	}
 }
 
 .sorting-container {
