@@ -337,20 +337,42 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 			}
 		},
 
+		// look for options in the question string (format: // ....)
+		// class: no-labels
+		// preamble: line of text
 		parseOptions: function (q, elString) {
-			var regex = /(\/\/.*\n)/;
-			var match = elString.match(regex);
-			if (match) {
-				var opt = match[0];
+			var regex = /(\/\/.*\n)/g;
+			var matches;
+			while ((matches = regex.exec(elString)) !== null) {
+				var opt = matches[0];
 
 				if (opt.substr(0, 9) === "// class:") {
 					var klass = opt.substr(10);
 					q.addClass(klass);
+				} else if (opt.substr(0, 12) === "// preamble:") {
+					var preamble = $("<p>", { html: opt.substr(13) });
+					this.addPathToImages(preamble);
+					this.element.find(".quiz-holder").append(preamble);
 				}
-				elString = elString.replace(regex, "");
 			}
+			elString = elString.replace(regex, "");
 			return elString;
 		},
+
+		addPathToImages: function (el) {
+			var me = this;
+
+			// add paths to the images (unless they're data URIs)
+			el.find("img").each(function () {
+				var img = $(this);
+				var src = img.attr("src");
+				if (src && src.indexOf("data:image/") == -1) {
+					var path = me.options.path + "/" + src;
+					img.attr("src", path);
+				}
+			});
+		},
+
 
 		addQuestion: function (q_params) {
 			var n = this.element.find(".quiz-holder li.question").length;
@@ -368,17 +390,7 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 
 			var p_question = $("<p>", {class: "description", html: htmlString});
 
-			var me = this;
-
-			// add paths to the images (unless they're data URIs)
-			p_question.find("img").each(function () {
-				var img = $(this);
-				var src = img.attr("src");
-				if (src && src.indexOf("data:image/") == -1) {
-					var path = me.options.path + "/" + src;
-					img.attr("src", path);
-				}
-			});
+			this.addPathToImages(p_question);
 
 			q.append(p_question);
 
