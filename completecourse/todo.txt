@@ -379,3 +379,6 @@
 // DONE: quizzerator exercises: redo the "correct spot" logic
 // DONE: quizzerator quiz: unlabeled row: display: flex; flex-wrap: nowrap; list-style-type: none [// class: no-labels]
 // DONE: quizzerator quiz: add an option for ""// preamble" for text that comes before the first question
+// DONE: quizzerator sorting: obey "randomize answers" option
+// DONE: reloading quizzerator sorting doesn't work
+// DONE: quizzerator quiz: checkmark for no-labels should come below, I think

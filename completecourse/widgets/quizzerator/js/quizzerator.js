@@ -341,21 +341,23 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 		// class: no-labels
 		// preamble: line of text
 		parseOptions: function (q, elString) {
-			var regex = /(\/\/.*\n)/g;
-			var matches;
-			while ((matches = regex.exec(elString)) !== null) {
-				var opt = matches[0];
+			if (elString) {
+				var regex = /(\/\/.*\n)/g;
+				var matches;
+				while ((matches = regex.exec(elString)) !== null) {
+					var opt = matches[0];
 
-				if (opt.substr(0, 9) === "// class:") {
-					var klass = opt.substr(10);
-					q.addClass(klass);
-				} else if (opt.substr(0, 12) === "// preamble:") {
-					var preamble = $("<p>", { html: opt.substr(13) });
-					this.addPathToImages(preamble);
-					this.element.find(".quiz-holder").append(preamble);
+					if (opt.substr(0, 9) === "// class:") {
+						var klass = opt.substr(10);
+						q.addClass(klass);
+					} else if (opt.substr(0, 12) === "// preamble:") {
+						var preamble = $("<p>", {html: opt.substr(13)});
+						this.addPathToImages(preamble);
+						this.element.find(".quiz-holder").append(preamble);
+					}
 				}
+				elString = elString.replace(regex, "");
 			}
-			elString = elString.replace(regex, "");
 			return elString;
 		},
 
@@ -967,6 +969,7 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 			for (var i = 0; i < q_params.steps.length; i++) {
 				availableAnswers.push(i + 1);
 				var step = q_params.steps[i];
+				step.initialIndex = i;
 				if (step.order === "") {
 					numIgnored++;
 				}
@@ -1027,6 +1030,12 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 						saveProgress(q);
 					}, 100);
 				}, 250);
+			}
+
+			if (this.options.settings.randomizeResponses) {
+				q_params.steps = q_params.steps.sort(function () {
+					return Math.round(Math.random()) - 0.5;
+				});
 			}
 
 			for (var each in q_params.steps) {
@@ -1116,7 +1125,7 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 				var icon_incorrect = $("<i>", {class: "icon incorrect fa fa-2x fa-times hidden"});
 				icons.append(icon_incorrect);
 
-				li.attr( { "data-index": each, "data-order": step.order } );
+				li.attr( { "data-index": step.initialIndex, "data-order": step.order } );
 
 				steps.append(li);
 			}
@@ -1130,6 +1139,7 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 
 		onChangedSorting: function (event) {
 			var q = $(event.target).parents(".question");
+			q.attr("data-changed", true);
 			this.showCheckButton(q, true);
 			this.updateAndSave(q, false);
 		},
@@ -2024,14 +2034,21 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 					q.find("li.step.ignored").removeClass("ignored");
 					// put back in index order
 					var steps = q.find("li.step");
-					steps.sort(function (a,b) {
-						var keyA = $(a).attr("data-index");
-						var keyB = $(b).attr("data-index");
 
-						if (keyA < keyB) return -1;
-						if (keyA > keyB) return 1;
-						return 0;
-					});
+					if (this.options.settings.randomizeResponses) {
+						steps.sort(function () {
+							return Math.round(Math.random()) - 0.5;
+						});
+					} else {
+						steps.sort(function (a, b) {
+							var keyA = $(a).attr("data-index");
+							var keyB = $(b).attr("data-index");
+
+							if (keyA < keyB) return -1;
+							if (keyA > keyB) return 1;
+							return 0;
+						});
+					}
 					var stepHolder = q.find(".steps-holder");
 					$.each(steps, function (index, li) {
 						stepHolder.append(li);
@@ -2288,10 +2305,13 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 					return correct;
 					break;
 				case "sorting":
-					var steps = q.find("li.step");
-					var order = $.map(steps, function (item, index) {
-						return [$(item).attr("data-index"), $(item).hasClass("ignored")];
-					});
+					var order = [];
+					if (q.attr("data-changed")) {
+						var steps = q.find("li.step");
+						order = $.map(steps, function (item, index) {
+							return [$(item).attr("data-index"), $(item).hasClass("ignored")];
+						});
+					}
 					return order;
 					break;
 			}

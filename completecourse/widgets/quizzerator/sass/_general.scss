@@ -682,6 +682,7 @@ li.question {
 				color: black;
 				border: 1px solid black;
 				white-space: normal;
+				text-align: left;
 
 				&:not(:hover):not(.selected) {
 					background: none;
@@ -775,6 +776,28 @@ li.question {
 		ol.answers-holder {
 			display: flex;
 			list-style-type: none;
+
+			button.response {
+				text-align: center;
+			}
+
+			li.answer {
+				display: flex;
+				flex-direction: column;
+
+				.icons {
+					position: relative;
+					height: auto;
+					top: 10px;
+					left: auto;
+					order: 2;
+
+					.icon {
+						display: block;
+						text-align: center;
+					}
+				}
+			}
 		}
 	}
 }
