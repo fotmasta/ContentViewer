@@ -237,6 +237,7 @@ define(["database", "jquery.ui", "bootstrap-confirmation"], function (Database) 
 
 				//row.append($("<td>", {text: isbn}))
 				row
+					.append($("<td>", {text: isbn}))
 					.append($("<td>", {text: dateFormatted}))
 					.append($("<td>", {text: rec.category}))
 					.append($("<td>", {text: rec.parent ? "reply" : "" }))

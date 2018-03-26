@@ -273,6 +273,8 @@ define(["bootstrap-dialog", "imagesloaded", "database", "jquery.ui"], function (
 
 			var allVideos = this.iframe.contents().find("video");
 			allVideos.attr("crossorigin", "anonymous");
+			allVideos.attr("oncontextmenu", "return false");
+			allVideos.attr("controlsList", "nodownload");
 			allVideos.on("play", $.proxy(this.onVideoPlay, this));
 			allVideos.on("ended", $.proxy(this.onVideoEnd, this));
 			allVideos.on("timeupdate", $.proxy(this.onVideoTimeUpdate, this));

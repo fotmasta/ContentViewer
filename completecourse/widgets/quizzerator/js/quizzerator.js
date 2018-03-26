@@ -1201,7 +1201,7 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 		},
 
 		onClickChoice1: function (event) {
-			var el = $(event.target);
+			var el = $(event.currentTarget);
 
 			this.clickChoice1(el);
 
@@ -1226,7 +1226,7 @@ define(["database", "imagesloaded", "highlight", "jquery.ui", "bootstrap", "jque
 		},
 
 		onClickChoice2: function (event) {
-			var el = $(event.target);
+			var el = $(event.currentTarget);
 
 			this.clickChoice2(el);
 
